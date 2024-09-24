@@ -49,16 +49,16 @@ namespace BACK_END.Services.Repositories
                 var user = new IdentityUser { UserName = model.Username, Email = model.Email };
 
                 var result = await _userManager.CreateAsync(user, model.Password);
-                int countAddRole = 0;
+                int countAddRoleAndUser = 0;
                 if (result.Succeeded)
                 {
                     var resultRole = await _userManager.AddToRoleAsync(user, model.Role);
                     if (resultRole.Succeeded)
                     {
-                        countAddRole++;
+                        countAddRoleAndUser++;
                     }
                 }
-                if (countAddRole > 0)
+                if (countAddRoleAndUser > 0)
                 {
                     return "User registered successfully!";
                 } else
