@@ -87,7 +87,7 @@ namespace BACK_END.Services.Repositories
                         Email = model.Email ?? "",
                         Password = model.MatKhau ?? "",
                         PhoneNumber = model.SoDienThoai ?? "",
-                        Role = "Staff"
+                        Role = "Customer"
                     };
                     var resultRegister = await RegisterAsync(RegisterDto);
                     if (resultRegister != "Thêm tài khoản vào IdentityUser thành công.")
