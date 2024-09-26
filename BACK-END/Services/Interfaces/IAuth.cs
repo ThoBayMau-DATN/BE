@@ -9,5 +9,6 @@ namespace BACK_END.Services.Interfaces
         Task<string> DangKyUser(DangKyUserDto model);
         Task<bool> CheckEmail(string email);
         Task<bool> CheckSDT(string sdt);
+        Task<DangNhapRepository?> DangNhap(string email);
     }
 }
