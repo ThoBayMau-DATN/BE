@@ -13,8 +13,17 @@ builder.Services.AddDbContext<BACK_ENDContext>(options =>
 builder.Services.AddServices();
 
 // Add Identity services
-builder.Services.AddIdentity <IdentityUser, IdentityRole>()
+builder.Services.AddIdentity <IdentityUser, IdentityRole>(options =>
+{
+    options.Password.RequireDigit = true;
+    options.Password.RequiredLength = 6;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireLowercase = true;
+    options.Password.RequiredUniqueChars = 1;
+})
     .AddEntityFrameworkStores<BACK_ENDContext>()
+    .AddErrorDescriber<CustomIdentityErrorDescriber>()
     .AddDefaultTokenProviders();
 
 // Configure JWT Authentication
