@@ -11,7 +11,7 @@ builder.Services.AddDbContext<BACK_ENDContext>(options =>
 builder.Services.AddServices();
 
 // Add Identity services
-builder.Services.AddIdentity <IdentityUser, IdentityRole>(options =>
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {
     options.Password.RequireDigit = true;
     options.Password.RequiredLength = 6;
@@ -50,6 +50,8 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddMemoryCache(); // su dung cache
 
 var MyCors = "_APP-CORS"; // => Config name cors
 // setting cors
