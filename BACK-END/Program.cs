@@ -1,11 +1,9 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using BACK_END.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using BACK_END.Models;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<BACK_ENDContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("BACK_ENDContext") ?? throw new InvalidOperationException("Connection string 'BACK_ENDContext' not found.")));
@@ -55,14 +53,26 @@ builder.Services.AddSwaggerGen();
 
 var MyCors = "_APP-CORS"; // => Config name cors
 // setting cors
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy(name: MyCors,
+//                      policy =>
+//                      {
+//                          policy.WithOrigins("*");
+//                          policy.WithMethods("*");
+//                          policy.WithHeaders("*");
+//                      });
+//});
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: MyCors,
                       policy =>
                       {
-                          policy.WithOrigins("*");
-                          policy.WithMethods("*");
-                          policy.WithHeaders("*");
+                          policy.WithOrigins("http://localhost:5173")
+                                .AllowAnyHeader()
+                                .AllowAnyMethod()
+                                .AllowCredentials();
                       });
 });
 
@@ -92,7 +102,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseCors(MyCors);
 app.UseAuthentication();
 app.UseAuthorization();
 
