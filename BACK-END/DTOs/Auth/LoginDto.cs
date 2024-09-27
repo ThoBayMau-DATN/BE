@@ -1,8 +1,12 @@
-﻿namespace BACK_END.DTOs.Auth
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace BACK_END.DTOs.Auth
 {
     public class LoginDto
     {
-        public string Username { get; set; } = string.Empty;
+        [Required(ErrorMessage = "Email không được để trống.")]
+        public string Email { get; set; } = string.Empty;
+        [Required(ErrorMessage = "Password không được để trống.")]
         public string Password { get; set; } = string.Empty;
     }
 }
