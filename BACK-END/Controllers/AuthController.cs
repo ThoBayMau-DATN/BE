@@ -5,6 +5,9 @@ using BACK_END.Services.MyServices;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.DotNet.Scaffolding.Shared.Messaging;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
+using System.Net.Mail;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace BACK_END.Controllers
@@ -26,7 +29,8 @@ namespace BACK_END.Controllers
             {
                 var result = await _auth.RegisterAsync(model);
                 return Ok(result);
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
@@ -40,10 +44,11 @@ namespace BACK_END.Controllers
                 var token = await _auth.LoginAsync(model);
                 if (token != null)
                 {
-                    return Ok( new { Token = token });
+                    return Ok(new { Token = token });
                 }
                 return Unauthorized();
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
@@ -86,12 +91,13 @@ namespace BACK_END.Controllers
             {
                 var result = await _auth.DangKyUser(model);
                 return Ok(result);
-            } catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred while registering staff.");
                 return StatusCode(500, "Đã xảy ra lỗi khi đăng ký tài khoản.");
             }
-            
+
         }
         [HttpGet("dang-nhap")]
         public async Task<IActionResult> DangNhap(LoginDto model)
@@ -142,6 +148,104 @@ namespace BACK_END.Controllers
                 },
                 Errors = null
             });
+        }
+
+        [HttpPost("senderOtpToEmail")]
+        public async Task<IActionResult> SenderOtpToEmail([FromBody] ForgetPassword model)
+        {
+            try
+            {
+                string res = await _auth.SenderEmailOtp(model);
+
+                if (string.IsNullOrEmpty(res))
+                {
+                    return BadRequest("Không thể gửi OTP, vui lòng thử lại.");
+                }
+
+                return Ok(res);
+            }
+            catch (ArgumentNullException ex)
+            {
+                return BadRequest($"ArgumentNullException: {ex.Message}");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(500, $"InvalidOperationException: {ex.Message}");
+            }
+            catch (FileNotFoundException ex)
+            {
+                return StatusCode(500, $"FileNotFoundException: {ex.Message}");
+            }
+            catch (SmtpException ex)
+            {
+                return StatusCode(500, "SmtpException: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Exception: {ex.Message}");
+            }
+        }
+
+        [HttpPost("checkOtp")]
+        public IActionResult CheckOtp(string otp)
+        {
+            try
+            {
+                bool res = _auth.CheckOtp(otp);
+                return Ok(res);
+            }
+            catch (ArgumentNullException ex)
+            {
+                return BadRequest($"ArgumentNullException: {ex.Message}");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(500, $"InvalidOperationException: {ex.Message}");
+            }
+            catch (FileNotFoundException ex)
+            {
+                return StatusCode(500, $"FileNotFoundException: {ex.Message}");
+            }
+            catch (SmtpException ex)
+            {
+                return StatusCode(500, "SmtpException: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Exception: {ex.Message}");
+            }
+        }
+
+        [HttpPost("changePassword")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePassWord model)
+        {
+
+            try
+            {
+                bool res = await _auth.ChangePassword(model);
+
+                return Ok(res);
+            }
+            catch (ArgumentNullException ex)
+            {
+                return BadRequest($"ArgumentNullException: {ex.Message}");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(500, $"InvalidOperationException: {ex.Message}");
+            }
+            catch (FileNotFoundException ex)
+            {
+                return StatusCode(500, $"FileNotFoundException: {ex.Message}");
+            }
+            catch (SmtpException ex)
+            {
+                return StatusCode(500, "SmtpException: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Exception: {ex.Message}");
+            }
         }
     }
 }
