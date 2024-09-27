@@ -51,6 +51,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddMemoryCache(); // su dung cache
+
 var MyCors = "_APP-CORS"; // => Config name cors
 // setting cors
 //builder.Services.AddCors(options =>

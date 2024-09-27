@@ -1,0 +1,11 @@
+@import './components/theme/theme.scss';
+
+.App {
+  min-height: 100vh;
+}
+
+.dark-mode,
+.light-mode {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}

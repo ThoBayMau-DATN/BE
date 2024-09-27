@@ -10,5 +10,11 @@ namespace BACK_END.Services.Interfaces
         Task<bool> CheckEmail(string email);
         Task<bool> CheckSDT(string sdt);
         Task<DangNhapRepository?> DangNhap(string email);
+
+        Task<string> SenderEmailOtp(ForgetPassword model);
+
+        Task<bool> ChangePassword(ChangePassWord model);
+
+        bool CheckOtp(string model);
     }
 }

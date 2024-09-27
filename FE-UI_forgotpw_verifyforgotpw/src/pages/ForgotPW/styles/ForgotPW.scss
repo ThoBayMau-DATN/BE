@@ -1,0 +1,43 @@
+
+.btn-color{
+     background-color: #2b7378;
+    }
+
+    .btn-color:hover,
+    .btn-color:active,
+    .btn-color:focus {
+      background-color: #28777ce8;
+    }
+.heightinput-60 {
+     height: 60px;
+}
+.color-sdt{
+     color: #0B1A46;
+     font-weight: 500;
+}
+.color-pla::placeholder, .color-xam , .boder-color {
+     color: #7B85A2;
+     opacity: 1; /* Đảm bảo màu sắc hiển thị rõ ràng */
+   }
+.dangky-color{
+     color: #138086;
+     opacity: 1;
+     text-decoration: none;
+}
+.h2-QMK{
+     font-size: 48px;
+     font-weight: 600;
+}
+.input-xacminh{
+     height: 71px;
+     width: 71px;
+     font-size: 30px;
+     font-weight: 400;
+}
+.time-text{
+     color: #FF6584;
+}
+.icon-password{
+     position: absolute;     
+     padding-right: 1%;
+};
