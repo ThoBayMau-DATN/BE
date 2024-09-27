@@ -1,5 +1,6 @@
 ﻿using BACK_END.Data;
 using BACK_END.DTOs.Auth;
+using BACK_END.Mappers;
 using BACK_END.Models;
 using BACK_END.Services.Interfaces;
 using BACK_END.Services.MyServices;
@@ -116,11 +117,27 @@ namespace BACK_END.Services.Repositories
             
         }
 
+        public async Task<DangNhapRepository?> DangNhap(string email)
+        {
+            try
+            {
+                var nguoiDung = await _db.NguoiDung.FirstOrDefaultAsync(x => x.Email == email);
+                if (nguoiDung != null)
+                {
+                    return nguoiDung.MapToDangNhapRepository();
+                }
+                return null;
+            } catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
         public async Task<string> LoginAsync(LoginDto model)
         {
             try
             {
-                var user = await _userManager.FindByNameAsync(model.Username);
+                var user = await _userManager.FindByEmailAsync(model.Email);
                 if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
                 {
                     var token = await _tokenService.GenerateTokenAsync(user);

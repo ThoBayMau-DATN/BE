@@ -53,6 +53,19 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+var MyCors = "_APP-CORS"; // => Config name cors
+// setting cors
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyCors,
+                      policy =>
+                      {
+                          policy.WithOrigins("*");
+                          policy.WithMethods("*");
+                          policy.WithHeaders("*");
+                      });
+});
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())

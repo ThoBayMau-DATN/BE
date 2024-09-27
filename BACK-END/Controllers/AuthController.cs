@@ -1,8 +1,11 @@
 ﻿using BACK_END.DTOs.Auth;
+using BACK_END.DTOs.Repository;
 using BACK_END.Services.Interfaces;
 using BACK_END.Services.MyServices;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.DotNet.Scaffolding.Shared.Messaging;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace BACK_END.Controllers
 {
@@ -45,7 +48,7 @@ namespace BACK_END.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpPost("dangKyStaff")]
+        [HttpPost("dang-ky-user")]
         public async Task<IActionResult> DangKyUser([FromBody] DangKyUserDto model)
         {
             if (!ModelState.IsValid)
@@ -89,6 +92,56 @@ namespace BACK_END.Controllers
                 return StatusCode(500, "Đã xảy ra lỗi khi đăng ký tài khoản.");
             }
             
+        }
+        [HttpGet("dang-nhap")]
+        public async Task<IActionResult> DangNhap(LoginDto model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ApiResponse<object>
+                {
+                    Status = "error",
+                    Message = "Dữ liệu đầu vào không hợp lệ.",
+                    Data = null,
+                    Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
+                });
+            }
+
+            var token = await _auth.LoginAsync(model);
+            if (string.IsNullOrEmpty(token))
+            {
+                return Unauthorized(new ApiResponse<object>
+                {
+                    Status = "error",
+                    Message = "Đăng nhập thất bại.",
+                    Data = null,
+                    Errors = "Tài khoản hoặc mật khẩu không đúng."
+                });
+            }
+
+            var nguoiDung = await _auth.DangNhap(model.Email);
+            if (nguoiDung == null)
+            {
+                return NotFound(new ApiResponse<object>
+                {
+                    Status = "error",
+                    Message = "Không tìm thấy người dùng trong hệ thống.",
+                    Data = null,
+                    Errors = null
+                });
+            }
+
+            return Ok(new ApiResponse<object>
+            {
+                Status = "success",
+                Message = "Đăng nhập thành công.",
+                Data = new
+                {
+                    Token = token,
+                    User = nguoiDung
+                },
+                Errors = null
+            });
         }
     }
 }
