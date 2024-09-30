@@ -11,6 +11,6 @@ namespace BACK_END.Models
         public string? SDT { get; set; } = string.Empty;
         public string? Anh { get; set; } = string.Empty;
         [Column(TypeName = "tinyint")]
-        public bool TrangThai { get; set; }
+        public bool TrangThai { get; set; } =true;
     }
 }
