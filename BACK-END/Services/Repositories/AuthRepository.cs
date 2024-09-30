@@ -4,16 +4,9 @@ using BACK_END.Mappers;
 using BACK_END.Models;
 using BACK_END.Services.Interfaces;
 using BACK_END.Services.MyServices;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
-using Twilio;
-using Twilio.Rest.Api.V2010.Account;
-using Twilio.Rest.Verify.V2.Service;
-using Twilio.Types;
 
 namespace BACK_END.Services.Repositories
 {
@@ -261,8 +254,16 @@ namespace BACK_END.Services.Repositories
         {
             try
             {
-                var user = await _userManager.FindByEmailAsync(model.Email);
+                // Tìm user theo số điện thoại
+                var user = await _userManager.Users
+                    .FirstOrDefaultAsync(u => u.PhoneNumber == model.PhoneNumber);
+
                 if (user == null)
+                    return null;
+
+                // Lấy email từ user tìm được
+                var email = user.Email;
+                if (string.IsNullOrEmpty(email))
                     return null;
 
                 string content = GetEmailTemplateContent("SenderOtpEmail.html");
@@ -273,13 +274,13 @@ namespace BACK_END.Services.Repositories
 
                 content = content.Replace("{{otpCode}}", otpCode);
 
-                bool emailSent = UserMapper.SenderEmail(content, model.Email);
+                bool emailSent = UserMapper.SenderEmail(content, email);
                 if (!emailSent)
                     return null;
 
                 _cache.Set($"otp", otpCode, TimeSpan.FromMinutes(1)); // sét thời gian tồn tại cho mã otp
 
-                _cache.Set($"email", model.Email, TimeSpan.FromMinutes(30));
+                _cache.Set($"email", email, TimeSpan.FromMinutes(30));
 
                 return otpCode;
             }
