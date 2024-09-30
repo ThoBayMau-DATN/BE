@@ -7,6 +7,7 @@ using BACK_END.Services.MyServices;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 
 namespace BACK_END.Services.Repositories
 {
@@ -55,27 +56,20 @@ namespace BACK_END.Services.Repositories
 
         }
 
-        public async Task<bool> CheckSDT(string sdt)
+        public async Task<DangNhapRepository?> CheckSDT(string sdt)
         {
             try
             {
                 if (sdt == null)
                 {
-                    return false;
+                    return null;
                 }
-                var sdtCheck = await _userManager.Users.FirstOrDefaultAsync(x => x.PhoneNumber == sdt);
-                if (sdtCheck == null)
-                {
-                    return false;
-                }
-                else
-                {
-                    return true;
-                }
+                var ngDung = await _db.NguoiDung.FirstOrDefaultAsync(x => x.SDT == sdt);
+                return ngDung?.MapToDangNhapRepository() ?? null;
             }
             catch (Exception ex)
             {
-                return false;
+                return null;
             }
         }
 
@@ -123,11 +117,11 @@ namespace BACK_END.Services.Repositories
 
         }
 
-        public async Task<DangNhapRepository?> DangNhap(string email)
+        public async Task<DangNhapRepository?> DangNhap(string sdt)
         {
             try
             {
-                var nguoiDung = await _db.NguoiDung.FirstOrDefaultAsync(x => x.Email == email);
+                var nguoiDung = await _db.NguoiDung.FirstOrDefaultAsync(x => x.SDT == sdt);
                 if (nguoiDung != null)
                 {
                     return nguoiDung.MapToDangNhapRepository();
@@ -144,7 +138,7 @@ namespace BACK_END.Services.Repositories
         {
             try
             {
-                var user = await _userManager.FindByEmailAsync(model.Email);
+                var user = await _userManager.Users.FirstOrDefaultAsync(x => x.PhoneNumber == model.Phone);
                 if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
                 {
                     var token = await _tokenService.GenerateTokenAsync(user);

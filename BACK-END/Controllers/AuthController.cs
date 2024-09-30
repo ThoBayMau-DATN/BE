@@ -77,7 +77,7 @@ namespace BACK_END.Controllers
                 {
                     return BadRequest("Email đã tồn tại.");
                 }
-                if (checkPhone == true)
+                if (checkPhone != null)
                 {
                     return BadRequest("SĐT đã tồn tại.");
                 }
@@ -104,13 +104,13 @@ namespace BACK_END.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(new ApiResponse<object>
-                {
-                    Status = "error",
-                    Message = "Dữ liệu đầu vào không hợp lệ.",
-                    Data = null,
-                    Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
-                });
+                var errorMessages = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage);
+
+                var fullErrorMessage = string.Join("; ", errorMessages);
+
+                return BadRequest(fullErrorMessage);
             }
 
             var token = await _auth.LoginAsync(model);
@@ -125,7 +125,7 @@ namespace BACK_END.Controllers
                 });
             }
 
-            var nguoiDung = await _auth.DangNhap(model.Email);
+            var nguoiDung = await _auth.CheckSDT(model.Phone);
             if (nguoiDung == null)
             {
                 return NotFound(new ApiResponse<object>
