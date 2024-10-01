@@ -64,7 +64,7 @@ namespace BACK_END.Services.Repositories
                 {
                     return null;
                 }
-                var ngDung = await _db.NguoiDung.FirstOrDefaultAsync(x => x.SDT == sdt);
+                var ngDung = await _db.User.FirstOrDefaultAsync(x => x.PhoneNumber == sdt);
                 return ngDung?.MapToDangNhapRepository() ?? null;
             }
             catch (Exception ex)
@@ -94,14 +94,14 @@ namespace BACK_END.Services.Repositories
                     {
                         return resultRegister;
                     }
-                    var nguoiDung = new NguoiDung
+                    var nguoiDung = new User
                     {
                         Email = model.Email ?? "",
-                        HoTen = model.HoTen ?? "",
-                        SDT = model.SoDienThoai ?? ""
+                        FullName = model.HoTen ?? "",
+                        PhoneNumber = model.SoDienThoai ?? ""
                     };
 
-                    _db.NguoiDung.Add(nguoiDung);
+                    _db.User.Add(nguoiDung);
                     var resultAddNguoiDung = await _db.SaveChangesAsync();
                     if (resultAddNguoiDung > 0)
                     {
@@ -121,7 +121,7 @@ namespace BACK_END.Services.Repositories
         {
             try
             {
-                var nguoiDung = await _db.NguoiDung.FirstOrDefaultAsync(x => x.SDT == sdt);
+                var nguoiDung = await _db.User.FirstOrDefaultAsync(x => x.PhoneNumber == sdt);
                 if (nguoiDung != null)
                 {
                     return nguoiDung.MapToDangNhapRepository();

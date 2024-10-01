@@ -2,16 +2,21 @@
 
 namespace BACK_END.Models
 {
-    public class DichVu
+    public class Service
     {
         public int Id { get; set; }
+
         [Column(TypeName = "nvarchar(50)")]
-        public string? TenDichVu { get; set; }
+        public string? ServiceName { get; set; }
+
         [Column(TypeName = "decimal(18,2)")]
-        public decimal Gia { get; set; }
+        public decimal Price { get; set; }
+
         [Column(TypeName = "ntext")]
-        public string MoTa { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+
         [Column(TypeName = "tinyint")]
-        public int TrangThai { get; set; }
+        public int Status { get; set; }
     }
+
 }

@@ -16,31 +16,22 @@ namespace BACK_END.Data
         {
         }
 
-        public DbSet<BACK_END.Models.PhongTro> PhongTro { get; set; } = default!;
-        public DbSet<BACK_END.Models.ChiTiet_HoaDon> ChiTiet_HoaDon { get; set; } = default!;
-        public DbSet<BACK_END.Models.DayTro> DayTro { get; set; } = default!;
-        public DbSet<BACK_END.Models.DayTro_FIle> DayTro_FIle { get; set; } = default!;
-        public DbSet<BACK_END.Models.DichVu> DichVu { get; set; } = default!;
-        public DbSet<BACK_END.Models.DichVu_DayTro> DichVu_DayTro { get; set; } = default!;
+        public DbSet<BACK_END.Models.Room> Room { get; set; } = default!;
+        public DbSet<BACK_END.Models.OrderDetail> OrderDetail { get; set; } = default!;
+        public DbSet<BACK_END.Models.BoardingHouse> BoardingHouse { get; set; } = default!;
+        public DbSet<BACK_END.Models.BoardingHouse_FIle> BoardingHouse_FIle { get; set; } = default!;
+        public DbSet<BACK_END.Models.Service> Services { get; set; } = default!;
+        public DbSet<BACK_END.Models.Service_BoardingHouse> Service_BoardingHouse { get; set; } = default!;
         public DbSet<BACK_END.Models.File> File { get; set; } = default!;
-        public DbSet<BACK_END.Models.HoaDon> HoaDon { get; set; } = default!;
-        public DbSet<BACK_END.Models.LoaiTicket> LoaiTicket { get; set; } = default!;
-        public DbSet<BACK_END.Models.MucDoUuTien> MucDoUuTien { get; set; } = default!;
-        public DbSet<BACK_END.Models.NguoiDung> NguoiDung { get; set; } = default!;
-        public DbSet<BACK_END.Models.PhongTro_FIle> PhongTro_FIle { get; set; } = default!;
+        public DbSet<BACK_END.Models.Order> Order { get; set; } = default!;
+        public DbSet<BACK_END.Models.TicketType> TicketType { get; set; } = default!;
+        public DbSet<BACK_END.Models.PriorityLevel> PriorityLevel { get; set; } = default!;
+        public DbSet<BACK_END.Models.User> User { get; set; } = default!;
+        public DbSet<BACK_END.Models.Room_FIle> Room_FIle { get; set; } = default!;
         public DbSet<BACK_END.Models.Ticket> Ticket { get; set; } = default!;
         public DbSet<BACK_END.Models.Ticket_File> Ticket_File { get; set; } = default!;
-        public DbSet<BACK_END.Models.XuLy_Ticket> XuLy_Ticket { get; set; } = default!;
-        public DbSet<BACK_END.Models.ThueTro> ThueTro { get; set; } = default!;
+        public DbSet<BACK_END.Models.TicketProcessing> TicketProcessing { get; set; } = default!;
+        public DbSet<BACK_END.Models.RoomRental> RoomRental { get; set; } = default!;
 
-        /*protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
-
-            modelBuilder.Entity<ApplicationUser>()
-                .HasOne(u => u.NguoiDung)
-                .WithMany()
-                .HasForeignKey(u => u.NguoiDungId);
-        }*/
     }
 }
