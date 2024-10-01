@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BACK_END.Migrations
 {
     [DbContext(typeof(BACK_ENDContext))]
-    [Migration("20240919155118_NEW-DB")]
-    partial class NEWDB
+    [Migration("20241001090754_to_english")]
+    partial class to_english
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace BACK_END.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("BACK_END.Models.ChiTiet_HoaDon", b =>
+            modelBuilder.Entity("BACK_END.Models.BoardingHouse", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -33,56 +33,33 @@ namespace BACK_END.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("DichVuId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("HoaDonId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("TongPhiDichVu")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DichVuId");
-
-                    b.HasIndex("HoaDonId");
-
-                    b.ToTable("ChiTiet_HoaDon");
-                });
-
-            modelBuilder.Entity("BACK_END.Models.DayTro", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("DiaChi")
+                    b.Property<string>("Address")
                         .IsRequired()
                         .HasColumnType("ntext");
 
-                    b.Property<int>("NguoiDungId")
-                        .HasColumnType("int");
-
-                    b.Property<byte>("TrangThai")
+                    b.Property<byte>("Status")
                         .HasColumnType("tinyint");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("NguoiDungId");
+                    b.HasIndex("UserId");
 
-                    b.ToTable("DayTro");
+                    b.ToTable("BoardingHouse");
                 });
 
-            modelBuilder.Entity("BACK_END.Models.DayTro_FIle", b =>
+            modelBuilder.Entity("BACK_END.Models.BoardingHouse_FIle", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("BoardingHouseId")
+                        .HasColumnType("int");
 
                     b.Property<int>("DayTroId")
                         .HasColumnType("int");
@@ -92,60 +69,11 @@ namespace BACK_END.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DayTroId");
+                    b.HasIndex("BoardingHouseId");
 
                     b.HasIndex("FileId");
 
-                    b.ToTable("DayTro_FIle");
-                });
-
-            modelBuilder.Entity("BACK_END.Models.DichVu", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("Gia")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("MoTa")
-                        .IsRequired()
-                        .HasColumnType("ntext");
-
-                    b.Property<string>("TenDichVu")
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<byte>("TrangThai")
-                        .HasColumnType("tinyint");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("DichVu");
-                });
-
-            modelBuilder.Entity("BACK_END.Models.DichVu_DayTro", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("DayTroId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("DichVuId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DayTroId");
-
-                    b.HasIndex("DichVuId");
-
-                    b.ToTable("DichVu_DayTro");
+                    b.ToTable("BoardingHouse_FIle");
                 });
 
             modelBuilder.Entity("BACK_END.Models.File", b =>
@@ -156,15 +84,15 @@ namespace BACK_END.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("KieuFile")
+                    b.Property<string>("FileName")
                         .IsRequired()
                         .HasColumnType("varchar(50)");
 
-                    b.Property<string>("TenFile")
+                    b.Property<string>("FileType")
                         .IsRequired()
                         .HasColumnType("varchar(50)");
 
-                    b.Property<string>("ViTriLuu")
+                    b.Property<string>("StorageLocation")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -173,7 +101,7 @@ namespace BACK_END.Migrations
                     b.ToTable("File");
                 });
 
-            modelBuilder.Entity("BACK_END.Models.HoaDon", b =>
+            modelBuilder.Entity("BACK_END.Models.Order", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -181,29 +109,29 @@ namespace BACK_END.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("ChiPhiKhac")
+                    b.Property<decimal>("OtherCost")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<DateTime>("NgayLap")
+                    b.Property<int>("RoomId")
+                        .HasColumnType("int");
+
+                    b.Property<byte>("Status")
+                        .HasColumnType("tinyint");
+
+                    b.Property<DateTime>("TimeCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("PhongTroId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("ThanhTien")
+                    b.Property<decimal>("TotalAmount")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<byte>("TrangThai")
-                        .HasColumnType("tinyint");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("PhongTroId");
+                    b.HasIndex("RoomId");
 
-                    b.ToTable("HoaDon");
+                    b.ToTable("Order");
                 });
 
-            modelBuilder.Entity("BACK_END.Models.LoaiTicket", b =>
+            modelBuilder.Entity("BACK_END.Models.OrderDetail", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -211,23 +139,25 @@ namespace BACK_END.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("MoTa")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("TenLoai")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<int>("ServiceId")
+                        .HasColumnType("int");
 
-                    b.Property<byte>("TrangThai")
-                        .HasColumnType("tinyint");
+                    b.Property<decimal>("TotalServiceFee")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("LoaiTicket");
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("ServiceId");
+
+                    b.ToTable("OrderDetail");
                 });
 
-            modelBuilder.Entity("BACK_END.Models.MucDoUuTien", b =>
+            modelBuilder.Entity("BACK_END.Models.PriorityLevel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -235,23 +165,23 @@ namespace BACK_END.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("MoTa")
+                    b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("ntext");
 
-                    b.Property<string>("Ten")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<byte>("TrangThai")
+                    b.Property<byte>("Status")
                         .HasColumnType("tinyint");
 
                     b.HasKey("Id");
 
-                    b.ToTable("MucDoUuTien");
+                    b.ToTable("PriorityLevel");
                 });
 
-            modelBuilder.Entity("BACK_END.Models.NguoiDung", b =>
+            modelBuilder.Entity("BACK_END.Models.Room", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -259,63 +189,59 @@ namespace BACK_END.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Anh")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("HoTen")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SDT")
-                        .HasColumnType("varchar(10)");
-
-                    b.Property<byte>("TrangThai")
-                        .HasColumnType("tinyint");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("NguoiDung");
-                });
-
-            modelBuilder.Entity("BACK_END.Models.PhongTro", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("DayTroId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("DienTich")
+                    b.Property<decimal>("Area")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<decimal>("Gia")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<int>("BoardingHouseId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("MoTa")
+                    b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("ntext");
 
-                    b.Property<int>("SoLuong")
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.Property<byte>("TrangThai")
+                    b.Property<byte>("Status")
                         .HasColumnType("tinyint");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DayTroId");
+                    b.HasIndex("BoardingHouseId");
 
-                    b.ToTable("PhongTro");
+                    b.ToTable("Room");
                 });
 
-            modelBuilder.Entity("BACK_END.Models.PhongTro_FIle", b =>
+            modelBuilder.Entity("BACK_END.Models.RoomRental", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("RoomId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoomId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RoomRental");
+                });
+
+            modelBuilder.Entity("BACK_END.Models.Room_FIle", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -326,19 +252,19 @@ namespace BACK_END.Migrations
                     b.Property<int>("FileId")
                         .HasColumnType("int");
 
-                    b.Property<int>("PhongTroId")
+                    b.Property<int>("RoomId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("FileId");
 
-                    b.HasIndex("PhongTroId");
+                    b.HasIndex("RoomId");
 
-                    b.ToTable("PhongTro_FIle");
+                    b.ToTable("Room_FIle");
                 });
 
-            modelBuilder.Entity("BACK_END.Models.ThueTro", b =>
+            modelBuilder.Entity("BACK_END.Models.Service", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -346,22 +272,45 @@ namespace BACK_END.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("NguoiDungId")
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("ntext");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("ServiceName")
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<byte>("Status")
+                        .HasColumnType("tinyint");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Services");
+                });
+
+            modelBuilder.Entity("BACK_END.Models.Service_BoardingHouse", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("PhongTroId")
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BoardingHouseId")
                         .HasColumnType("int");
 
-                    b.Property<int>("TrangThai")
+                    b.Property<int>("ServiceId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("NguoiDungId");
+                    b.HasIndex("BoardingHouseId");
 
-                    b.HasIndex("PhongTroId");
+                    b.HasIndex("ServiceId");
 
-                    b.ToTable("ThueTro");
+                    b.ToTable("Service_BoardingHouse");
                 });
 
             modelBuilder.Entity("BACK_END.Models.Ticket", b =>
@@ -372,38 +321,94 @@ namespace BACK_END.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("LoaiTicketId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("NgayTao")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("NguoiDungId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("NoiDung")
+                    b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("TieuDe")
+                    b.Property<int>("PriorityId")
+                        .HasColumnType("int");
+
+                    b.Property<byte>("Status")
+                        .HasColumnType("tinyint");
+
+                    b.Property<int>("TicketTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("TimeCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<byte>("TrangThai")
-                        .HasColumnType("tinyint");
-
-                    b.Property<int>("UuTienId")
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LoaiTicketId");
+                    b.HasIndex("PriorityId");
 
-                    b.HasIndex("NguoiDungId");
+                    b.HasIndex("TicketTypeId");
 
-                    b.HasIndex("UuTienId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Ticket");
+                });
+
+            modelBuilder.Entity("BACK_END.Models.TicketProcessing", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<byte>("Status")
+                        .HasColumnType("tinyint");
+
+                    b.Property<int>("TicketId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("TimeDone")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("TimeReceived")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TicketId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("TicketProcessing");
+                });
+
+            modelBuilder.Entity("BACK_END.Models.TicketType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<byte>("Status")
+                        .HasColumnType("tinyint");
+
+                    b.Property<string>("TypeName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TicketType");
                 });
 
             modelBuilder.Entity("BACK_END.Models.Ticket_File", b =>
@@ -429,7 +434,7 @@ namespace BACK_END.Migrations
                     b.ToTable("Ticket_File");
                 });
 
-            modelBuilder.Entity("BACK_END.Models.XuLy_Ticket", b =>
+            modelBuilder.Entity("BACK_END.Models.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -437,28 +442,30 @@ namespace BACK_END.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("NguoiDungId")
-                        .HasColumnType("int");
+                    b.Property<string>("Avatar")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("ThoiGianNhan")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TicketId")
-                        .HasColumnType("int");
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("TimeDone")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("varchar(10)");
 
-                    b.Property<byte>("TrangThai")
+                    b.Property<byte>("Status")
                         .HasColumnType("tinyint");
+
+                    b.Property<DateTime>("TimeCreated")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("NguoiDungId");
-
-                    b.HasIndex("TicketId");
-
-                    b.ToTable("XuLy_Ticket");
+                    b.ToTable("User");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -659,43 +666,22 @@ namespace BACK_END.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("BACK_END.Models.ChiTiet_HoaDon", b =>
+            modelBuilder.Entity("BACK_END.Models.BoardingHouse", b =>
                 {
-                    b.HasOne("BACK_END.Models.DichVu", "DichVu")
+                    b.HasOne("BACK_END.Models.User", "User")
                         .WithMany()
-                        .HasForeignKey("DichVuId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BACK_END.Models.HoaDon", "HoaDon")
-                        .WithMany()
-                        .HasForeignKey("HoaDonId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("DichVu");
-
-                    b.Navigation("HoaDon");
+                    b.Navigation("User");
                 });
 
-            modelBuilder.Entity("BACK_END.Models.DayTro", b =>
+            modelBuilder.Entity("BACK_END.Models.BoardingHouse_FIle", b =>
                 {
-                    b.HasOne("BACK_END.Models.NguoiDung", "NguoiDung")
+                    b.HasOne("BACK_END.Models.BoardingHouse", "BoardingHouse")
                         .WithMany()
-                        .HasForeignKey("NguoiDungId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("NguoiDung");
-                });
-
-            modelBuilder.Entity("BACK_END.Models.DayTro_FIle", b =>
-                {
-                    b.HasOne("BACK_END.Models.DayTro", "DayTro")
-                        .WithMany()
-                        .HasForeignKey("DayTroId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("BoardingHouseId");
 
                     b.HasOne("BACK_END.Models.File", "File")
                         .WithMany()
@@ -703,53 +689,72 @@ namespace BACK_END.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("DayTro");
+                    b.Navigation("BoardingHouse");
 
                     b.Navigation("File");
                 });
 
-            modelBuilder.Entity("BACK_END.Models.DichVu_DayTro", b =>
+            modelBuilder.Entity("BACK_END.Models.Order", b =>
                 {
-                    b.HasOne("BACK_END.Models.DayTro", "DayTro")
+                    b.HasOne("BACK_END.Models.Room", "Room")
                         .WithMany()
-                        .HasForeignKey("DayTroId")
+                        .HasForeignKey("RoomId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BACK_END.Models.DichVu", "DichVu")
-                        .WithMany()
-                        .HasForeignKey("DichVuId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("DayTro");
-
-                    b.Navigation("DichVu");
+                    b.Navigation("Room");
                 });
 
-            modelBuilder.Entity("BACK_END.Models.HoaDon", b =>
+            modelBuilder.Entity("BACK_END.Models.OrderDetail", b =>
                 {
-                    b.HasOne("BACK_END.Models.PhongTro", "PhongTro")
+                    b.HasOne("BACK_END.Models.Order", "Order")
                         .WithMany()
-                        .HasForeignKey("PhongTroId")
+                        .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("PhongTro");
-                });
-
-            modelBuilder.Entity("BACK_END.Models.PhongTro", b =>
-                {
-                    b.HasOne("BACK_END.Models.DayTro", "DayTro")
+                    b.HasOne("BACK_END.Models.Service", "Service")
                         .WithMany()
-                        .HasForeignKey("DayTroId")
+                        .HasForeignKey("ServiceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("DayTro");
+                    b.Navigation("Order");
+
+                    b.Navigation("Service");
                 });
 
-            modelBuilder.Entity("BACK_END.Models.PhongTro_FIle", b =>
+            modelBuilder.Entity("BACK_END.Models.Room", b =>
+                {
+                    b.HasOne("BACK_END.Models.BoardingHouse", "BoardingHouse")
+                        .WithMany()
+                        .HasForeignKey("BoardingHouseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BoardingHouse");
+                });
+
+            modelBuilder.Entity("BACK_END.Models.RoomRental", b =>
+                {
+                    b.HasOne("BACK_END.Models.Room", "Room")
+                        .WithMany()
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BACK_END.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Room");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BACK_END.Models.Room_FIle", b =>
                 {
                     b.HasOne("BACK_END.Models.File", "File")
                         .WithMany()
@@ -757,61 +762,80 @@ namespace BACK_END.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BACK_END.Models.PhongTro", "PhongTro")
+                    b.HasOne("BACK_END.Models.Room", "Room")
                         .WithMany()
-                        .HasForeignKey("PhongTroId")
+                        .HasForeignKey("RoomId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("File");
 
-                    b.Navigation("PhongTro");
+                    b.Navigation("Room");
                 });
 
-            modelBuilder.Entity("BACK_END.Models.ThueTro", b =>
+            modelBuilder.Entity("BACK_END.Models.Service_BoardingHouse", b =>
                 {
-                    b.HasOne("BACK_END.Models.NguoiDung", "NguoiDung")
+                    b.HasOne("BACK_END.Models.BoardingHouse", "BoardingHouse")
                         .WithMany()
-                        .HasForeignKey("NguoiDungId")
+                        .HasForeignKey("BoardingHouseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BACK_END.Models.PhongTro", "PhongTro")
+                    b.HasOne("BACK_END.Models.Service", "Service")
                         .WithMany()
-                        .HasForeignKey("PhongTroId")
+                        .HasForeignKey("ServiceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("NguoiDung");
+                    b.Navigation("BoardingHouse");
 
-                    b.Navigation("PhongTro");
+                    b.Navigation("Service");
                 });
 
             modelBuilder.Entity("BACK_END.Models.Ticket", b =>
                 {
-                    b.HasOne("BACK_END.Models.LoaiTicket", "LoaiTicket")
+                    b.HasOne("BACK_END.Models.PriorityLevel", "Priority")
                         .WithMany()
-                        .HasForeignKey("LoaiTicketId")
+                        .HasForeignKey("PriorityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BACK_END.Models.NguoiDung", "NguoiDung")
+                    b.HasOne("BACK_END.Models.TicketType", "TicketType")
                         .WithMany()
-                        .HasForeignKey("NguoiDungId")
+                        .HasForeignKey("TicketTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BACK_END.Models.MucDoUuTien", "UuTien")
+                    b.HasOne("BACK_END.Models.User", "User")
                         .WithMany()
-                        .HasForeignKey("UuTienId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("LoaiTicket");
+                    b.Navigation("Priority");
 
-                    b.Navigation("NguoiDung");
+                    b.Navigation("TicketType");
 
-                    b.Navigation("UuTien");
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BACK_END.Models.TicketProcessing", b =>
+                {
+                    b.HasOne("BACK_END.Models.Ticket", "Ticket")
+                        .WithMany()
+                        .HasForeignKey("TicketId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BACK_END.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Ticket");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("BACK_END.Models.Ticket_File", b =>
@@ -829,25 +853,6 @@ namespace BACK_END.Migrations
                         .IsRequired();
 
                     b.Navigation("File");
-
-                    b.Navigation("Ticket");
-                });
-
-            modelBuilder.Entity("BACK_END.Models.XuLy_Ticket", b =>
-                {
-                    b.HasOne("BACK_END.Models.NguoiDung", "NguoiDung")
-                        .WithMany()
-                        .HasForeignKey("NguoiDungId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BACK_END.Models.Ticket", "Ticket")
-                        .WithMany()
-                        .HasForeignKey("TicketId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("NguoiDung");
 
                     b.Navigation("Ticket");
                 });

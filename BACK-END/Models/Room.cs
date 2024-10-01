@@ -5,20 +5,20 @@ using System.Net.Mime;
 
 namespace BACK_END.Models
 {
-    public class PhongTro
+    public class Room
     {
         public int Id { get; set; }
         [Column(TypeName = "decimal(18,2)")]
-        public decimal DienTich { get; set; }
+        public decimal Area { get; set; }
         [Column(TypeName = "decimal(18,2)")]
-        public decimal Gia { get; set; }
-        public int SoLuong { get; set; }
+        public decimal Price { get; set; }
+        public int Quantity { get; set; }
         [Column(TypeName = "ntext")]
-        public string MoTa { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
         [Column(TypeName = "tinyint")]
-        public int TrangThai { get; set; }
-        public int DayTroId { get; set; }
-        [ForeignKey("DayTroId")]
-        public DayTro? DayTro { get; set; }
+        public int Status { get; set; }
+        public int BoardingHouseId { get; set; }
+        [ForeignKey("BoardingHouseId")]
+        public BoardingHouse? BoardingHouse { get; set; }
     }
 }

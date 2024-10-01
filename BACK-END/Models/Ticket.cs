@@ -5,18 +5,19 @@ namespace BACK_END.Models
     public class Ticket
     {
         public int Id { get; set; }
-        public string TieuDe { get; set; } = string.Empty;
+        public string Title { get; set; } = string.Empty;
         [Column(TypeName = "text")]
-        public string NoiDung {  get; set; } = string.Empty;
-        public DateTime NgayTao { get; set; } = DateTime.Now;
+        public string Content { get; set; } = string.Empty;
+        public DateTime TimeCreated { get; set; } = DateTime.Now;
         [Column(TypeName = "tinyint")]
-        public int TrangThai { get; set; }
-        public int LoaiTicketId { get; set; }
-        public LoaiTicket? LoaiTicket { get; set; }
-        public int UuTienId { get; set; }
-        [ForeignKey("UuTienId")]
-        public MucDoUuTien? UuTien { get; set; }
-        public int NguoiDungId { get; set; }
-        public NguoiDung? NguoiDung { get; set; }
+        public int Status { get; set; }
+        public int TicketTypeId { get; set; }
+        public TicketType? TicketType { get; set; }
+        public int PriorityId { get; set; }
+        [ForeignKey("PriorityId")]
+        public PriorityLevel? Priority { get; set; }
+        public int UserId { get; set; }
+        public User? User { get; set; }
     }
+
 }

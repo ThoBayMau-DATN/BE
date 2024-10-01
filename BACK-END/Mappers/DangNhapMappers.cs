@@ -6,15 +6,15 @@ namespace BACK_END.Mappers
 {
     public static class DangNhapMappers
     {
-        public static DangNhapRepository MapToDangNhapRepository(this NguoiDung model)
+        public static DangNhapRepository MapToDangNhapRepository(this User model)
         {
             return new DangNhapRepository
             {
-                HoTen = model.HoTen,
+                HoTen = model.FullName,
                 Email = model.Email,
-                SDT = model.SDT,
-                Anh = model.Anh,
-                TrangThai = model.TrangThai
+                SDT = model.PhoneNumber,
+                Anh = model.Avatar,
+                TrangThai = model.Status
             };
         }
     }
