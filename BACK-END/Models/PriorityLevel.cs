@@ -2,14 +2,15 @@
 
 namespace BACK_END.Models
 {
-    public class MucDoUuTien
+    public class PriorityLevel
     {
         public int Id { get; set; }
         [Column(TypeName = "nvarchar(50)")]
-        public string Ten { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
         [Column(TypeName = "ntext")]
-        public string MoTa { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
         [Column(TypeName = "tinyint")]
-        public int TrangThai { get; set; }
+        public int Status { get; set; }
     }
+
 }

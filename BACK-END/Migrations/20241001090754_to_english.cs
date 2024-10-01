@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BACK_END.Migrations
 {
     /// <inheritdoc />
-    public partial class NEWDB : Migration
+    public partial class to_english : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -51,30 +51,14 @@ namespace BACK_END.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "DichVu",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    TenDichVu = table.Column<string>(type: "nvarchar(50)", nullable: true),
-                    Gia = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    MoTa = table.Column<string>(type: "ntext", nullable: false),
-                    TrangThai = table.Column<byte>(type: "tinyint", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_DichVu", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "File",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    TenFile = table.Column<string>(type: "varchar(50)", nullable: false),
-                    ViTriLuu = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    KieuFile = table.Column<string>(type: "varchar(50)", nullable: false)
+                    FileName = table.Column<string>(type: "varchar(50)", nullable: false),
+                    StorageLocation = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FileType = table.Column<string>(type: "varchar(50)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -82,50 +66,67 @@ namespace BACK_END.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "LoaiTicket",
+                name: "PriorityLevel",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    TenLoai = table.Column<string>(type: "nvarchar(50)", nullable: false),
-                    MoTa = table.Column<string>(type: "text", nullable: false),
-                    TrangThai = table.Column<byte>(type: "tinyint", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(50)", nullable: false),
+                    Description = table.Column<string>(type: "ntext", nullable: false),
+                    Status = table.Column<byte>(type: "tinyint", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_LoaiTicket", x => x.Id);
+                    table.PrimaryKey("PK_PriorityLevel", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "MucDoUuTien",
+                name: "Services",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Ten = table.Column<string>(type: "nvarchar(50)", nullable: false),
-                    MoTa = table.Column<string>(type: "ntext", nullable: false),
-                    TrangThai = table.Column<byte>(type: "tinyint", nullable: false)
+                    ServiceName = table.Column<string>(type: "nvarchar(50)", nullable: true),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Description = table.Column<string>(type: "ntext", nullable: false),
+                    Status = table.Column<byte>(type: "tinyint", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MucDoUuTien", x => x.Id);
+                    table.PrimaryKey("PK_Services", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "NguoiDung",
+                name: "TicketType",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    HoTen = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TypeName = table.Column<string>(type: "nvarchar(50)", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: false),
+                    Status = table.Column<byte>(type: "tinyint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TicketType", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "User",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    SDT = table.Column<string>(type: "varchar(10)", nullable: true),
-                    Anh = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TrangThai = table.Column<byte>(type: "tinyint", nullable: false)
+                    PhoneNumber = table.Column<string>(type: "varchar(10)", nullable: false),
+                    Avatar = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TimeCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Status = table.Column<byte>(type: "tinyint", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_NguoiDung", x => x.Id);
+                    table.PrimaryKey("PK_User", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -235,22 +236,22 @@ namespace BACK_END.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "DayTro",
+                name: "BoardingHouse",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    DiaChi = table.Column<string>(type: "ntext", nullable: false),
-                    NguoiDungId = table.Column<int>(type: "int", nullable: false),
-                    TrangThai = table.Column<byte>(type: "tinyint", nullable: false)
+                    Address = table.Column<string>(type: "ntext", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<byte>(type: "tinyint", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DayTro", x => x.Id);
+                    table.PrimaryKey("PK_BoardingHouse", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_DayTro_NguoiDung_NguoiDungId",
-                        column: x => x.NguoiDungId,
-                        principalTable: "NguoiDung",
+                        name: "FK_BoardingHouse_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -261,57 +262,57 @@ namespace BACK_END.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    TieuDe = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    NoiDung = table.Column<string>(type: "text", nullable: false),
-                    NgayTao = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    TrangThai = table.Column<byte>(type: "tinyint", nullable: false),
-                    LoaiTicketId = table.Column<int>(type: "int", nullable: false),
-                    UuTienId = table.Column<int>(type: "int", nullable: false),
-                    NguoiDungId = table.Column<int>(type: "int", nullable: false)
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Content = table.Column<string>(type: "text", nullable: false),
+                    TimeCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Status = table.Column<byte>(type: "tinyint", nullable: false),
+                    TicketTypeId = table.Column<int>(type: "int", nullable: false),
+                    PriorityId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Ticket", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Ticket_LoaiTicket_LoaiTicketId",
-                        column: x => x.LoaiTicketId,
-                        principalTable: "LoaiTicket",
+                        name: "FK_Ticket_PriorityLevel_PriorityId",
+                        column: x => x.PriorityId,
+                        principalTable: "PriorityLevel",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Ticket_MucDoUuTien_UuTienId",
-                        column: x => x.UuTienId,
-                        principalTable: "MucDoUuTien",
+                        name: "FK_Ticket_TicketType_TicketTypeId",
+                        column: x => x.TicketTypeId,
+                        principalTable: "TicketType",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Ticket_NguoiDung_NguoiDungId",
-                        column: x => x.NguoiDungId,
-                        principalTable: "NguoiDung",
+                        name: "FK_Ticket_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "DayTro_FIle",
+                name: "BoardingHouse_FIle",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     DayTroId = table.Column<int>(type: "int", nullable: false),
+                    BoardingHouseId = table.Column<int>(type: "int", nullable: true),
                     FileId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DayTro_FIle", x => x.Id);
+                    table.PrimaryKey("PK_BoardingHouse_FIle", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_DayTro_FIle_DayTro_DayTroId",
-                        column: x => x.DayTroId,
-                        principalTable: "DayTro",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        name: "FK_BoardingHouse_FIle_BoardingHouse_BoardingHouseId",
+                        column: x => x.BoardingHouseId,
+                        principalTable: "BoardingHouse",
+                        principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_DayTro_FIle_File_FileId",
+                        name: "FK_BoardingHouse_FIle_File_FileId",
                         column: x => x.FileId,
                         principalTable: "File",
                         principalColumn: "Id",
@@ -319,51 +320,51 @@ namespace BACK_END.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "DichVu_DayTro",
+                name: "Room",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    DichVuId = table.Column<int>(type: "int", nullable: false),
-                    DayTroId = table.Column<int>(type: "int", nullable: false)
+                    Area = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    Description = table.Column<string>(type: "ntext", nullable: false),
+                    Status = table.Column<byte>(type: "tinyint", nullable: false),
+                    BoardingHouseId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DichVu_DayTro", x => x.Id);
+                    table.PrimaryKey("PK_Room", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_DichVu_DayTro_DayTro_DayTroId",
-                        column: x => x.DayTroId,
-                        principalTable: "DayTro",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_DichVu_DayTro_DichVu_DichVuId",
-                        column: x => x.DichVuId,
-                        principalTable: "DichVu",
+                        name: "FK_Room_BoardingHouse_BoardingHouseId",
+                        column: x => x.BoardingHouseId,
+                        principalTable: "BoardingHouse",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "PhongTro",
+                name: "Service_BoardingHouse",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    DienTich = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Gia = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    SoLuong = table.Column<int>(type: "int", nullable: false),
-                    MoTa = table.Column<string>(type: "ntext", nullable: false),
-                    TrangThai = table.Column<byte>(type: "tinyint", nullable: false),
-                    DayTroId = table.Column<int>(type: "int", nullable: false)
+                    ServiceId = table.Column<int>(type: "int", nullable: false),
+                    BoardingHouseId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PhongTro", x => x.Id);
+                    table.PrimaryKey("PK_Service_BoardingHouse", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_PhongTro_DayTro_DayTroId",
-                        column: x => x.DayTroId,
-                        principalTable: "DayTro",
+                        name: "FK_Service_BoardingHouse_BoardingHouse_BoardingHouseId",
+                        column: x => x.BoardingHouseId,
+                        principalTable: "BoardingHouse",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Service_BoardingHouse_Services_ServiceId",
+                        column: x => x.ServiceId,
+                        principalTable: "Services",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -395,133 +396,133 @@ namespace BACK_END.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "XuLy_Ticket",
+                name: "TicketProcessing",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     TicketId = table.Column<int>(type: "int", nullable: false),
-                    NguoiDungId = table.Column<int>(type: "int", nullable: false),
-                    ThoiGianNhan = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    TimeReceived = table.Column<DateTime>(type: "datetime2", nullable: false),
                     TimeDone = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    TrangThai = table.Column<byte>(type: "tinyint", nullable: false)
+                    Status = table.Column<byte>(type: "tinyint", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_XuLy_Ticket", x => x.Id);
+                    table.PrimaryKey("PK_TicketProcessing", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_XuLy_Ticket_NguoiDung_NguoiDungId",
-                        column: x => x.NguoiDungId,
-                        principalTable: "NguoiDung",
+                        name: "FK_TicketProcessing_Ticket_TicketId",
+                        column: x => x.TicketId,
+                        principalTable: "Ticket",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_XuLy_Ticket_Ticket_TicketId",
-                        column: x => x.TicketId,
-                        principalTable: "Ticket",
+                        name: "FK_TicketProcessing_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "HoaDon",
+                name: "Order",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    NgayLap = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ChiPhiKhac = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    ThanhTien = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    TrangThai = table.Column<byte>(type: "tinyint", nullable: false),
-                    PhongTroId = table.Column<int>(type: "int", nullable: false)
+                    TimeCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    OtherCost = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Status = table.Column<byte>(type: "tinyint", nullable: false),
+                    RoomId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_HoaDon", x => x.Id);
+                    table.PrimaryKey("PK_Order", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_HoaDon_PhongTro_PhongTroId",
-                        column: x => x.PhongTroId,
-                        principalTable: "PhongTro",
+                        name: "FK_Order_Room_RoomId",
+                        column: x => x.RoomId,
+                        principalTable: "Room",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "PhongTro_FIle",
+                name: "Room_FIle",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    PhongTroId = table.Column<int>(type: "int", nullable: false),
+                    RoomId = table.Column<int>(type: "int", nullable: false),
                     FileId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PhongTro_FIle", x => x.Id);
+                    table.PrimaryKey("PK_Room_FIle", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_PhongTro_FIle_File_FileId",
+                        name: "FK_Room_FIle_File_FileId",
                         column: x => x.FileId,
                         principalTable: "File",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_PhongTro_FIle_PhongTro_PhongTroId",
-                        column: x => x.PhongTroId,
-                        principalTable: "PhongTro",
+                        name: "FK_Room_FIle_Room_RoomId",
+                        column: x => x.RoomId,
+                        principalTable: "Room",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ThueTro",
+                name: "RoomRental",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    PhongTroId = table.Column<int>(type: "int", nullable: false),
-                    NguoiDungId = table.Column<int>(type: "int", nullable: false),
-                    TrangThai = table.Column<int>(type: "int", nullable: false)
+                    RoomId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ThueTro", x => x.Id);
+                    table.PrimaryKey("PK_RoomRental", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ThueTro_NguoiDung_NguoiDungId",
-                        column: x => x.NguoiDungId,
-                        principalTable: "NguoiDung",
+                        name: "FK_RoomRental_Room_RoomId",
+                        column: x => x.RoomId,
+                        principalTable: "Room",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ThueTro_PhongTro_PhongTroId",
-                        column: x => x.PhongTroId,
-                        principalTable: "PhongTro",
+                        name: "FK_RoomRental_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ChiTiet_HoaDon",
+                name: "OrderDetail",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    HoaDonId = table.Column<int>(type: "int", nullable: false),
-                    DichVuId = table.Column<int>(type: "int", nullable: false),
-                    TongPhiDichVu = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    OrderId = table.Column<int>(type: "int", nullable: false),
+                    ServiceId = table.Column<int>(type: "int", nullable: false),
+                    TotalServiceFee = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ChiTiet_HoaDon", x => x.Id);
+                    table.PrimaryKey("PK_OrderDetail", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ChiTiet_HoaDon_DichVu_DichVuId",
-                        column: x => x.DichVuId,
-                        principalTable: "DichVu",
+                        name: "FK_OrderDetail_Order_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Order",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ChiTiet_HoaDon_HoaDon_HoaDonId",
-                        column: x => x.HoaDonId,
-                        principalTable: "HoaDon",
+                        name: "FK_OrderDetail_Services_ServiceId",
+                        column: x => x.ServiceId,
+                        principalTable: "Services",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -566,84 +567,84 @@ namespace BACK_END.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ChiTiet_HoaDon_DichVuId",
-                table: "ChiTiet_HoaDon",
-                column: "DichVuId");
+                name: "IX_BoardingHouse_UserId",
+                table: "BoardingHouse",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ChiTiet_HoaDon_HoaDonId",
-                table: "ChiTiet_HoaDon",
-                column: "HoaDonId");
+                name: "IX_BoardingHouse_FIle_BoardingHouseId",
+                table: "BoardingHouse_FIle",
+                column: "BoardingHouseId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DayTro_NguoiDungId",
-                table: "DayTro",
-                column: "NguoiDungId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_DayTro_FIle_DayTroId",
-                table: "DayTro_FIle",
-                column: "DayTroId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_DayTro_FIle_FileId",
-                table: "DayTro_FIle",
+                name: "IX_BoardingHouse_FIle_FileId",
+                table: "BoardingHouse_FIle",
                 column: "FileId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DichVu_DayTro_DayTroId",
-                table: "DichVu_DayTro",
-                column: "DayTroId");
+                name: "IX_Order_RoomId",
+                table: "Order",
+                column: "RoomId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DichVu_DayTro_DichVuId",
-                table: "DichVu_DayTro",
-                column: "DichVuId");
+                name: "IX_OrderDetail_OrderId",
+                table: "OrderDetail",
+                column: "OrderId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_HoaDon_PhongTroId",
-                table: "HoaDon",
-                column: "PhongTroId");
+                name: "IX_OrderDetail_ServiceId",
+                table: "OrderDetail",
+                column: "ServiceId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PhongTro_DayTroId",
-                table: "PhongTro",
-                column: "DayTroId");
+                name: "IX_Room_BoardingHouseId",
+                table: "Room",
+                column: "BoardingHouseId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PhongTro_FIle_FileId",
-                table: "PhongTro_FIle",
+                name: "IX_Room_FIle_FileId",
+                table: "Room_FIle",
                 column: "FileId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PhongTro_FIle_PhongTroId",
-                table: "PhongTro_FIle",
-                column: "PhongTroId");
+                name: "IX_Room_FIle_RoomId",
+                table: "Room_FIle",
+                column: "RoomId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ThueTro_NguoiDungId",
-                table: "ThueTro",
-                column: "NguoiDungId");
+                name: "IX_RoomRental_RoomId",
+                table: "RoomRental",
+                column: "RoomId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ThueTro_PhongTroId",
-                table: "ThueTro",
-                column: "PhongTroId");
+                name: "IX_RoomRental_UserId",
+                table: "RoomRental",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Ticket_LoaiTicketId",
+                name: "IX_Service_BoardingHouse_BoardingHouseId",
+                table: "Service_BoardingHouse",
+                column: "BoardingHouseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Service_BoardingHouse_ServiceId",
+                table: "Service_BoardingHouse",
+                column: "ServiceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Ticket_PriorityId",
                 table: "Ticket",
-                column: "LoaiTicketId");
+                column: "PriorityId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Ticket_NguoiDungId",
+                name: "IX_Ticket_TicketTypeId",
                 table: "Ticket",
-                column: "NguoiDungId");
+                column: "TicketTypeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Ticket_UuTienId",
+                name: "IX_Ticket_UserId",
                 table: "Ticket",
-                column: "UuTienId");
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Ticket_File_FileId",
@@ -656,14 +657,14 @@ namespace BACK_END.Migrations
                 column: "TicketId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_XuLy_Ticket_NguoiDungId",
-                table: "XuLy_Ticket",
-                column: "NguoiDungId");
+                name: "IX_TicketProcessing_TicketId",
+                table: "TicketProcessing",
+                column: "TicketId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_XuLy_Ticket_TicketId",
-                table: "XuLy_Ticket",
-                column: "TicketId");
+                name: "IX_TicketProcessing_UserId",
+                table: "TicketProcessing",
+                column: "UserId");
         }
 
         /// <inheritdoc />
@@ -685,25 +686,25 @@ namespace BACK_END.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "ChiTiet_HoaDon");
+                name: "BoardingHouse_FIle");
 
             migrationBuilder.DropTable(
-                name: "DayTro_FIle");
+                name: "OrderDetail");
 
             migrationBuilder.DropTable(
-                name: "DichVu_DayTro");
+                name: "Room_FIle");
 
             migrationBuilder.DropTable(
-                name: "PhongTro_FIle");
+                name: "RoomRental");
 
             migrationBuilder.DropTable(
-                name: "ThueTro");
+                name: "Service_BoardingHouse");
 
             migrationBuilder.DropTable(
                 name: "Ticket_File");
 
             migrationBuilder.DropTable(
-                name: "XuLy_Ticket");
+                name: "TicketProcessing");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
@@ -712,10 +713,10 @@ namespace BACK_END.Migrations
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "HoaDon");
+                name: "Order");
 
             migrationBuilder.DropTable(
-                name: "DichVu");
+                name: "Services");
 
             migrationBuilder.DropTable(
                 name: "File");
@@ -724,19 +725,19 @@ namespace BACK_END.Migrations
                 name: "Ticket");
 
             migrationBuilder.DropTable(
-                name: "PhongTro");
+                name: "Room");
 
             migrationBuilder.DropTable(
-                name: "LoaiTicket");
+                name: "PriorityLevel");
 
             migrationBuilder.DropTable(
-                name: "MucDoUuTien");
+                name: "TicketType");
 
             migrationBuilder.DropTable(
-                name: "DayTro");
+                name: "BoardingHouse");
 
             migrationBuilder.DropTable(
-                name: "NguoiDung");
+                name: "User");
         }
     }
 }
