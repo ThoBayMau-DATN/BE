@@ -22,7 +22,7 @@ namespace BACK_END.Controllers
             _logger = logger;
         }
 
-        [HttpPost("register")]
+        /*[HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto model)
         {
             try
@@ -52,7 +52,7 @@ namespace BACK_END.Controllers
             {
                 return BadRequest(ex.Message);
             }
-        }
+        }*/
         [HttpPost("dang-ky-user")]
         public async Task<IActionResult> DangKyUser([FromBody] DangKyUserDto model)
         {

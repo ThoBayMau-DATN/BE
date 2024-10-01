@@ -6,9 +6,10 @@ namespace BACK_END.Models
     {
         public int Id { get; set; }
         [Column(TypeName = "varchar(50)")]
-        public string TenFile { get; set; } = string.Empty;
-        public string ViTriLuu { get; set; } = string.Empty;
+        public string FileName { get; set; } = string.Empty;
+        public string StorageLocation { get; set; } = string.Empty;
         [Column(TypeName = "varchar(50)")]
-        public string KieuFile { get; set; } = string.Empty;
+        public string FileType { get; set; } = string.Empty;
     }
+
 }
