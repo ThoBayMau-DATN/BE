@@ -56,6 +56,7 @@ namespace BACK_END.Controllers
         [HttpPost("dang-ky-user")]
         public async Task<IActionResult> DangKyUser([FromBody] DangKyUserDto model)
         {
+            //kiểm lỗi nhập vào dto
             if (!ModelState.IsValid)
             {
                 var errorMessages = ModelState.Values
@@ -73,7 +74,7 @@ namespace BACK_END.Controllers
                 });
 
             }
-
+            //kiểm lỗi đã tồn tại trong sql
             try
             {
                 var checkEmail = await _auth.CheckEmail(model.Email);
@@ -110,7 +111,7 @@ namespace BACK_END.Controllers
                     Data = null
                 });
             }
-
+            //đăng ký tài khoản
             try
             {
                 var result = await _auth.DangKyUser(model);
@@ -138,6 +139,7 @@ namespace BACK_END.Controllers
         [HttpGet("dang-nhap")]
         public async Task<IActionResult> DangNhap(LoginDto model)
         {
+            //kiểm lỗi nhập vào dto
             if (!ModelState.IsValid)
             {
                 var errorMessages = ModelState.Values
@@ -150,6 +152,7 @@ namespace BACK_END.Controllers
             }
 
             var token = await _auth.LoginAsync(model);
+            //kiểm lỗi tài khoản hoặc mật khẩu không đúng
             if (string.IsNullOrEmpty(token))
             {
                 return Unauthorized(new ApiResponse<object>
@@ -160,7 +163,7 @@ namespace BACK_END.Controllers
                     Data = null,
                 });
             }
-
+            //kiểm lỗi không tìm thấy người dùng trong hệ thống
             var nguoiDung = await _auth.CheckSDT(model.Phone);
             if (nguoiDung == null)
             {
@@ -172,7 +175,7 @@ namespace BACK_END.Controllers
                     Data = null,
                 });
             }
-
+            //thành công
             return Ok(new ApiResponse<object>
             {
                 Code = 200,
