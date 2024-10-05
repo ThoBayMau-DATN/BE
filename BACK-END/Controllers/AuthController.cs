@@ -107,7 +107,7 @@ namespace BACK_END.Controllers
                 {
                     Code = 500,
                     Status = "error",
-                    Message = "Lỗi kết nối với sever.",
+                    Message = ex.Message,
                     Data = null
                 });
             }
@@ -130,7 +130,7 @@ namespace BACK_END.Controllers
                 {
                     Code = 500,
                     Status = "error",
-                    Message = "Lỗi khi đăng ký tài khoản.",
+                    Message = ex.Message,
                     Data = null
                 });
             }
