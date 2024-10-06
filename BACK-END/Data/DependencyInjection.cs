@@ -10,6 +10,7 @@ namespace BACK_END.Data
 		{
 			services.AddScoped<IAuth, AuthRepository>();
 			services.AddScoped<TokenService>();
+			services.AddScoped<IRoom, RoomRepository>();
 		}
 	}
 }

@@ -32,6 +32,7 @@ namespace BACK_END.Data
         public DbSet<BACK_END.Models.Ticket_File> Ticket_File { get; set; } = default!;
         public DbSet<BACK_END.Models.TicketProcessing> TicketProcessing { get; set; } = default!;
         public DbSet<BACK_END.Models.RoomRental> RoomRental { get; set; } = default!;
+        public DbSet<BACK_END.Models.RoomType> RoomType { get; set; } = default!;
 
     }
 }
