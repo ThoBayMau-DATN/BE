@@ -15,6 +15,7 @@ namespace BACK_END.Models
         public int Quantity { get; set; }
         [Column(TypeName = "ntext")]
         public string Description { get; set; } = string.Empty;
+        public DateTime TimeCreate { get; set; } = DateTime.Now;
         [Column(TypeName = "tinyint")]
         public int Status { get; set; }
         public int BoardingHouseId { get; set; }
