@@ -22,6 +22,7 @@ namespace BACK_END.Mappers
                 BoardingHouse = new DTOs.RoomDto.BoardingHouse {
                     NameOwner = model.BoardingHouse?.User?.FullName ?? "",
                     Address = model.BoardingHouse?.Address ?? "",
+                    Avatars = model.BoardingHouse?.User?.Avatar ?? ""
                 }
             };
         }
