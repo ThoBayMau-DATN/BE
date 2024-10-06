@@ -17,7 +17,6 @@ namespace BACK_END.DTOs.RoomDto
     }
     public class BoardingHouse
     {
-        public int Id { get; set; }
         public string NameOwner { get; set; } = string.Empty;
         public string Address { get; set; } = string.Empty;
 

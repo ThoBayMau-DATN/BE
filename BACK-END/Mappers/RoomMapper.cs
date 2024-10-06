@@ -20,7 +20,6 @@ namespace BACK_END.Mappers
                 Description = model.Description,
                 RoomTypeName = model.RoomType?.Name ?? "",
                 BoardingHouse = new DTOs.RoomDto.BoardingHouse {
-                    Id = model.BoardingHouse?.Id ?? 0,
                     NameOwner = model.BoardingHouse?.User?.FullName ?? "",
                     Address = model.BoardingHouse?.Address ?? "",
                 }
