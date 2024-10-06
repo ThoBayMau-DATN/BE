@@ -59,28 +59,28 @@ builder.Services.AddMemoryCache(); // su dung cache
 
 var MyCors = "_APP-CORS"; // => Config name cors
 // setting cors
-//builder.Services.AddCors(options =>
-//{
-//    options.AddPolicy(name: MyCors,
-//                      policy =>
-//                      {
-//                          policy.WithOrigins("*");
-//                          policy.WithMethods("*");
-//                          policy.WithHeaders("*");
-//                      });
-//});
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: MyCors,
                       policy =>
                       {
-                          policy.WithOrigins("http://localhost:5173")
-                                .AllowAnyHeader()
-                                .AllowAnyMethod()
-                                .AllowCredentials();
+                          policy.WithOrigins("*");
+                          policy.WithMethods("*");
+                          policy.WithHeaders("*");
                       });
 });
+
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy(name: MyCors,
+//                      policy =>
+//                      {
+//                          policy.WithOrigins("http://localhost:5173")
+//                                .AllowAnyHeader()
+//                                .AllowAnyMethod()
+//                                .AllowCredentials();
+//                      });
+//});
 
 var app = builder.Build();
 
