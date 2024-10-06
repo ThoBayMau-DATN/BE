@@ -10,11 +10,11 @@ namespace BACK_END.Mappers
         {
             return new DangNhapRepository
             {
-                HoTen = model.FullName,
+                Name = model.FullName,
                 Email = model.Email,
-                SDT = model.PhoneNumber,
-                Anh = model.Avatar,
-                TrangThai = model.Status
+                Phone = model.PhoneNumber,
+                Avatar = model.Avatar,
+                Status = model.Status
             };
         }
     }
