@@ -19,6 +19,7 @@ namespace BACK_END.DTOs.RoomDto
     {
         public string NameOwner { get; set; } = string.Empty;
         public string Address { get; set; } = string.Empty;
+        public string Avatars { get; set; } = string.Empty;
 
     }
 }
