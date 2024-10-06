@@ -8,6 +8,6 @@ namespace BACK_END.Services.Interfaces
 {
     public interface IRoom
     {
-        Task<List<GetAllRoomRepository>?> GetAllRoom(string sortColumn, string sortOrder, int pageNumber, int pageSize);
+        Task<List<GetAllRoomRepository>?> GetAllRoom(string searchAddress,string sortColumn, string sortOrder, int pageNumber, int pageSize);
     }
 }
