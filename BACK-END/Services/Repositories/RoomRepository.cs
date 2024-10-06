@@ -21,24 +21,25 @@ namespace BACK_END.Services.Repositories
             _db = db;
         }
         public async Task<List<GetAllRoomRepository>?> GetAllRoom(
+            string searchAddress,
             string sortColumn, 
             string sortOrder, 
             int pageNumber, 
             int pageSize)
         {
-            // var listRoom = await _db.Room
-            //     .Include(x => x.BoardingHouse)
-            //     .ThenInclude(x => x.User)
-            //     .Include(x => x.RoomType)
-            //     .Select(x => x.MapToGetAllRoomRepository())
-            //     .ToListAsync();
-            // return listRoom;
+            
 
             var query = _db.Room
                 .Include(x => x.BoardingHouse)
                 .ThenInclude(x => x.User)
                 .Include(x => x.RoomType)
                 .AsQueryable();
+
+            //Tìm kiếm
+            if (!string.IsNullOrEmpty(searchAddress))
+            {
+                query = query.Where(x => x.BoardingHouse.Address.Contains(searchAddress));
+            }
 
             // Sắp xếp
             if (!string.IsNullOrEmpty(sortColumn))

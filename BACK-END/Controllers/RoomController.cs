@@ -24,14 +24,15 @@ namespace BACK_END.Controllers
 
         [HttpGet]
         public async Task<IActionResult> GetAllRoom(
-            [FromQuery] string sortColumn, 
+            [FromQuery] string searchAddress,
+            [FromQuery] string sortColumn,
             [FromQuery] string sortOrder = "asc", 
             [FromQuery] int pageNumber = 1, 
             [FromQuery] int pageSize = 6)
         {
             try
             {
-                var listRoom = await _room.GetAllRoom(sortColumn, sortOrder, pageNumber, pageSize);
+                var listRoom = await _room.GetAllRoom(searchAddress, sortColumn, sortOrder, pageNumber, pageSize);
                 return Ok(new ApiResponse<object>
                 {
                     Code = 200,
