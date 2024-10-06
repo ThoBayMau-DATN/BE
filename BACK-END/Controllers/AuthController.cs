@@ -1,14 +1,8 @@
 ﻿using BACK_END.DTOs.Auth;
 using BACK_END.DTOs.Repository;
 using BACK_END.Services.Interfaces;
-using BACK_END.Services.MyServices;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.DotNet.Scaffolding.Shared.Messaging;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 using System.Net.Mail;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace BACK_END.Controllers
 {
@@ -136,8 +130,8 @@ namespace BACK_END.Controllers
             }
 
         }
-        [HttpGet("dang-nhap")]
-        public async Task<IActionResult> DangNhap(LoginDto model)
+        [HttpPost("dang-nhap")]
+        public async Task<IActionResult> DangNhap([FromBody] LoginDto model)
         {
             //kiểm lỗi nhập vào dto
             if (!ModelState.IsValid)
