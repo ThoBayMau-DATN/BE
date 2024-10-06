@@ -85,8 +85,8 @@ namespace BACK_END.Services.Repositories
                     {
                         Username = model.Email ?? "",
                         Email = model.Email ?? "",
-                        Password = model.MatKhau ?? "",
-                        PhoneNumber = model.SoDienThoai ?? "",
+                        Password = model.Password ?? "",
+                        PhoneNumber = model.Phone ?? "",
                         Role = "Customer"
                     };
                     var resultRegister = await RegisterAsync(RegisterDto);
@@ -97,8 +97,8 @@ namespace BACK_END.Services.Repositories
                     var nguoiDung = new User
                     {
                         Email = model.Email ?? "",
-                        FullName = model.HoTen ?? "",
-                        PhoneNumber = model.SoDienThoai ?? ""
+                        FullName = model.Name ?? "",
+                        PhoneNumber = model.Phone ?? ""
                     };
 
                     _db.User.Add(nguoiDung);

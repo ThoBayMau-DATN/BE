@@ -13,6 +13,11 @@ builder.Services.AddServices();
 // Add Identity services
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {
+    /*- Yêu cầu ít nhất 1 chữ số
+    - Độ dài tối thiểu 6 ký tự
+    - Không bắt buộc ký tự đặc biệt và chữ hoa
+    - Bắt buộc có chữ thường
+    - Yêu cầu ít nhất 1 ký tự duy nhất*/
     options.Password.RequireDigit = true;
     options.Password.RequiredLength = 6;
     options.Password.RequireNonAlphanumeric = false;
@@ -23,7 +28,6 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
     .AddEntityFrameworkStores<BACK_ENDContext>()
     .AddErrorDescriber<CustomIdentityErrorDescriber>()
     .AddDefaultTokenProviders();
-
 // Configure JWT Authentication
 builder.Services.AddAuthentication(options =>
 {
