@@ -219,7 +219,14 @@ namespace BACK_END.Controllers
             }
         }
 
-        [HttpPost("checkOtp")]
+        [HttpPost("test")]
+        public IActionResult TestOtp([FromBody] string testapi)
+        {
+            return Ok();
+        }
+
+
+        [HttpGet("checkOtp")]
         public IActionResult CheckOtp(string otp)
         {
             try
