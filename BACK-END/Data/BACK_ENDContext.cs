@@ -56,7 +56,7 @@ namespace BACK_END.Data
                     Description = "Phòng trọ rộng rãi, có điều hòa và ban công",
                     TimeCreate = DateTime.Now,
                     Status = 1, // Available
-                    BoardingHouseId = -1,
+                    BoardingHouseId = -2,
                     RoomTypeId = -2
                 },
                 new Room
@@ -68,7 +68,7 @@ namespace BACK_END.Data
                     Description = "Phòng nhỏ, phù hợp cho sinh viên",
                     TimeCreate = DateTime.Now,
                     Status = 1, // Available
-                    BoardingHouseId = -2,
+                    BoardingHouseId = -3,
                     RoomTypeId = -1
                 },
                 new Room
@@ -80,7 +80,7 @@ namespace BACK_END.Data
                     Description = "Phòng cao cấp, có view nhìn ra công viên",
                     TimeCreate = DateTime.Now,
                     Status = 1, // Available
-                    BoardingHouseId = -3,
+                    BoardingHouseId = -4,
                     RoomTypeId = -3
                 },
                 new Room
@@ -92,7 +92,7 @@ namespace BACK_END.Data
                     Description = "Phòng tiết kiệm, nhỏ gọn, gần chợ",
                     TimeCreate = DateTime.Now,
                     Status = 1, // Available
-                    BoardingHouseId = -4,
+                    BoardingHouseId = -5,
                     RoomTypeId = -1
                 }
             );
@@ -103,35 +103,35 @@ namespace BACK_END.Data
                    Id = -1,
                    Name = "Phòng đơn",
                    Description = "Phòng trọ dành cho một người ở, không gian nhỏ gọn, tiện nghi cơ bản",
-                   Status = true
+                   Status = 1
                },
                new RoomType
                {
                    Id = -2,
                    Name = "Phòng đôi",
                    Description = "Phòng trọ dành cho hai người ở, không gian rộng rãi hơn, có tiện nghi đầy đủ",
-                   Status = true
+                   Status = 1
                },
                new RoomType
                {
                    Id = -3,
                    Name = "Phòng gia đình",
                    Description = "Phòng trọ dành cho gia đình, không gian rộng, có bếp và phòng tắm riêng",
-                   Status = true
+                   Status = 1
                },
                new RoomType
                {
                    Id = -4,
                    Name = "Phòng VIP",
                    Description = "Phòng trọ cao cấp, tiện nghi hiện đại, có view đẹp, diện tích lớn",
-                   Status = true
+                   Status = 1
                },
                new RoomType
                {
                    Id = -5,
                    Name = "Phòng tiết kiệm",
                    Description = "Phòng nhỏ, giá rẻ, phù hợp cho sinh viên hoặc người có thu nhập thấp",
-                   Status = true
+                   Status = 1
                }
             );
 
