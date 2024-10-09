@@ -4,6 +4,7 @@ using BACK_END.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BACK_END.Migrations
 {
     [DbContext(typeof(BACK_ENDContext))]
-    partial class BACK_ENDContextModelSnapshot : ModelSnapshot
+    [Migration("20241009170720_sua-du-lieu-mau")]
+    partial class suadulieumau
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -264,7 +267,7 @@ namespace BACK_END.Migrations
                             Quantity = 1,
                             RoomTypeId = -1,
                             Status = (byte)1,
-                            TimeCreate = new DateTime(2024, 10, 10, 0, 9, 53, 370, DateTimeKind.Local).AddTicks(8536)
+                            TimeCreate = new DateTime(2024, 10, 10, 0, 7, 17, 289, DateTimeKind.Local).AddTicks(1416)
                         },
                         new
                         {
@@ -276,7 +279,7 @@ namespace BACK_END.Migrations
                             Quantity = 2,
                             RoomTypeId = -2,
                             Status = (byte)1,
-                            TimeCreate = new DateTime(2024, 10, 10, 0, 9, 53, 370, DateTimeKind.Local).AddTicks(8539)
+                            TimeCreate = new DateTime(2024, 10, 10, 0, 7, 17, 289, DateTimeKind.Local).AddTicks(1421)
                         },
                         new
                         {
@@ -288,7 +291,7 @@ namespace BACK_END.Migrations
                             Quantity = 1,
                             RoomTypeId = -1,
                             Status = (byte)1,
-                            TimeCreate = new DateTime(2024, 10, 10, 0, 9, 53, 370, DateTimeKind.Local).AddTicks(8542)
+                            TimeCreate = new DateTime(2024, 10, 10, 0, 7, 17, 289, DateTimeKind.Local).AddTicks(1425)
                         },
                         new
                         {
@@ -300,7 +303,7 @@ namespace BACK_END.Migrations
                             Quantity = 1,
                             RoomTypeId = -3,
                             Status = (byte)1,
-                            TimeCreate = new DateTime(2024, 10, 10, 0, 9, 53, 370, DateTimeKind.Local).AddTicks(8549)
+                            TimeCreate = new DateTime(2024, 10, 10, 0, 7, 17, 289, DateTimeKind.Local).AddTicks(1428)
                         },
                         new
                         {
@@ -312,7 +315,7 @@ namespace BACK_END.Migrations
                             Quantity = 1,
                             RoomTypeId = -1,
                             Status = (byte)1,
-                            TimeCreate = new DateTime(2024, 10, 10, 0, 9, 53, 370, DateTimeKind.Local).AddTicks(8551)
+                            TimeCreate = new DateTime(2024, 10, 10, 0, 7, 17, 289, DateTimeKind.Local).AddTicks(1431)
                         });
                 });
 
@@ -327,8 +330,8 @@ namespace BACK_END.Migrations
                     b.Property<int>("RoomId")
                         .HasColumnType("int");
 
-                    b.Property<byte>("Status")
-                        .HasColumnType("tinyint");
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -358,8 +361,8 @@ namespace BACK_END.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(50)");
 
-                    b.Property<byte>("Status")
-                        .HasColumnType("tinyint");
+                    b.Property<bool>("Status")
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -371,35 +374,35 @@ namespace BACK_END.Migrations
                             Id = -1,
                             Description = "Phòng trọ dành cho một người ở, không gian nhỏ gọn, tiện nghi cơ bản",
                             Name = "Phòng đơn",
-                            Status = (byte)1
+                            Status = true
                         },
                         new
                         {
                             Id = -2,
                             Description = "Phòng trọ dành cho hai người ở, không gian rộng rãi hơn, có tiện nghi đầy đủ",
                             Name = "Phòng đôi",
-                            Status = (byte)1
+                            Status = true
                         },
                         new
                         {
                             Id = -3,
                             Description = "Phòng trọ dành cho gia đình, không gian rộng, có bếp và phòng tắm riêng",
                             Name = "Phòng gia đình",
-                            Status = (byte)1
+                            Status = true
                         },
                         new
                         {
                             Id = -4,
                             Description = "Phòng trọ cao cấp, tiện nghi hiện đại, có view đẹp, diện tích lớn",
                             Name = "Phòng VIP",
-                            Status = (byte)1
+                            Status = true
                         },
                         new
                         {
                             Id = -5,
                             Description = "Phòng nhỏ, giá rẻ, phù hợp cho sinh viên hoặc người có thu nhập thấp",
                             Name = "Phòng tiết kiệm",
-                            Status = (byte)1
+                            Status = true
                         });
                 });
 
@@ -638,7 +641,7 @@ namespace BACK_END.Migrations
                             FullName = "John Doe",
                             PhoneNumber = "1234567890",
                             Status = (byte)1,
-                            TimeCreated = new DateTime(2024, 10, 10, 0, 9, 53, 370, DateTimeKind.Local).AddTicks(8827)
+                            TimeCreated = new DateTime(2024, 10, 10, 0, 7, 17, 289, DateTimeKind.Local).AddTicks(1701)
                         },
                         new
                         {
@@ -648,7 +651,7 @@ namespace BACK_END.Migrations
                             FullName = "Jane Smith",
                             PhoneNumber = "0987654321",
                             Status = (byte)1,
-                            TimeCreated = new DateTime(2024, 10, 10, 0, 9, 53, 370, DateTimeKind.Local).AddTicks(8829)
+                            TimeCreated = new DateTime(2024, 10, 10, 0, 7, 17, 289, DateTimeKind.Local).AddTicks(1703)
                         },
                         new
                         {
@@ -658,7 +661,7 @@ namespace BACK_END.Migrations
                             FullName = "Alice Brown",
                             PhoneNumber = "1122334455",
                             Status = (byte)1,
-                            TimeCreated = new DateTime(2024, 10, 10, 0, 9, 53, 370, DateTimeKind.Local).AddTicks(8830)
+                            TimeCreated = new DateTime(2024, 10, 10, 0, 7, 17, 289, DateTimeKind.Local).AddTicks(1706)
                         },
                         new
                         {
@@ -668,7 +671,7 @@ namespace BACK_END.Migrations
                             FullName = "Bob Johnson",
                             PhoneNumber = "5566778899",
                             Status = (byte)0,
-                            TimeCreated = new DateTime(2024, 10, 10, 0, 9, 53, 370, DateTimeKind.Local).AddTicks(8831)
+                            TimeCreated = new DateTime(2024, 10, 10, 0, 7, 17, 289, DateTimeKind.Local).AddTicks(1707)
                         },
                         new
                         {
@@ -678,7 +681,7 @@ namespace BACK_END.Migrations
                             FullName = "Charlie White",
                             PhoneNumber = "6677889900",
                             Status = (byte)1,
-                            TimeCreated = new DateTime(2024, 10, 10, 0, 9, 53, 370, DateTimeKind.Local).AddTicks(8833)
+                            TimeCreated = new DateTime(2024, 10, 10, 0, 7, 17, 289, DateTimeKind.Local).AddTicks(1709)
                         });
                 });
 

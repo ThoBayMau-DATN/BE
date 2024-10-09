@@ -9,6 +9,7 @@ namespace BACK_END.Models
         public string Name { get; set; } = string.Empty;
         [Column(TypeName = "ntext")]
         public string Description { get; set; } = string.Empty;
-        public bool Status { get; set; }
+        [Column(TypeName = "tinyint")]
+        public int Status { get; set; }
     }
 }
