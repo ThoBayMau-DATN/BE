@@ -23,7 +23,7 @@ namespace BACK_END.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllRoom(
+        public async Task<IActionResult> GetAllRoomByUser(
             [FromQuery] string searchAddress,
             [FromQuery] string sortColumn,
             [FromQuery] string sortOrder = "asc", 
@@ -32,7 +32,7 @@ namespace BACK_END.Controllers
         {
             try
             {
-                var listRoom = await _room.GetAllRoom(searchAddress, sortColumn, sortOrder, pageNumber, pageSize);
+                var listRoom = await _room.GetAllRoomByUser(searchAddress, sortColumn, sortOrder, pageNumber, pageSize);
                 return Ok(new ApiResponse<object>
                 {
                     Code = 200,

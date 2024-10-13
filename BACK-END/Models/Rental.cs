@@ -2,12 +2,11 @@
 
 namespace BACK_END.Models
 {
-    public class Ticket
+    public class Rental
     {
         public int Id { get; set; }
-        public string Type { get; set; } =string.Empty;
-        public string Title { get; set; } =string.Empty;
-        public string Content { get; set; } =string.Empty;
+        public DateTime TimeStart { get; set; }
+        public DateTime TimeEnd { get; set; }
         [Column(TypeName = "tinyint")]
         public int Status { get; set; }
         public int UserId { get; set; }

@@ -22,7 +22,78 @@ namespace BACK_END.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("BACK_END.Models.BoardingHouse", b =>
+            modelBuilder.Entity("BACK_END.Models.Consumption", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Electric")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("Time")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("Water")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Consumption");
+                });
+
+            modelBuilder.Entity("BACK_END.Models.Image", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Link")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Image");
+                });
+
+            modelBuilder.Entity("BACK_END.Models.Media", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("ImageId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("MotelId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TicketId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ImageId");
+
+                    b.HasIndex("MotelId");
+
+                    b.HasIndex("TicketId");
+
+                    b.ToTable("Media");
+                });
+
+            modelBuilder.Entity("BACK_END.Models.Motel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -34,169 +105,7 @@ namespace BACK_END.Migrations
                         .IsRequired()
                         .HasColumnType("ntext");
 
-                    b.Property<byte>("Status")
-                        .HasColumnType("tinyint");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("BoardingHouse");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = -1,
-                            Address = "123 Main St",
-                            Status = (byte)1,
-                            UserId = -1
-                        },
-                        new
-                        {
-                            Id = -2,
-                            Address = "456 Oak Ave",
-                            Status = (byte)2,
-                            UserId = -2
-                        },
-                        new
-                        {
-                            Id = -3,
-                            Address = "789 Pine Rd",
-                            Status = (byte)1,
-                            UserId = -3
-                        },
-                        new
-                        {
-                            Id = -4,
-                            Address = "101 Maple Dr",
-                            Status = (byte)0,
-                            UserId = -4
-                        },
-                        new
-                        {
-                            Id = -5,
-                            Address = "202 Birch Ln",
-                            Status = (byte)1,
-                            UserId = -5
-                        });
-                });
-
-            modelBuilder.Entity("BACK_END.Models.BoardingHouse_FIle", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("BoardingHouseId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("FileId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BoardingHouseId");
-
-                    b.HasIndex("FileId");
-
-                    b.ToTable("BoardingHouse_FIle");
-                });
-
-            modelBuilder.Entity("BACK_END.Models.File", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("FileName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("FileType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("StorageLocation")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("File");
-                });
-
-            modelBuilder.Entity("BACK_END.Models.Order", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("OtherCost")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("RoomId")
-                        .HasColumnType("int");
-
-                    b.Property<byte>("Status")
-                        .HasColumnType("tinyint");
-
-                    b.Property<DateTime>("TimeCreated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal>("TotalAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RoomId");
-
-                    b.ToTable("Order");
-                });
-
-            modelBuilder.Entity("BACK_END.Models.OrderDetail", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("OrderId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ServiceId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("TotalServiceFee")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrderId");
-
-                    b.HasIndex("ServiceId");
-
-                    b.ToTable("OrderDetail");
-                });
-
-            modelBuilder.Entity("BACK_END.Models.PriorityLevel", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
+                    b.Property<string>("Location")
                         .IsRequired()
                         .HasColumnType("ntext");
 
@@ -207,9 +116,153 @@ namespace BACK_END.Migrations
                     b.Property<byte>("Status")
                         .HasColumnType("tinyint");
 
+                    b.Property<int>("TermId")
+                        .HasColumnType("int");
+
+                    b.Property<byte>("TotalRoom")
+                        .HasColumnType("tinyint");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.ToTable("PriorityLevel");
+                    b.HasIndex("TermId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Motel");
+                });
+
+            modelBuilder.Entity("BACK_END.Models.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte>("Status")
+                        .HasColumnType("tinyint");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Notification");
+                });
+
+            modelBuilder.Entity("BACK_END.Models.Price", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<double>("Electric")
+                        .HasColumnType("float");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("MotelId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("Other")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Water")
+                        .HasColumnType("double(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MotelId")
+                        .IsUnique();
+
+                    b.ToTable("Price");
+                });
+
+            modelBuilder.Entity("BACK_END.Models.Rental", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("MotelId")
+                        .HasColumnType("int");
+
+                    b.Property<byte>("Status")
+                        .HasColumnType("tinyint");
+
+                    b.Property<DateTime>("TimeEnd")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("TimeStart")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MotelId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Rental");
+                });
+
+            modelBuilder.Entity("BACK_END.Models.Review", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("MotelId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Rating")
+                        .HasColumnType("decimal(18,1)");
+
+                    b.Property<int?>("RoomId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MotelId");
+
+                    b.HasIndex("RoomId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Reviews");
                 });
 
             modelBuilder.Entity("BACK_END.Models.Room", b =>
@@ -223,100 +276,26 @@ namespace BACK_END.Migrations
                     b.Property<decimal>("Area")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("BoardingHouseId")
+                    b.Property<int>("MotelId")
                         .HasColumnType("int");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("ntext");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,1)");
 
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RoomTypeId")
+                    b.Property<int>("RoomNumber")
                         .HasColumnType("int");
 
                     b.Property<byte>("Status")
                         .HasColumnType("tinyint");
 
-                    b.Property<DateTime>("TimeCreate")
-                        .HasColumnType("datetime2");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("BoardingHouseId");
-
-                    b.HasIndex("RoomTypeId");
+                    b.HasIndex("MotelId");
 
                     b.ToTable("Room");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = -1,
-                            Area = 25.5m,
-                            BoardingHouseId = -1,
-                            Description = "Phòng trọ gần trường, đầy đủ tiện nghi",
-                            Price = 1500000m,
-                            Quantity = 1,
-                            RoomTypeId = -1,
-                            Status = (byte)1,
-                            TimeCreate = new DateTime(2024, 10, 10, 0, 9, 53, 370, DateTimeKind.Local).AddTicks(8536)
-                        },
-                        new
-                        {
-                            Id = -2,
-                            Area = 30.0m,
-                            BoardingHouseId = -2,
-                            Description = "Phòng trọ rộng rãi, có điều hòa và ban công",
-                            Price = 2000000m,
-                            Quantity = 2,
-                            RoomTypeId = -2,
-                            Status = (byte)1,
-                            TimeCreate = new DateTime(2024, 10, 10, 0, 9, 53, 370, DateTimeKind.Local).AddTicks(8539)
-                        },
-                        new
-                        {
-                            Id = -3,
-                            Area = 20.0m,
-                            BoardingHouseId = -3,
-                            Description = "Phòng nhỏ, phù hợp cho sinh viên",
-                            Price = 1000000m,
-                            Quantity = 1,
-                            RoomTypeId = -1,
-                            Status = (byte)1,
-                            TimeCreate = new DateTime(2024, 10, 10, 0, 9, 53, 370, DateTimeKind.Local).AddTicks(8542)
-                        },
-                        new
-                        {
-                            Id = -4,
-                            Area = 40.0m,
-                            BoardingHouseId = -4,
-                            Description = "Phòng cao cấp, có view nhìn ra công viên",
-                            Price = 3500000m,
-                            Quantity = 1,
-                            RoomTypeId = -3,
-                            Status = (byte)1,
-                            TimeCreate = new DateTime(2024, 10, 10, 0, 9, 53, 370, DateTimeKind.Local).AddTicks(8549)
-                        },
-                        new
-                        {
-                            Id = -5,
-                            Area = 15.0m,
-                            BoardingHouseId = -5,
-                            Description = "Phòng tiết kiệm, nhỏ gọn, gần chợ",
-                            Price = 800000m,
-                            Quantity = 1,
-                            RoomTypeId = -1,
-                            Status = (byte)1,
-                            TimeCreate = new DateTime(2024, 10, 10, 0, 9, 53, 370, DateTimeKind.Local).AddTicks(8551)
-                        });
                 });
 
-            modelBuilder.Entity("BACK_END.Models.RoomRental", b =>
+            modelBuilder.Entity("BACK_END.Models.Term", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -324,155 +303,13 @@ namespace BACK_END.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("RoomId")
-                        .HasColumnType("int");
-
-                    b.Property<byte>("Status")
-                        .HasColumnType("tinyint");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RoomId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("RoomRental");
-                });
-
-            modelBuilder.Entity("BACK_END.Models.RoomType", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
+                    b.Property<string>("Link")
                         .IsRequired()
                         .HasColumnType("ntext");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<byte>("Status")
-                        .HasColumnType("tinyint");
-
                     b.HasKey("Id");
 
-                    b.ToTable("RoomType");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = -1,
-                            Description = "Phòng trọ dành cho một người ở, không gian nhỏ gọn, tiện nghi cơ bản",
-                            Name = "Phòng đơn",
-                            Status = (byte)1
-                        },
-                        new
-                        {
-                            Id = -2,
-                            Description = "Phòng trọ dành cho hai người ở, không gian rộng rãi hơn, có tiện nghi đầy đủ",
-                            Name = "Phòng đôi",
-                            Status = (byte)1
-                        },
-                        new
-                        {
-                            Id = -3,
-                            Description = "Phòng trọ dành cho gia đình, không gian rộng, có bếp và phòng tắm riêng",
-                            Name = "Phòng gia đình",
-                            Status = (byte)1
-                        },
-                        new
-                        {
-                            Id = -4,
-                            Description = "Phòng trọ cao cấp, tiện nghi hiện đại, có view đẹp, diện tích lớn",
-                            Name = "Phòng VIP",
-                            Status = (byte)1
-                        },
-                        new
-                        {
-                            Id = -5,
-                            Description = "Phòng nhỏ, giá rẻ, phù hợp cho sinh viên hoặc người có thu nhập thấp",
-                            Name = "Phòng tiết kiệm",
-                            Status = (byte)1
-                        });
-                });
-
-            modelBuilder.Entity("BACK_END.Models.Room_FIle", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("FileId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RoomId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FileId");
-
-                    b.HasIndex("RoomId");
-
-                    b.ToTable("Room_FIle");
-                });
-
-            modelBuilder.Entity("BACK_END.Models.Service", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("ntext");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("ServiceName")
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<byte>("Status")
-                        .HasColumnType("tinyint");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Services");
-                });
-
-            modelBuilder.Entity("BACK_END.Models.Service_BoardingHouse", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("BoardingHouseId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ServiceId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BoardingHouseId");
-
-                    b.HasIndex("ServiceId");
-
-                    b.ToTable("Service_BoardingHouse");
+                    b.ToTable("Term");
                 });
 
             modelBuilder.Entity("BACK_END.Models.Ticket", b =>
@@ -485,21 +322,19 @@ namespace BACK_END.Migrations
 
                     b.Property<string>("Content")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("PriorityId")
+                    b.Property<int>("MotelId")
                         .HasColumnType("int");
 
                     b.Property<byte>("Status")
                         .HasColumnType("tinyint");
 
-                    b.Property<int>("TicketTypeId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("TimeCreated")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -508,92 +343,11 @@ namespace BACK_END.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PriorityId");
-
-                    b.HasIndex("TicketTypeId");
+                    b.HasIndex("MotelId");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("Ticket");
-                });
-
-            modelBuilder.Entity("BACK_END.Models.TicketProcessing", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<byte>("Status")
-                        .HasColumnType("tinyint");
-
-                    b.Property<int>("TicketId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("TimeDone")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("TimeReceived")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TicketId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("TicketProcessing");
-                });
-
-            modelBuilder.Entity("BACK_END.Models.TicketType", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<byte>("Status")
-                        .HasColumnType("tinyint");
-
-                    b.Property<string>("TypeName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("TicketType");
-                });
-
-            modelBuilder.Entity("BACK_END.Models.Ticket_File", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("FileId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TicketId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FileId");
-
-                    b.HasIndex("TicketId");
-
-                    b.ToTable("Ticket_File");
                 });
 
             modelBuilder.Entity("BACK_END.Models.User", b =>
@@ -613,9 +367,9 @@ namespace BACK_END.Migrations
 
                     b.Property<string>("FullName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(50)");
 
-                    b.Property<string>("PhoneNumber")
+                    b.Property<string>("Phone")
                         .IsRequired()
                         .HasColumnType("varchar(10)");
 
@@ -628,58 +382,6 @@ namespace BACK_END.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("User");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = -1,
-                            Avatar = "john_avatar.png",
-                            Email = "johndoe@example.com",
-                            FullName = "John Doe",
-                            PhoneNumber = "1234567890",
-                            Status = (byte)1,
-                            TimeCreated = new DateTime(2024, 10, 10, 0, 9, 53, 370, DateTimeKind.Local).AddTicks(8827)
-                        },
-                        new
-                        {
-                            Id = -2,
-                            Avatar = "jane_avatar.png",
-                            Email = "janesmith@example.com",
-                            FullName = "Jane Smith",
-                            PhoneNumber = "0987654321",
-                            Status = (byte)1,
-                            TimeCreated = new DateTime(2024, 10, 10, 0, 9, 53, 370, DateTimeKind.Local).AddTicks(8829)
-                        },
-                        new
-                        {
-                            Id = -3,
-                            Avatar = "alice_avatar.png",
-                            Email = "alicebrown@example.com",
-                            FullName = "Alice Brown",
-                            PhoneNumber = "1122334455",
-                            Status = (byte)1,
-                            TimeCreated = new DateTime(2024, 10, 10, 0, 9, 53, 370, DateTimeKind.Local).AddTicks(8830)
-                        },
-                        new
-                        {
-                            Id = -4,
-                            Avatar = "bob_avatar.png",
-                            Email = "bobjohnson@example.com",
-                            FullName = "Bob Johnson",
-                            PhoneNumber = "5566778899",
-                            Status = (byte)0,
-                            TimeCreated = new DateTime(2024, 10, 10, 0, 9, 53, 370, DateTimeKind.Local).AddTicks(8831)
-                        },
-                        new
-                        {
-                            Id = -5,
-                            Avatar = "charlie_avatar.png",
-                            Email = "charliewhite@example.com",
-                            FullName = "Charlie White",
-                            PhoneNumber = "6677889900",
-                            Status = (byte)1,
-                            TimeCreated = new DateTime(2024, 10, 10, 0, 9, 53, 370, DateTimeKind.Local).AddTicks(8833)
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -880,7 +582,47 @@ namespace BACK_END.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("BACK_END.Models.BoardingHouse", b =>
+            modelBuilder.Entity("BACK_END.Models.Media", b =>
+                {
+                    b.HasOne("BACK_END.Models.Image", "Image")
+                        .WithMany()
+                        .HasForeignKey("ImageId");
+
+                    b.HasOne("BACK_END.Models.Motel", "Motel")
+                        .WithMany()
+                        .HasForeignKey("MotelId");
+
+                    b.HasOne("BACK_END.Models.Ticket", "Ticket")
+                        .WithMany()
+                        .HasForeignKey("TicketId");
+
+                    b.Navigation("Image");
+
+                    b.Navigation("Motel");
+
+                    b.Navigation("Ticket");
+                });
+
+            modelBuilder.Entity("BACK_END.Models.Motel", b =>
+                {
+                    b.HasOne("BACK_END.Models.Term", "Term")
+                        .WithMany()
+                        .HasForeignKey("TermId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BACK_END.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Term");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BACK_END.Models.Notification", b =>
                 {
                     b.HasOne("BACK_END.Models.User", "User")
                         .WithMany()
@@ -891,142 +633,75 @@ namespace BACK_END.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("BACK_END.Models.BoardingHouse_FIle", b =>
+            modelBuilder.Entity("BACK_END.Models.Price", b =>
                 {
-                    b.HasOne("BACK_END.Models.BoardingHouse", "BoardingHouse")
-                        .WithMany()
-                        .HasForeignKey("BoardingHouseId")
+                    b.HasOne("BACK_END.Models.Motel", "Motel")
+                        .WithOne("Price")
+                        .HasForeignKey("BACK_END.Models.Price", "MotelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BACK_END.Models.File", "File")
-                        .WithMany()
-                        .HasForeignKey("FileId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("BoardingHouse");
-
-                    b.Navigation("File");
+                    b.Navigation("Motel");
                 });
 
-            modelBuilder.Entity("BACK_END.Models.Order", b =>
+            modelBuilder.Entity("BACK_END.Models.Rental", b =>
                 {
-                    b.HasOne("BACK_END.Models.Room", "Room")
+                    b.HasOne("BACK_END.Models.Motel", "Motel")
                         .WithMany()
-                        .HasForeignKey("RoomId")
+                        .HasForeignKey("MotelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Room");
+                    b.HasOne("BACK_END.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Motel");
+
+                    b.Navigation("User");
                 });
 
-            modelBuilder.Entity("BACK_END.Models.OrderDetail", b =>
+            modelBuilder.Entity("BACK_END.Models.Review", b =>
                 {
-                    b.HasOne("BACK_END.Models.Order", "Order")
-                        .WithMany()
-                        .HasForeignKey("OrderId")
+                    b.HasOne("BACK_END.Models.Motel", "Motel")
+                        .WithMany("Reviews")
+                        .HasForeignKey("MotelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BACK_END.Models.Service", "Service")
+                    b.HasOne("BACK_END.Models.Room", null)
+                        .WithMany("Reviews")
+                        .HasForeignKey("RoomId");
+
+                    b.HasOne("BACK_END.Models.User", "User")
                         .WithMany()
-                        .HasForeignKey("ServiceId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Order");
+                    b.Navigation("Motel");
 
-                    b.Navigation("Service");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("BACK_END.Models.Room", b =>
                 {
-                    b.HasOne("BACK_END.Models.BoardingHouse", "BoardingHouse")
-                        .WithMany()
-                        .HasForeignKey("BoardingHouseId")
+                    b.HasOne("BACK_END.Models.Motel", "Motel")
+                        .WithMany("Rooms")
+                        .HasForeignKey("MotelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BACK_END.Models.RoomType", "RoomType")
-                        .WithMany()
-                        .HasForeignKey("RoomTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("BoardingHouse");
-
-                    b.Navigation("RoomType");
-                });
-
-            modelBuilder.Entity("BACK_END.Models.RoomRental", b =>
-                {
-                    b.HasOne("BACK_END.Models.Room", "Room")
-                        .WithMany()
-                        .HasForeignKey("RoomId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BACK_END.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Room");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("BACK_END.Models.Room_FIle", b =>
-                {
-                    b.HasOne("BACK_END.Models.File", "File")
-                        .WithMany()
-                        .HasForeignKey("FileId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BACK_END.Models.Room", "Room")
-                        .WithMany()
-                        .HasForeignKey("RoomId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("File");
-
-                    b.Navigation("Room");
-                });
-
-            modelBuilder.Entity("BACK_END.Models.Service_BoardingHouse", b =>
-                {
-                    b.HasOne("BACK_END.Models.BoardingHouse", "BoardingHouse")
-                        .WithMany()
-                        .HasForeignKey("BoardingHouseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BACK_END.Models.Service", "Service")
-                        .WithMany()
-                        .HasForeignKey("ServiceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("BoardingHouse");
-
-                    b.Navigation("Service");
+                    b.Navigation("Motel");
                 });
 
             modelBuilder.Entity("BACK_END.Models.Ticket", b =>
                 {
-                    b.HasOne("BACK_END.Models.PriorityLevel", "Priority")
+                    b.HasOne("BACK_END.Models.Motel", "Motel")
                         .WithMany()
-                        .HasForeignKey("PriorityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BACK_END.Models.TicketType", "TicketType")
-                        .WithMany()
-                        .HasForeignKey("TicketTypeId")
+                        .HasForeignKey("MotelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1036,49 +711,9 @@ namespace BACK_END.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Priority");
-
-                    b.Navigation("TicketType");
+                    b.Navigation("Motel");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("BACK_END.Models.TicketProcessing", b =>
-                {
-                    b.HasOne("BACK_END.Models.Ticket", "Ticket")
-                        .WithMany()
-                        .HasForeignKey("TicketId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BACK_END.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Ticket");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("BACK_END.Models.Ticket_File", b =>
-                {
-                    b.HasOne("BACK_END.Models.File", "File")
-                        .WithMany()
-                        .HasForeignKey("FileId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BACK_END.Models.Ticket", "Ticket")
-                        .WithMany()
-                        .HasForeignKey("TicketId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("File");
-
-                    b.Navigation("Ticket");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1130,6 +765,20 @@ namespace BACK_END.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("BACK_END.Models.Motel", b =>
+                {
+                    b.Navigation("Price");
+
+                    b.Navigation("Reviews");
+
+                    b.Navigation("Rooms");
+                });
+
+            modelBuilder.Entity("BACK_END.Models.Room", b =>
+                {
+                    b.Navigation("Reviews");
                 });
 #pragma warning restore 612, 618
         }

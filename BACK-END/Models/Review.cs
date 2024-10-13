@@ -2,14 +2,12 @@
 
 namespace BACK_END.Models
 {
-    public class Ticket
+    public class Review
     {
         public int Id { get; set; }
-        public string Type { get; set; } =string.Empty;
-        public string Title { get; set; } =string.Empty;
-        public string Content { get; set; } =string.Empty;
-        [Column(TypeName = "tinyint")]
-        public int Status { get; set; }
+        [Column(TypeName = "decimal(18,1)")]
+        public int Rating { get; set; }
+        public string Content { get; set; } = string.Empty;
         public int UserId { get; set; }
         public User? User { get; set; }
         public int MotelId { get; set; }

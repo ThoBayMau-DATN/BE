@@ -20,7 +20,7 @@ namespace BACK_END.Services.Repositories
         {
             _db = db;
         }
-        public async Task<List<GetAllRoomRepository>?> GetAllRoom(
+        public async Task<List<GetAllRoomRepositoryDto>?> GetAllRoomByUser(
             string searchAddress,
             string sortColumn, 
             string sortOrder, 
@@ -30,15 +30,22 @@ namespace BACK_END.Services.Repositories
             
 
             var query = _db.Room
-                .Include(x => x.BoardingHouse)
+                .Include(x => x.Motel)
+                .ThenInclude(x => x.Price)
+                .Include(x => x.Motel)
                 .ThenInclude(x => x.User)
-                .Include(x => x.RoomType)
+                .Include(x => x.Motel)
+                .ThenInclude(x => x.Reviews)
+                .Include(x => x.Motel)
+                .ThenInclude(x => x.Term)
+                .Where(x => x.Motel.Status == 1)
+                .Where(x => x.Status == 1)
                 .AsQueryable();
 
             //Tìm kiếm
             if (!string.IsNullOrEmpty(searchAddress))
             {
-                query = query.Where(x => x.BoardingHouse.Address.Contains(searchAddress));
+                query = query.Where(x => x.Motel.Address.Contains(searchAddress));
             }
 
             // Sắp xếp
@@ -50,7 +57,7 @@ namespace BACK_END.Services.Repositories
             }
 
             // Áp dụng mapping và phân trang
-            var pagedResult = await PagedList<GetAllRoomRepository>.CreateAsync(
+            var pagedResult = await PagedList<GetAllRoomRepositoryDto>.CreateAsync(
                 query.Select(x => x.MapToGetAllRoomRepository()),
                 pageNumber,
                 pageSize);
@@ -64,7 +71,6 @@ namespace BACK_END.Services.Repositories
             {
                 "area" => r => r.Area,
                 "price" => r => r.Price,
-                "quantity" => r => r.Quantity,
                 _ => r => r.Id // Mặc định sắp xếp theo Id
             };
         }
