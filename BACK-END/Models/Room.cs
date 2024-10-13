@@ -1,28 +1,19 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using System.Collections;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Net.Mime;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BACK_END.Models
 {
     public class Room
     {
         public int Id { get; set; }
+        public int RoomNumber { get; set; }
         [Column(TypeName = "decimal(18,2)")]
-        public decimal Area { get; set; }
-        [Column(TypeName = "decimal(18,2)")]
+        public int Area { get; set; }
+        [Column(TypeName ="decimal(18,1)")]
         public decimal Price { get; set; }
-        public int Quantity { get; set; }
-        [Column(TypeName = "ntext")]
-        public string Description { get; set; } = string.Empty;
-        public DateTime TimeCreate { get; set; } = DateTime.Now;
         [Column(TypeName = "tinyint")]
         public int Status { get; set; }
-        public int BoardingHouseId { get; set; }
-        [ForeignKey("BoardingHouseId")]
-        public BoardingHouse? BoardingHouse { get; set; }
-        public int RoomTypeId { get; set; }
-        [ForeignKey("RoomTypeId")]
-        public RoomType? RoomType { get; set; }
+        public int MotelId { get; set; }
+        public Motel? Motel { get; set; }
+        public List<Review>? Reviews { get; set; }
     }
 }
