@@ -1,37 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using BACK_END.Models;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using BACK_END.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace BACK_END.Data
 {
     public class BACK_ENDContext : IdentityDbContext<IdentityUser>
     {
-        public BACK_ENDContext (DbContextOptions<BACK_ENDContext> options)
+        public BACK_ENDContext(DbContextOptions<BACK_ENDContext> options)
             : base(options)
         {
         }
 
-        public DbSet<BACK_END.Models.Room> Room { get; set; } = default!;
-        public DbSet<BACK_END.Models.OrderDetail> OrderDetail { get; set; } = default!;
-        public DbSet<BACK_END.Models.BoardingHouse> BoardingHouse { get; set; } = default!;
-        public DbSet<BACK_END.Models.BoardingHouse_FIle> BoardingHouse_FIle { get; set; } = default!;
-        public DbSet<BACK_END.Models.Service> Services { get; set; } = default!;
-        public DbSet<BACK_END.Models.Service_BoardingHouse> Service_BoardingHouse { get; set; } = default!;
-        public DbSet<BACK_END.Models.File> File { get; set; } = default!;
-        public DbSet<BACK_END.Models.Order> Order { get; set; } = default!;
-        public DbSet<BACK_END.Models.TicketType> TicketType { get; set; } = default!;
-        public DbSet<BACK_END.Models.PriorityLevel> PriorityLevel { get; set; } = default!;
-        public DbSet<BACK_END.Models.User> User { get; set; } = default!;
-        public DbSet<BACK_END.Models.Room_FIle> Room_FIle { get; set; } = default!;
-        public DbSet<BACK_END.Models.Ticket> Ticket { get; set; } = default!;
-        public DbSet<BACK_END.Models.Ticket_File> Ticket_File { get; set; } = default!;
-        public DbSet<BACK_END.Models.TicketProcessing> TicketProcessing { get; set; } = default!;
-        public DbSet<BACK_END.Models.RoomRental> RoomRental { get; set; } = default!;
+        public DbSet<Room> Room { get; set; }
+        public DbSet<Consumption> Consumption { get; set; }
+        public DbSet<Image> Image { get; set; }
+        public DbSet<Media> Media { get; set; }
+        public DbSet<Motel> Motel { get; set; }
+        public DbSet<Notification> Notification { get; set; }
+        public DbSet<Price> Price { get; set; }
+        public DbSet<Rental> Rental { get; set; }
+        public DbSet<Review> Reviews{ get; set; }
+        public DbSet<Term> Term { get; set; }
+        public DbSet<Ticket> Ticket { get; set; }
+        public DbSet<User> User { get; set; }
+
 
     }
 }

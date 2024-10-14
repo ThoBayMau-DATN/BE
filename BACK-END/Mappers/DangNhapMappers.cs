@@ -12,7 +12,7 @@ namespace BACK_END.Mappers
             {
                 Name = model.FullName,
                 Email = model.Email,
-                Phone = model.PhoneNumber,
+                Phone = model.Phone,
                 Avatar = model.Avatar,
                 Status = model.Status
             };
