@@ -10,6 +10,8 @@ builder.Services.AddDbContext<BACK_ENDContext>(options =>
 
 builder.Services.AddServices();
 
+
+
 // Add Identity services
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {
