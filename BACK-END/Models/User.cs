@@ -5,7 +5,7 @@ namespace BACK_END.Models
     public class User
     {
         public int Id { get; set; }
-        [Column(TypeName = "varchar(50)")]
+        [Column(TypeName = "nvarchar(50)")]
         public string FullName { get; set; } = string.Empty;
         [Column(TypeName = "varchar(10)")]
         public string Phone { get; set; } = string.Empty;
