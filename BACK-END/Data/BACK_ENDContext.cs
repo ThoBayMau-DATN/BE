@@ -20,7 +20,7 @@ namespace BACK_END.Data
         public DbSet<Notification> Notification { get; set; }
         public DbSet<Price> Price { get; set; }
         public DbSet<Rental> Rental { get; set; }
-        public DbSet<Review> Reviews{ get; set; }
+        public DbSet<Review> Review { get; set; }
         public DbSet<Term> Term { get; set; }
         public DbSet<Ticket> Ticket { get; set; }
         public DbSet<User> User { get; set; }
@@ -28,9 +28,11 @@ namespace BACK_END.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
             modelBuilder.Entity<Term>().HasData(
                 new Term { Id = 1002, Link = "https://example.com/link2" },
-                new Term { Id = 1003, Link = "https://example.com/link3" }
+                new Term { Id = 1001, Link = "https://example.com/link3" }
             );
 
             modelBuilder.Entity<User>().HasData(
@@ -64,7 +66,7 @@ namespace BACK_END.Data
                     TimeCreated = DateTime.Now,
                     Status = true
                 }
-            
+
             );
 
             modelBuilder.Entity<Motel>().HasData(
@@ -279,7 +281,7 @@ namespace BACK_END.Data
                     Id = 1001,
                     RoomNumber = 101,
                     Area = 25,
-                    Price = 500000m,
+                    Price = 500000,
                     Status = 1, // Đang hoạt động
                     MotelId = 1001
                 },
@@ -288,7 +290,7 @@ namespace BACK_END.Data
                     Id = 1002,
                     RoomNumber = 102,
                     Area = 30,
-                    Price = 600000m,
+                    Price = 600000,
                     Status = 0, // Tạm ngừng
                     MotelId = 1002
                 },
@@ -297,7 +299,7 @@ namespace BACK_END.Data
                     Id = 1003,
                     RoomNumber = 103,
                     Area = 35,
-                    Price = 700000m,
+                    Price = 700000,
                     Status = 1,
                     MotelId = 1003
                 },
@@ -306,7 +308,7 @@ namespace BACK_END.Data
                     Id = 1004,
                     RoomNumber = 104,
                     Area = 40,
-                    Price = 800000m,
+                    Price = 800000,
                     Status = 1,
                     MotelId = 1004
                 },
@@ -315,7 +317,7 @@ namespace BACK_END.Data
                     Id = 1005,
                     RoomNumber = 105,
                     Area = 45,
-                    Price = 900000m,
+                    Price = 900000,
                     Status = 0,
                     MotelId = 1005
                 },
@@ -324,7 +326,7 @@ namespace BACK_END.Data
                     Id = 1006,
                     RoomNumber = 106,
                     Area = 50,
-                    Price = 1000000m,
+                    Price = 1000000,
                     Status = 1,
                     MotelId = 1006
                 },
@@ -333,7 +335,7 @@ namespace BACK_END.Data
                     Id = 1007,
                     RoomNumber = 107,
                     Area = 55,
-                    Price = 1100000m,
+                    Price = 1100000,
                     Status = 1,
                     MotelId = 1007
                 },
@@ -342,7 +344,7 @@ namespace BACK_END.Data
                     Id = 1008,
                     RoomNumber = 108,
                     Area = 60,
-                    Price = 1200000m,
+                    Price = 1200000,
                     Status = 0,
                     MotelId = 1008
                 },
@@ -351,7 +353,7 @@ namespace BACK_END.Data
                     Id = 1009,
                     RoomNumber = 109,
                     Area = 65,
-                    Price = 1300000m,
+                    Price = 1300000,
                     Status = 1,
                     MotelId = 1009
                 },
@@ -360,7 +362,7 @@ namespace BACK_END.Data
                     Id = 1010,
                     RoomNumber = 110,
                     Area = 70,
-                    Price = 1400000m,
+                    Price = 1400000,
                     Status = 1,
                     MotelId = 1010
                 }
@@ -473,80 +475,80 @@ namespace BACK_END.Data
                 new Consumption
                 {
                     Id = 1001,
-                    Water = 50.25m,
-                    Electric = 120.50m,
+                    Water = 50.25,
+                    Electric = 120.50,
                     Time = DateTime.Now,
                     RoomId = 1001
                 },
                 new Consumption
                 {
                     Id = 1002,
-                    Water = 40.00m,
-                    Electric = 110.75m,
+                    Water = 40.00,
+                    Electric = 110.75,
                     Time = DateTime.Now.AddMonths(-1),
                     RoomId = 1002
                 },
                 new Consumption
                 {
                     Id = 1003,
-                    Water = 60.30m,
-                    Electric = 130.00m,
+                    Water = 60.30,
+                    Electric = 130.00,
                     Time = DateTime.Now.AddMonths(-2),
                     RoomId = 1003
                 },
                 new Consumption
                 {
                     Id = 1004,
-                    Water = 55.50m,
-                    Electric = 115.25m,
+                    Water = 55.50,
+                    Electric = 115.25,
                     Time = DateTime.Now.AddMonths(-3),
                     RoomId = 1004
                 },
                 new Consumption
                 {
                     Id = 1005,
-                    Water = 52.75m,
-                    Electric = 125.75m,
+                    Water = 52.75,
+                    Electric = 125.75,
                     Time = DateTime.Now.AddMonths(-4),
                     RoomId = 1005
                 },
                 new Consumption
                 {
                     Id = 1006,
-                    Water = 58.00m,
-                    Electric = 118.60m,
+                    Water = 58.00,
+                    Electric = 118.60,
                     Time = DateTime.Now.AddMonths(-5),
                     RoomId = 1006
                 },
                 new Consumption
                 {
                     Id = 1007,
-                    Water = 61.10m,
-                    Electric = 122.40m,
+                    Water = 61.10,
+                    Electric = 122.40,
                     Time = DateTime.Now.AddMonths(-6),
                     RoomId = 1007
                 },
                 new Consumption
                 {
                     Id = 1008,
-                    Water = 53.60m,
-                    Electric = 119.90m,
+                    Water = 53.60,
+                    Electric = 119.90,
                     Time = DateTime.Now.AddMonths(-7),
                     RoomId = 1008
                 },
                 new Consumption
                 {
                     Id = 1009,
-                    Water = 56.80m,
-                    Electric = 121.50m,
+                    Water = 56.80,
+                    Electric = 121.50,
                     Time = DateTime.Now.AddMonths(-8),
                     RoomId = 1009
                 },
                 new Consumption
                 {
                     Id = 1010,
-                    Water = 59.25m,
-                    Electric = 123.75m,
+                    Water = 59.25,
+                    Electric = 123.75,
                     Time = DateTime.Now.AddMonths(-9),
                     RoomId = 1010
                 }
@@ -611,6 +613,30 @@ namespace BACK_END.Data
                     UserId = 1003
                 }
             );
+
+
+            var reviews = new List<Review>();
+            var random = new Random();
+            int reviewId = 1001;
+
+            for (int motelId = 1001; motelId <= 1010; motelId++)
+            {
+                int numberOfReviews = random.Next(1, 6);
+
+                for (int i = 0; i < numberOfReviews; i++)
+                {
+                    reviews.Add(new Review
+                    {
+                        Id = reviewId++,
+                        Rating = random.Next(1, 6), 
+                        Content = $"Review cho MotelId {motelId}",
+                        UserId = 1001 + random.Next(0, 3),
+                        MotelId = motelId
+                    });
+                }
+            }
+
+            modelBuilder.Entity<Review>().HasData(reviews);
 
         }
     }
