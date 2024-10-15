@@ -10,5 +10,7 @@ namespace BACK_END.Models
         [Column(TypeName = "decimal(18,2)")]
         public decimal Electric { get; set; }
         public DateTime Time { get; set; }
+        public int RoomId { get; set; }
+        public Room? Room { get; set; }
     }
 }
