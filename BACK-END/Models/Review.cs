@@ -6,7 +6,7 @@ namespace BACK_END.Models
     {
         public int Id { get; set; }
         [Column(TypeName = "decimal(18,1)")]
-        public int Rating { get; set; }
+        public double Rating { get; set; }
         public string Content { get; set; } = string.Empty;
         public int UserId { get; set; }
         public User? User { get; set; }

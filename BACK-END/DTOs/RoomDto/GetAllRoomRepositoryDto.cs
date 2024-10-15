@@ -10,8 +10,8 @@ namespace BACK_END.DTOs.RoomDto
     public class GetAllRoomRepositoryDto
     {
         public int Id { get; set; }
-        public int Area { get; set; }
-        public decimal Price { get; set; }
+        public double Area { get; set; }
+        public double Price { get; set; }
         public double Rating { get; set; }
         public int TotalRating { get; set; }
         public string LinkTerm { get; set; } = string.Empty;
