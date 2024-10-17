@@ -10,6 +10,7 @@ namespace BACK_END.Mappers
         {
             CreateMap<Notification, addNotification>().ReverseMap();
             CreateMap<Notification, updateNotification>().ReverseMap();
+            CreateMap<Notification, SendNotificationDto>().ReverseMap();
         }
     }
 }
