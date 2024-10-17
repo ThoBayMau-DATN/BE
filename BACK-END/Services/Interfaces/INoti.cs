@@ -7,5 +7,9 @@ namespace BACK_END.Services.Interfaces
         Task<IEnumerable<Notification>> getAllNotificationAsync();
 
         Task<Notification> addNotificationAsync(Notification notification);
+
+        Task<Notification> updateNotificationAsync(Notification notification, int id);
+
+        Task<Notification> SendNotificationToRolesAsync(List<string> roles, Notification notification);
     }
 }

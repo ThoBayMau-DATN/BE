@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Security.Permissions;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BACK_END.Models
 {
