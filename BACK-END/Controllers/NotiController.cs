@@ -3,6 +3,7 @@ using BACK_END.DTOs.NotiDto;
 using BACK_END.DTOs.Repository;
 using BACK_END.Models;
 using BACK_END.Services.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BACK_END.Controllers
@@ -14,11 +15,14 @@ namespace BACK_END.Controllers
 
         private readonly INoti _noti;
         private readonly IMapper _mapper;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public NotiController(INoti noti, IMapper mapper)
+        public NotiController(INoti noti, IMapper mapper, UserManager<IdentityUser> userManager)
         {
             _noti = noti;
             _mapper = mapper;
+            _userManager = userManager;
+
         }
 
         [HttpGet]
@@ -81,6 +85,31 @@ namespace BACK_END.Controllers
                 Message = "cập nhật danh sách thông báo thành công",
                 Data = NotiUpdate
             }));
+        }
+
+        [HttpPost("SendByRole/{roleName}")]
+        public async Task<IActionResult> SendNotification([FromBody] SendNotificationDto sendNotificationDto, string roleName)
+        {
+            // Kiểm tra nếu yêu cầu hợp lệ
+            if (ModelState.IsValid)
+            {
+                var map = _mapper.Map<Notification>(sendNotificationDto);
+                var sendnoti =  await _noti.SendNotificationToRolesAsync(roleName, map);
+                return Ok((new ApiResponse<object>
+                {
+                    Code = 200,
+                    Status = "success",
+                    Message = "Gửi thông báo thành công",
+                    Data = sendnoti
+                }));
+            }
+            return BadRequest(new ApiResponse<object>
+            {
+                Code = 400,
+                Status = "error",
+                Message = "Gửi không thành công!!.",
+                Data = null,
+            });
         }
     }
 }
