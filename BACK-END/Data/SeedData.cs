@@ -11,7 +11,7 @@ namespace BACK_END.Data
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
             // Tạo các role mặc định
-            string[] roleNames = { "Admin", "Staff", "Motel", "Customer" };
+            string[] roleNames = { "Admin", "Staff", "Owner", "Customer" };
             IdentityResult roleResult;
 
             foreach (var roleName in roleNames)
