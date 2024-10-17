@@ -29,31 +29,39 @@ namespace BACK_END.Services.Repositories
             return await _db.Notification.ToListAsync();
         }
 
-        public async Task<Notification> SendNotificationToRolesAsync(List<string> roles, Notification notification)
+        public async Task<IEnumerable<IdentityUser>> GetUsersByRoleAsync(string roleName)
+        {
+            return await _userManager.GetUsersInRoleAsync(roleName);
+        }
+        public async Task<Notification> SendNotificationToRolesAsync(string roleName, Notification notification)
         {
             // Lấy danh sách tất cả người dùng trong các vai trò được chỉ định
-            var usersInRoles = new List<IdentityUser>();
-            foreach (var role in roles)
-            {
-                var usersInRole = await _userManager.GetUsersInRoleAsync(role);
-                usersInRoles.AddRange(usersInRole);
-            }
+            var usersInRole = await GetUsersByRoleAsync(roleName);
 
-            // Tạo thông báo cho từng người dùng
-            foreach (var user in usersInRoles.Distinct())
+            var userEmails = new List<User>();
+            foreach (var e in usersInRole)
             {
-                var newNotification = new Notification
+                var users =  _db.User.Where(x => x.Email == e.Email);
+                if (users.Any())
                 {
-                    Type = notification.Type,
+                    userEmails.AddRange(users);  // Thêm tất cả user vào danh sách
+                }
+
+
+            }
+            foreach (var user in userEmails)
+            {
+                // Tạo thông báo cho từng người dùng
+                var userNotification = new Notification
+                {
+                    UserId = user.Id,
                     Title = notification.Title,
                     Content = notification.Content,
-                    Status = 1, // Ví dụ: 1 = đã gửi
-                    UserId = Convert.ToInt32(user.Id)
+                    Status = 1,
+                    Type = notification.Type
                 };
-                await _db.AddAsync(newNotification);
+                await _db.AddAsync(userNotification);
             }
-
-            // Lưu tất cả thay đổi vào DB
             await _db.SaveChangesAsync();
 
             return notification;
