@@ -3,6 +3,7 @@ using BACK_END.DTOs.Repository;
 using BACK_END.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Mail;
+using System.Runtime.InteropServices;
 
 namespace BACK_END.Controllers
 {
@@ -109,11 +110,21 @@ namespace BACK_END.Controllers
             try
             {
                 var result = await _auth.RegisterCustomer(model);
-                return Ok(new ApiResponse<object>
+                if (result == "Đăng ký tài khoản thành công.")
                 {
-                    Code = 200,
-                    Status = "success",
-                    Message = "Đăng ký thành công.",
+                    return Ok(new ApiResponse<object>
+                    {
+                        Code = 200,
+                        Status = "success",
+                        Message = "Đăng ký thành công.",
+                        Data = null
+                    });
+                }
+                return BadRequest(new ApiResponse<object>
+                {
+                    Code = 400,
+                    Status = "error",
+                    Message = result,
                     Data = null
                 });
             }
@@ -192,11 +203,21 @@ namespace BACK_END.Controllers
             try
             {
                 var result = await _auth.RegisterOwner(model);
-                return Ok(new ApiResponse<object>
+                if (result == "Đăng ký tài khoản thành công.")
                 {
-                    Code = 200,
-                    Status = "success",
-                    Message = "Đăng ký thành công.",
+                    return Ok(new ApiResponse<object>
+                    {
+                        Code = 200,
+                        Status = "success",
+                        Message = "Đăng ký thành công.",
+                        Data = null
+                    });
+                }
+                return BadRequest(new ApiResponse<object>
+                {
+                    Code = 400,
+                    Status = "error",
+                    Message = result,
                     Data = null
                 });
             }
@@ -275,11 +296,21 @@ namespace BACK_END.Controllers
             try
             {
                 var result = await _auth.RegisterSaff(model);
-                return Ok(new ApiResponse<object>
+                if (result == "Đăng ký tài khoản thành công.")
                 {
-                    Code = 200,
-                    Status = "success",
-                    Message = "Đăng ký thành công.",
+                    return Ok(new ApiResponse<object>
+                    {
+                        Code = 200,
+                        Status = "success",
+                        Message = "Đăng ký thành công.",
+                        Data = null
+                    });
+                }
+                return BadRequest(new ApiResponse<object>
+                {
+                    Code = 400,
+                    Status = "error",
+                    Message = result,
                     Data = null
                 });
             }
