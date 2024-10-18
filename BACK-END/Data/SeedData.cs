@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using BACK_END.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace BACK_END.Data
 {
@@ -9,7 +10,7 @@ namespace BACK_END.Data
             // Lấy các service cần thiết
             var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-
+            var dbContext = serviceProvider.GetRequiredService<BACK_ENDContext>();
             // Tạo các role mặc định
             string[] roleNames = { "Admin", "Staff", "Owner", "Customer" };
             IdentityResult roleResult;
@@ -42,8 +43,21 @@ namespace BACK_END.Data
 
                 if (createPowerUser.Succeeded)
                 {
+
                     // Gán role Admin cho tài khoản admin
                     await userManager.AddToRoleAsync(powerUser, "Admin");
+                    // Thêm thông tin vào bảng User
+                    var newUser = new Models.User
+                    {
+                        FullName = "Admin",
+                        Email = powerUser.Email,
+                        Phone = "1234567890",
+                        TimeCreated = DateTime.Now,
+                        Status = true
+                    };
+
+                    dbContext.User.Add(newUser);
+                    dbContext.SaveChanges();
                 }
             }
         }
