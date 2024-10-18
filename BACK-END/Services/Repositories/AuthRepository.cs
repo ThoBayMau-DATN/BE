@@ -244,7 +244,7 @@ namespace BACK_END.Services.Repositories
             try
             {
 
-                string[] roleNames = { "Admin", "Staff", "Motel", "Customer" };
+                string[] roleNames = { "Admin", "Staff", "Owner", "Customer" };
                 if (!roleNames.Contains(model.Role))
                 {
                     return "Invalid role";
