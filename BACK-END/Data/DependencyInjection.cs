@@ -12,6 +12,7 @@ namespace BACK_END.Data
 			services.AddScoped<TokenService>();
 			services.AddScoped<IRoom, RoomRepository>();
             services.AddScoped<INoti, NofRespository>();
+			services.AddScoped<IStatictical, StaticticalRepository>();
         }
 	}
 }
