@@ -24,6 +24,7 @@ namespace BACK_END.Data
         public DbSet<Term> Term { get; set; }
         public DbSet<Ticket> Ticket { get; set; }
         public DbSet<User> User { get; set; }
+        public DbSet<Invoice> Invoice { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
