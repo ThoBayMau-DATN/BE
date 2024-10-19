@@ -20,7 +20,7 @@ namespace BACK_END.Services.Repositories
             return await _db.Ticket.ToListAsync();
         }
 
-        public async Task<Ticket>? CreateTicketAsync(Create data)
+        public async Task<Ticket?> CreateTicketAsync(Create data)
         {
             var ticket = new Ticket()
             {
@@ -34,6 +34,24 @@ namespace BACK_END.Services.Repositories
             var result = await _db.Ticket.AddAsync(ticket);
             await _db.SaveChangesAsync();
             return result.Entity;
+        }
+
+        public async Task<Ticket?> UpdateTicketAsync(Update data)
+        {
+            var exist = await _db.Ticket.FirstOrDefaultAsync(x => x.Id == data.Id);
+            if (exist != null)
+            {
+                if (exist.Status != 0)
+                {
+                    exist.Status = data.Status;
+                }
+                else
+                {
+                    exist.Receiver = data.Receiver;
+                }
+                await _db.SaveChangesAsync();
+            }
+            return exist;
         }
     }
 }
