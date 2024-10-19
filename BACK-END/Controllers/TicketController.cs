@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BACK_END.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class TicketController : Controller
     {
@@ -40,7 +40,7 @@ namespace BACK_END.Controllers
             }
         }
         [HttpPost]
-        public async Task<IActionResult> create([FromBody] DTOs.Ticket.Create data)
+        public async Task<IActionResult> Tickets([FromBody] DTOs.Ticket.Create data)
         {
             try
             {
@@ -50,6 +50,31 @@ namespace BACK_END.Controllers
                     Code = 200,
                     Status = "success",
                     Message = "Tạo mới thành công",
+                    Data = tickets
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ApiResponse<object>
+                {
+                    Code = 400,
+                    Status = "error",
+                    Message = $"Lỗi api :{ex.Message}",
+                    Data = null
+                });
+            }
+        }
+        [HttpPost]
+        public async Task<IActionResult> Assignee([FromBody] DTOs.Ticket.Update data)
+        {
+            try
+            {
+                var tickets = await _ticketRepository.UpdateTicketAsync(data);
+                return Ok(new ApiResponse<object>
+                {
+                    Code = 200,
+                    Status = "success",
+                    Message = "Đổi trạng thái thành công",
                     Data = tickets
                 });
             }

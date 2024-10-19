@@ -1,8 +1,10 @@
 ﻿using BACK_END.DTOs.Auth;
 using BACK_END.DTOs.Repository;
 using BACK_END.Services.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Mail;
+using System.Runtime.InteropServices;
 
 namespace BACK_END.Controllers
 {
@@ -10,10 +12,12 @@ namespace BACK_END.Controllers
     {
         private readonly IAuth _auth;
         private readonly ILogger<AuthController> _logger;
-        public AuthController(IAuth auth, ILogger<AuthController> logger)
+        private readonly UserManager<IdentityUser> _userManager;
+        public AuthController(IAuth auth, ILogger<AuthController> logger, UserManager<IdentityUser> userManager)
         {
             _auth = auth;
             _logger = logger;
+            _userManager = userManager;
         }
 
         /*[HttpPost("register")]
@@ -47,9 +51,10 @@ namespace BACK_END.Controllers
                 return BadRequest(ex.Message);
             }
         }*/
-        [HttpPost("dang-ky-user")]
-        public async Task<IActionResult> DangKyUser([FromBody] DangKyUserDto model)
+        [HttpPost("register-customer")]
+        public async Task<IActionResult> RegisterCustomer([FromBody] DangKyUserDto model)
         {
+            string fullErrorMessage = null;
             //kiểm lỗi nhập vào dto
             if (!ModelState.IsValid)
             {
@@ -57,43 +62,49 @@ namespace BACK_END.Controllers
                     .SelectMany(v => v.Errors)
                     .Select(e => e.ErrorMessage);
 
-                var fullErrorMessage = string.Join("; ", errorMessages);
-
-                return BadRequest(new ApiResponse<object>
-                {
-                    Code = 400,
-                    Status = "error",
-                    Message = fullErrorMessage,
-                    Data = null
-                });
+                fullErrorMessage = string.Join("; ", errorMessages);
 
             }
-            //kiểm lỗi đã tồn tại trong sql
+            //kiểm lỗi dữ liệu trong sql
             try
             {
                 var checkEmail = await _auth.CheckEmail(model.Email);
                 var checkPhone = await _auth.CheckSDT(model.Phone);
-
                 if (checkEmail == true)
                 {
-                    return BadRequest( new ApiResponse<object>
+                    if (fullErrorMessage == null)
                     {
-                        Code = 400,
-                        Status = "error",
-                        Message = "Email đã tồn tại.",
-                        Data = null
-                    });
+
+                        fullErrorMessage = string.Join("; ", "Email đã tồn tại.");
+                    } else
+                    {
+                        fullErrorMessage = string.Join("; ", fullErrorMessage, "Email đã tồn tại.");
+                    }
                 }
                 if (checkPhone != null)
                 {
+                    if (fullErrorMessage == null)
+                    {
+
+                        fullErrorMessage = string.Join("; ", "Phone đã tồn tại.");
+                    } else
+                    {
+                        fullErrorMessage = string.Join("; ", fullErrorMessage, "Phone đã tồn tại.");
+                    }
+                }
+
+                if (fullErrorMessage != null)
+                {
+
                     return BadRequest(new ApiResponse<object>
                     {
                         Code = 400,
                         Status = "error",
-                        Message = "Số điện thoại đã tồn tại.",
+                        Message = fullErrorMessage,
                         Data = null
                     });
                 }
+
             }
             catch (Exception ex)
             {
@@ -108,12 +119,226 @@ namespace BACK_END.Controllers
             //đăng ký tài khoản
             try
             {
-                var result = await _auth.DangKyUser(model);
-                return Ok(new ApiResponse<object>
+                var result = await _auth.RegisterCustomer(model);
+                if (result == "Đăng ký tài khoản thành công.")
                 {
-                    Code = 200,
-                    Status = "success",
-                    Message = "Đăng ký thành công.",
+                    return Ok(new ApiResponse<object>
+                    {
+                        Code = 200,
+                        Status = "success",
+                        Message = "Đăng ký thành công.",
+                        Data = null
+                    });
+                }
+                return BadRequest(new ApiResponse<object>
+                {
+                    Code = 400,
+                    Status = "error",
+                    Message = result,
+                    Data = null
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while registering staff.");
+                return BadRequest(new ApiResponse<object>
+                {
+                    Code = 500,
+                    Status = "error",
+                    Message = ex.Message,
+                    Data = null
+                });
+            }
+
+        }
+        [HttpPost("register-owner")]
+        public async Task<IActionResult> RegisterOwner([FromBody] DangKyUserDto model)
+        {
+            string fullErrorMessage = null;
+            //kiểm lỗi nhập vào dto
+            if (!ModelState.IsValid)
+            {
+                var errorMessages = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage);
+
+                fullErrorMessage = string.Join("; ", errorMessages);
+
+            }
+            //kiểm lỗi dữ liệu trong sql
+            try
+            {
+                var checkEmail = await _auth.CheckEmail(model.Email);
+                var checkPhone = await _auth.CheckSDT(model.Phone);
+                if (checkEmail == true)
+                {
+                    if (fullErrorMessage == null)
+                    {
+
+                        fullErrorMessage = string.Join("; ", "Email đã tồn tại.");
+                    }
+                    else
+                    {
+                        fullErrorMessage = string.Join("; ", fullErrorMessage, "Email đã tồn tại.");
+                    }
+                }
+                if (checkPhone != null)
+                {
+                    if (fullErrorMessage == null)
+                    {
+
+                        fullErrorMessage = string.Join("; ", "Phone đã tồn tại.");
+                    }
+                    else
+                    {
+                        fullErrorMessage = string.Join("; ", fullErrorMessage, "Phone đã tồn tại.");
+                    }
+                }
+
+                if (fullErrorMessage != null)
+                {
+
+                    return BadRequest(new ApiResponse<object>
+                    {
+                        Code = 400,
+                        Status = "error",
+                        Message = fullErrorMessage,
+                        Data = null
+                    });
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ApiResponse<object>
+                {
+                    Code = 500,
+                    Status = "error",
+                    Message = ex.Message,
+                    Data = null
+                });
+            }
+            //đăng ký tài khoản
+            try
+            {
+                var result = await _auth.RegisterOwner(model);
+                if (result == "Đăng ký tài khoản thành công.")
+                {
+                    return Ok(new ApiResponse<object>
+                    {
+                        Code = 200,
+                        Status = "success",
+                        Message = "Đăng ký thành công.",
+                        Data = null
+                    });
+                }
+                return BadRequest(new ApiResponse<object>
+                {
+                    Code = 400,
+                    Status = "error",
+                    Message = result,
+                    Data = null
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while registering staff.");
+                return BadRequest(new ApiResponse<object>
+                {
+                    Code = 500,
+                    Status = "error",
+                    Message = ex.Message,
+                    Data = null
+                });
+            }
+
+        }
+        [HttpPost("register-saff")]
+        public async Task<IActionResult> RegisterSaff([FromBody] DangKyUserDto model)
+        {
+            string fullErrorMessage = null;
+            //kiểm lỗi nhập vào dto
+            if (!ModelState.IsValid)
+            {
+                var errorMessages = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage);
+
+                fullErrorMessage = string.Join("; ", errorMessages);
+
+            }
+            //kiểm lỗi dữ liệu trong sql
+            try
+            {
+                var checkEmail = await _auth.CheckEmail(model.Email);
+                var checkPhone = await _auth.CheckSDT(model.Phone);
+                if (checkEmail == true)
+                {
+                    if (fullErrorMessage == null)
+                    {
+
+                        fullErrorMessage = string.Join("; ", "Email đã tồn tại.");
+                    }
+                    else
+                    {
+                        fullErrorMessage = string.Join("; ", fullErrorMessage, "Email đã tồn tại.");
+                    }
+                }
+                if (checkPhone != null)
+                {
+                    if (fullErrorMessage == null)
+                    {
+
+                        fullErrorMessage = string.Join("; ", "Phone đã tồn tại.");
+                    }
+                    else
+                    {
+                        fullErrorMessage = string.Join("; ", fullErrorMessage, "Phone đã tồn tại.");
+                    }
+                }
+
+                if (fullErrorMessage != null)
+                {
+
+                    return BadRequest(new ApiResponse<object>
+                    {
+                        Code = 400,
+                        Status = "error",
+                        Message = fullErrorMessage,
+                        Data = null
+                    });
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ApiResponse<object>
+                {
+                    Code = 500,
+                    Status = "error",
+                    Message = ex.Message,
+                    Data = null
+                });
+            }
+            //đăng ký tài khoản
+            try
+            {
+                var result = await _auth.RegisterSaff(model);
+                if (result == "Đăng ký tài khoản thành công.")
+                {
+                    return Ok(new ApiResponse<object>
+                    {
+                        Code = 200,
+                        Status = "success",
+                        Message = "Đăng ký thành công.",
+                        Data = null
+                    });
+                }
+                return BadRequest(new ApiResponse<object>
+                {
+                    Code = 400,
+                    Status = "error",
+                    Message = result,
                     Data = null
                 });
             }
