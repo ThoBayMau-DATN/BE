@@ -6,7 +6,9 @@ namespace BACK_END.Services.Interfaces
     {
         Task<string> RegisterAsync(RegisterDto model);
         Task<string> LoginAsync(LoginDto model);
-        Task<string> DangKyUser(DangKyUserDto model);
+        Task<string> RegisterCustomer(DangKyUserDto model);
+        Task<string> RegisterOwner(DangKyUserDto model);
+        Task<string> RegisterSaff(DangKyUserDto model);
         Task<bool> CheckEmail(string email);
         Task<DangNhapRepository> CheckSDT(string sdt);
         Task<DangNhapRepository?> DangNhap(string email);
