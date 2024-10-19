@@ -74,7 +74,7 @@ namespace BACK_END.Services.Repositories
         }
 
 
-        public async Task<string> DangKyUser(DangKyUserDto model)
+        public async Task<string> RegisterCustomer(DangKyUserDto model)
         {
             try
             {
@@ -115,6 +115,90 @@ namespace BACK_END.Services.Repositories
                 return ex.Message;
             }
 
+        }
+        public async Task<string> RegisterOwner(DangKyUserDto model)
+        {
+            try
+            {
+
+                if (model != null)
+                {
+                    var RegisterDto = new RegisterDto
+                    {
+                        Username = model.Email ?? "",
+                        Email = model.Email ?? "",
+                        Password = model.Password ?? "",
+                        PhoneNumber = model.Phone ?? "",
+                        Role = "Owner"
+                    };
+                    var resultRegister = await RegisterAsync(RegisterDto);
+                    if (resultRegister != "Thêm tài khoản vào IdentityUser thành công.")
+                    {
+                        return resultRegister;
+                    }
+                    var nguoiDung = new User
+                    {
+                        Email = model.Email ?? "",
+                        FullName = model.Name ?? "",
+                        Phone = model.Phone ?? ""
+                    };
+
+                    _db.User.Add(nguoiDung);
+                    var resultAddNguoiDung = await _db.SaveChangesAsync();
+                    if (resultAddNguoiDung > 0)
+                    {
+                        return "Đăng ký tài khoản thành công.";
+                    }
+                }
+                return "Du lieu ko dc nhap vao";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+
+        }
+
+        public async Task<string> RegisterSaff(DangKyUserDto model)
+        {
+            try
+            {
+
+                if (model != null)
+                {
+                    var RegisterDto = new RegisterDto
+                    {
+                        Username = model.Email ?? "",
+                        Email = model.Email ?? "",
+                        Password = model.Password ?? "",
+                        PhoneNumber = model.Phone ?? "",
+                        Role = "Staff"
+                    };
+                    var resultRegister = await RegisterAsync(RegisterDto);
+                    if (resultRegister != "Thêm tài khoản vào IdentityUser thành công.")
+                    {
+                        return resultRegister;
+                    }
+                    var nguoiDung = new User
+                    {
+                        Email = model.Email ?? "",
+                        FullName = model.Name ?? "",
+                        Phone = model.Phone ?? ""
+                    };
+
+                    _db.User.Add(nguoiDung);
+                    var resultAddNguoiDung = await _db.SaveChangesAsync();
+                    if (resultAddNguoiDung > 0)
+                    {
+                        return "Đăng ký tài khoản thành công.";
+                    }
+                }
+                return "Du lieu ko dc nhap vao";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
         }
 
         public async Task<DangNhapRepository?> DangNhap(string sdt)
@@ -160,7 +244,7 @@ namespace BACK_END.Services.Repositories
             try
             {
 
-                string[] roleNames = { "Admin", "Staff", "Motel", "Customer" };
+                string[] roleNames = { "Admin", "Staff", "Owner", "Customer" };
                 if (!roleNames.Contains(model.Role))
                 {
                     return "Invalid role";
@@ -305,5 +389,7 @@ namespace BACK_END.Services.Repositories
                 return null;
             }
         }
+
+        
     }
 }
