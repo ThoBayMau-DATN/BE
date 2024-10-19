@@ -9,7 +9,7 @@ namespace BACK_END.Data
             return new IdentityError
             {
                 Code = nameof(PasswordTooShort),
-                Description = $"Mật khẩu phải có ít nhất {length} ký tự."
+                Description = $"Password phải có ít nhất {length} ký tự."
             };
         }
 
@@ -18,7 +18,7 @@ namespace BACK_END.Data
             return new IdentityError
             {
                 Code = nameof(PasswordRequiresNonAlphanumeric),
-                Description = "Mật khẩu phải chứa ký tự đặc biệt."
+                Description = "Password phải chứa ký tự đặc biệt."
             };
         }
 
@@ -27,7 +27,7 @@ namespace BACK_END.Data
             return new IdentityError
             {
                 Code = nameof(PasswordRequiresDigit),
-                Description = "Mật khẩu phải chứa ít nhất một chữ số."
+                Description = "Password phải chứa ít nhất một chữ số."
             };
         }
 
@@ -36,7 +36,7 @@ namespace BACK_END.Data
             return new IdentityError
             {
                 Code = nameof(PasswordRequiresLower),
-                Description = "Mật khẩu phải chứa ít nhất một chữ thường."
+                Description = "Password phải chứa ít nhất một chữ thường."
             };
         }
 
@@ -45,7 +45,7 @@ namespace BACK_END.Data
             return new IdentityError
             {
                 Code = nameof(PasswordRequiresUpper),
-                Description = "Mật khẩu phải chứa ít nhất một chữ hoa."
+                Description = "Password phải chứa ít nhất một chữ hoa."
             };
         }
     }
