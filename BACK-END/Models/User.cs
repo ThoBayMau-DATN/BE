@@ -6,14 +6,18 @@ namespace BACK_END.Models
     {
         public int Id { get; set; }
         [Column(TypeName = "nvarchar(50)")]
-        public string FullName { get; set; } = string.Empty;
+        public string? FullName { get; set; }
         [Column(TypeName = "varchar(10)")]
-        public string Phone { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
-        public string? Avatar { get; set; } = string.Empty;
-        public DateTime TimeCreated { get; set; } = DateTime.Now;
+        public string? Phone { get; set; }
+        public string? Email { get; set; }
+        public string? Avatar { get; set; }
+        public DateTime CreateDate { get; set; } = DateTime.Now;
         [Column(TypeName = "tinyint")]
         public bool Status { get; set; } = true;
+        public int? RoomId { get; set; }
+        public Room? Room { get; set; }
+
+        public virtual ICollection<Motel>? Motels { get; set; }
     }
 
 }
