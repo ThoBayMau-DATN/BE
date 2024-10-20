@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
 using BACK_END.Data;
 using BACK_END.DTOs.RoomDto;
 using BACK_END.Mappers;
@@ -10,6 +5,7 @@ using BACK_END.Models;
 using BACK_END.Services.Interfaces;
 using BACK_END.Services.MyServices;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace BACK_END.Services.Repositories
 {
@@ -63,6 +59,14 @@ namespace BACK_END.Services.Repositories
                 pageSize);
 
             return pagedResult;
+        }
+
+        public async Task<List<Room>> GetAvailableRooms()
+        {
+           var motelStatus = await _db.Room.Include(r => r.Motel)  
+            .Where(r => r.Status == 0)
+            .ToListAsync();
+            return motelStatus;
         }
 
         private Expression<Func<Room, object>> GetSortProperty(string sortColumn)

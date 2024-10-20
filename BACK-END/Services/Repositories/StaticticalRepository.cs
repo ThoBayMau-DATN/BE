@@ -1,4 +1,5 @@
 ﻿using BACK_END.Data;
+using BACK_END.Models;
 using BACK_END.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,6 +12,16 @@ namespace BACK_END.Services.Repositories
         public StaticticalRepository(BACK_ENDContext db)
         {
             _db = db;
+        }
+
+        public async Task<List<Motel>> GetAvailableMotelsAsync()
+        {
+            var motels = await _db.Motel
+            .Include(m => m.Rooms)
+            .Where(m => m.Rooms.Count() < m.TotalRoom)
+            .ToListAsync();
+
+            return motels;
         }
 
         public async Task<int> GetMonthlyRentalCountAsync()

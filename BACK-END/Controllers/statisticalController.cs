@@ -1,4 +1,6 @@
-﻿using BACK_END.DTOs.Repository;
+﻿using AutoMapper;
+using BACK_END.DTOs.MotelDto;
+using BACK_END.DTOs.Repository;
 using BACK_END.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,9 +11,11 @@ namespace BACK_END.Controllers
     public class statisticalController : Controller
     {
         private readonly IStatictical _statictical;
-        public statisticalController(IStatictical statictical)
+        private readonly IMapper _mapper;
+        public statisticalController(IStatictical statictical,IMapper mapper)
         {
             _statictical = statictical;
+            _mapper = mapper;
         }
 
         [HttpGet("count/under-one-million")]
@@ -87,6 +91,18 @@ namespace BACK_END.Controllers
                     Data = null,
                 });
             }
+        }
+
+        [HttpGet("available-motels")]
+        public async Task<ActionResult<List<MotelAvailabilityDTO>>> GetAvailableMotels()
+        {
+            // Lấy danh sách dãy trọ từ repository
+            var motels = await _statictical.GetAvailableMotelsAsync();
+
+            // Map từ danh sách Motel sang danh sách MotelAvailabilityDTO
+            var availableMotels = _mapper.Map<List<MotelAvailabilityDTO>>(motels);
+
+            return Ok(availableMotels);
         }
     }
 }
