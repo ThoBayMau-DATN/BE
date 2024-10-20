@@ -1,15 +1,13 @@
-﻿using BACK_END.Models;
-
-namespace BACK_END.Services.Interfaces
+﻿namespace BACK_END.Services.Interfaces
 {
     public interface INoti
     {
-        Task<IEnumerable<Notification>> getAllNotificationAsync();
+        //Task<IEnumerable<Notification>> getAllNotificationAsync();
 
-        Task<Notification> addNotificationAsync(Notification notification);
+        //Task<Notification> addNotificationAsync(Notification notification);
 
-        Task<Notification> updateNotificationAsync(Notification notification, int id);
+        //Task<Notification> updateNotificationAsync(Notification notification, int id);
 
-        Task<Notification> SendNotificationToRolesAsync(string roleName, Notification notification);
+        //Task<Notification> SendNotificationToRolesAsync(string roleName, Notification notification);
     }
 }
