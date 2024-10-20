@@ -3,6 +3,6 @@
     public class RevenueDto
     {
         public string Month { get; set; }
-        public double TotalRevenue { get; set; }
+        public double Amount { get; set; }
     }
 }

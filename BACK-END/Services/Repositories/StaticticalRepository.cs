@@ -24,6 +24,14 @@ namespace BACK_END.Services.Repositories
             return motels;
         }
 
+        public async Task<List<Invoice>> GetInvoicesLastSixMonthsAsync()
+        {
+            var sixMonthsAgo = DateTime.Now.AddMonths(-6);
+            return await _db.Invoice
+                .Where(i => i.TimeCreated >= sixMonthsAgo)
+                .ToListAsync();
+        }
+
         public async Task<int> GetMonthlyRentalCountAsync()
         {
             var now = DateTime.Now;
@@ -46,5 +54,7 @@ namespace BACK_END.Services.Repositories
         .CountAsync(r => r.Price < 1000000);
             return statictical;
         }
+
+        
     }
 }

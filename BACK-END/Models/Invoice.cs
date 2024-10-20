@@ -10,7 +10,7 @@ namespace BACK_END.Models
         [Column(TypeName = "decimal(18,2)")]
         public double Electric { get; set; }
         [Column(TypeName = "decimal(18,2)")]
-        public double Price { get; set; }
+        public double Price { get; set; } // giá trọ
         [Column(TypeName = "decimal(18,2)")]
         public double Other { get; set; }
         [Column(TypeName = "decimal(18,2)")]

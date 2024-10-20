@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using BACK_END.DTOs.MotelDto;
 using BACK_END.DTOs.Repository;
+using BACK_END.DTOs.StaticDto;
 using BACK_END.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
 
 namespace BACK_END.Controllers
 {
@@ -96,13 +98,54 @@ namespace BACK_END.Controllers
         [HttpGet("available-motels")]
         public async Task<ActionResult<List<MotelAvailabilityDTO>>> GetAvailableMotels()
         {
-            // Lấy danh sách dãy trọ từ repository
             var motels = await _statictical.GetAvailableMotelsAsync();
-
-            // Map từ danh sách Motel sang danh sách MotelAvailabilityDTO
             var availableMotels = _mapper.Map<List<MotelAvailabilityDTO>>(motels);
-
             return Ok(availableMotels);
         }
+
+        [HttpGet("revenue-statistics")]
+        public async Task<IActionResult> GetRevenueStatistics()
+        {
+            var invoices = await _statictical.GetInvoicesLastSixMonthsAsync();
+            var revenueByMonth = new double[6];
+            var currentMonth = DateTime.Now.Month;
+            var currentYear = DateTime.Now.Year;
+            for (int i = 0; i < 6; i++)
+            {
+                var monthToCheck = (currentMonth - i + 12) % 12;
+                var yearToCheck = currentYear - (currentMonth - i < 1 ? 1 : 0);
+
+                foreach (var invoice in invoices)
+                {
+                    var invoiceMonth = invoice.TimeCreated.Month;
+                    var invoiceYear = invoice.TimeCreated.Year;
+
+                    // Kiểm tra xem tháng và năm của hóa đơn có trùng với tháng và năm đang kiểm tra không
+                    if (invoiceMonth == monthToCheck && invoiceYear == yearToCheck)
+                    {
+                        revenueByMonth[i] += (double)invoice.TotalAmount;
+                    }
+                }
+            }
+
+            // Tạo danh sách DTO để trả về
+            var revenueList = new List<RevenueDto>();
+            for (int i = 0; i < revenueByMonth.Length; i++)
+            {
+                var monthName = new DateTime(currentYear, (currentMonth - i + 12) % 12 + 1, 1)
+                    .ToString("MMMM", CultureInfo.InvariantCulture);
+
+                var revenueDto = new RevenueDto
+                {
+                    Month = monthName,
+                    Amount = revenueByMonth[5 - i] // Lật lại chỉ số để tháng hiện tại nằm ở đầu
+                };
+
+                revenueList.Add(revenueDto);
+            }
+
+            return Ok(revenueList);
+        }
+
     }
 }

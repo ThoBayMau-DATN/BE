@@ -11,5 +11,7 @@ namespace BACK_END.Services.Interfaces
         Task<int> GetMonthlyRentalCountAsync();
 
         Task<List<Motel>> GetAvailableMotelsAsync();
+
+        Task<List<Invoice>> GetInvoicesLastSixMonthsAsync();
     }
 }
