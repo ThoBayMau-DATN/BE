@@ -637,7 +637,8 @@ namespace BACK_END.Data
                 }
             }
 
-            modelBuilder.Entity<Review>().HasData(reviews);
+            
+          modelBuilder.Entity<Review>().HasData(reviews);
 
         }
     }
