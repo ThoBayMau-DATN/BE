@@ -15,6 +15,7 @@ namespace BACK_END.Models
         public double Other { get; set; }
         [Column(TypeName = "decimal(18,2)")]
         public double TotalAmount { get; set; }
+        public DateTime TimeCreated { get; set; } = DateTime.Now;
         public bool Status { get; set; } = false; // default status
         public int RoomId { get; set; }
         [ForeignKey("RoomId")]
