@@ -22,6 +22,7 @@ namespace BACK_END.Data
         public DbSet<Ticket> Ticket { get; set; }
         public DbSet<User> User { get; set; }
         public DbSet<Invoice> Invoice { get; set; }
+
         public DbSet<User_Notification> User_Notification { get; set; }
         public DbSet<Ticket_Log> Ticket_Log { get; set; }
         public DbSet<Consumption> Consumption { get; set; }
