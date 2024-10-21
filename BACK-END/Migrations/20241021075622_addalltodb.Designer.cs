@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BACK_END.Migrations
 {
     [DbContext(typeof(BACK_ENDContext))]
-    [Migration("20241020152538_db2")]
-    partial class db2
+    [Migration("20241021075622_addalltodb")]
+    partial class addalltodb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -103,6 +103,9 @@ namespace BACK_END.Migrations
 
                     b.Property<bool>("Status")
                         .HasColumnType("bit");
+
+                    b.Property<DateTime>("TimeCreated")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("Water")
                         .HasColumnType("int");

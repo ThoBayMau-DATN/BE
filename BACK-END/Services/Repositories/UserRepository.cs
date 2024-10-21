@@ -1,14 +1,11 @@
 ﻿using BACK_END.Data;
-using BACK_END.DTOs.RoomDto;
 using BACK_END.DTOs.UserDto;
-using BACK_END.Mappers;
 using BACK_END.Models;
 using BACK_END.Services.Interfaces;
 using BACK_END.Services.MyServices;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using Twilio.Rest.Studio.V2.Flow;
 
 namespace BACK_END.Services.Repositories
 {
@@ -85,7 +82,7 @@ namespace BACK_END.Services.Repositories
                 FullName = userDict[user.Email].FullName,
                 Phone = userDict[user.Email].Phone,
                 Avatar = userDict[user.Email].Avatar,
-                TimeCreated = userDict[user.Email].TimeCreated,
+                TimeCreated = userDict[user.Email].CreateDate,
                 Status = userDict[user.Email].Status,
                 Role = userRoles.GetValueOrDefault(user.Email, "")
             });
@@ -183,7 +180,7 @@ namespace BACK_END.Services.Repositories
                 Phone = query.Result.Phone,
                 Email = query.Result.Email,
                 Avatar = query.Result.Avatar,
-                TimeCreated = query.Result.TimeCreated,
+                TimeCreated = query.Result.CreateDate,
                 Status = query.Result.Status,
                 Role = roles[0]
             };
@@ -208,7 +205,7 @@ namespace BACK_END.Services.Repositories
                 Phone = userDto.Phone,
                 Email = userDto.Email,
                 Avatar = userDto.Avatar,
-                TimeCreated = DateTime.Now, // Thiết lập thời gian tạo
+                CreateDate = DateTime.Now, // Thiết lập thời gian tạo
                 Status = true // Trạng thái mặc định
             };
 

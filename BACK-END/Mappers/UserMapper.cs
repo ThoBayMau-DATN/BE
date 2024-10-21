@@ -1,13 +1,13 @@
-﻿using MimeKit;
-using BACK_END.DTOs.UserDto;
+﻿using BACK_END.DTOs.UserDto;
 using BACK_END.Models;
+using MimeKit;
 using System.Net.Mail;
 using System.Text;
 
 
 namespace BACK_END.Mappers
 {
-	public static class UserMapper
+    public static class UserMapper
 	{
 		public static string RandomNewPassword()
 		{
@@ -76,7 +76,7 @@ namespace BACK_END.Mappers
 				Phone = model.Phone,
 				Email = model.Email,
 				Avatar = model.Avatar,
-				TimeCreated = model.TimeCreated,
+				TimeCreated = model.CreateDate,
 				Status = model.Status
 
 			};

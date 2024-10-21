@@ -1,17 +1,17 @@
-﻿using BACK_END.Models;
+﻿using BACK_END.DTOs.MotelDto;
+using BACK_END.DTOs.StaticDto;
+using BACK_END.Models;
 
 namespace BACK_END.Services.Interfaces
 {
     public interface IStatictical
     {
-        Task<int> GetRoomCountUnderOneMillionAsync();
 
-        Task<int> GetNewUserCountByTimeCreate();
 
-        Task<int> GetMonthlyRentalCountAsync();
+        Task<List<MotelAvailabilityDTO>> GetAvailableMotelsAsync();
 
-        Task<List<Motel>> GetAvailableMotelsAsync();
+        Task<List<MonthlyRevenueDto>> GetMonthlyRevenueLastSixMonthsAsync();
 
-        Task<List<Invoice>> GetInvoicesLastSixMonthsAsync();
+        Task<List<Invoice>> GetAllAsync();
     }
 }
