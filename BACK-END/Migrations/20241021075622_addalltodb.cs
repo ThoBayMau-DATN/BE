@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BACK_END.Migrations
 {
     /// <inheritdoc />
-    public partial class db : Migration
+    public partial class addalltodb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -173,6 +173,22 @@ namespace BACK_END.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Consumption",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Water = table.Column<int>(type: "int", nullable: false),
+                    Electricity = table.Column<int>(type: "int", nullable: false),
+                    Time = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    RoomId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Consumption", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Image",
                 columns: table => new
                 {
@@ -199,7 +215,8 @@ namespace BACK_END.Migrations
                     Price = table.Column<int>(type: "int", nullable: false),
                     Other = table.Column<int>(type: "int", nullable: false),
                     Status = table.Column<bool>(type: "bit", nullable: false),
-                    RoomId = table.Column<int>(type: "int", nullable: false)
+                    RoomId = table.Column<int>(type: "int", nullable: false),
+                    TimeCreated = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -460,6 +477,11 @@ namespace BACK_END.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Consumption_RoomId",
+                table: "Consumption",
+                column: "RoomId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Image_MotelId",
                 table: "Image",
                 column: "MotelId");
@@ -535,6 +557,14 @@ namespace BACK_END.Migrations
                 column: "UserId");
 
             migrationBuilder.AddForeignKey(
+                name: "FK_Consumption_Room_RoomId",
+                table: "Consumption",
+                column: "RoomId",
+                principalTable: "Room",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
                 name: "FK_Image_Motel_MotelId",
                 table: "Image",
                 column: "MotelId",
@@ -570,8 +600,8 @@ namespace BACK_END.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_Room_Motel_MotelId",
-                table: "Room");
+                name: "FK_User_Room_RoomId",
+                table: "User");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
@@ -587,6 +617,9 @@ namespace BACK_END.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "Consumption");
 
             migrationBuilder.DropTable(
                 name: "Image");
@@ -622,13 +655,13 @@ namespace BACK_END.Migrations
                 name: "Notification");
 
             migrationBuilder.DropTable(
+                name: "Room");
+
+            migrationBuilder.DropTable(
                 name: "Motel");
 
             migrationBuilder.DropTable(
                 name: "User");
-
-            migrationBuilder.DropTable(
-                name: "Room");
         }
     }
 }
