@@ -1,6 +1,9 @@
 ﻿using MimeKit;
+using BACK_END.DTOs.UserDto;
+using BACK_END.Models;
 using System.Net.Mail;
 using System.Text;
+
 
 namespace BACK_END.Mappers
 {
@@ -63,5 +66,22 @@ namespace BACK_END.Mappers
 
 			return result.ToString();
 		}
-	}
+
+		public static GetAllUserRepositoryDto MapToGetAllUserRepository(this User model)
+		{
+			var User = new GetAllUserRepositoryDto
+			{
+				Id = model.Id,
+				FullName = model.FullName,
+				Phone = model.Phone,
+				Email = model.Email,
+				Avatar = model.Avatar,
+				TimeCreated = model.TimeCreated,
+				Status = model.Status
+
+			};
+			return User;
+
+		}
+    }
 }

@@ -3,6 +3,7 @@
     public class Invoice
     {
         public int Id { get; set; }
+
         public int Water { get; set; }
         public int Electric { get; set; }
         public int Price { get; set; }

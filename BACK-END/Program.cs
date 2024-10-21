@@ -30,6 +30,7 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
     .AddEntityFrameworkStores<BACK_ENDContext>()
     .AddErrorDescriber<CustomIdentityErrorDescriber>()
     .AddDefaultTokenProviders();
+
 // Configure JWT Authentication
 builder.Services.AddAuthentication(options =>
 {
