@@ -5,9 +5,9 @@ namespace BACK_END.Models
     public class Review
     {
         public int Id { get; set; }
-        [Column(TypeName = "decimal(18,1)")]
-        public double Rating { get; set; }
-        public string Content { get; set; } = string.Empty;
+        public float Rating { get; set; }
+        [Column(TypeName = "nvarchar(max)")]
+        public string? Content { get; set; }
         public int UserId { get; set; }
         public User? User { get; set; }
         public int MotelId { get; set; }
