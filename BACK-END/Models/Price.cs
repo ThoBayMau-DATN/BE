@@ -7,6 +7,7 @@
         public int Electric { get; set; }
         public int Other { get; set; }
         public bool IsActive { get; set; } = false;
+        public DateTime CreateDate { get; set; } = DateTime.Now;
         public int MotelId { get; set; }
         public Motel? Motel { get; set; }
     }
