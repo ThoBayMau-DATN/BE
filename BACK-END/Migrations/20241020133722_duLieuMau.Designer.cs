@@ -4,6 +4,7 @@ using BACK_END.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BACK_END.Migrations
 {
     [DbContext(typeof(BACK_ENDContext))]
-    partial class BACK_ENDContextModelSnapshot : ModelSnapshot
+    [Migration("20241020133722_duLieuMau")]
+    partial class duLieuMau
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -131,7 +134,7 @@ namespace BACK_END.Migrations
                             Id = 1001,
                             Acreage = (byte)0,
                             Address = "123 Đường Biển, Quận 1, TP. HCM",
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1474),
+                            CreateDate = new DateTime(2024, 10, 20, 20, 37, 21, 513, DateTimeKind.Local).AddTicks(6418),
                             Location = "10.762622, 106.660172",
                             Name = "Tro A",
                             Status = (byte)1,
@@ -142,7 +145,7 @@ namespace BACK_END.Migrations
                             Id = 1002,
                             Acreage = (byte)0,
                             Address = "456 Đường Sông, Quận 2, TP. HCM",
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1480),
+                            CreateDate = new DateTime(2024, 10, 20, 20, 37, 21, 513, DateTimeKind.Local).AddTicks(6425),
                             Location = "10.762623, 106.660173",
                             Name = "Tro B",
                             Status = (byte)0,
@@ -153,7 +156,7 @@ namespace BACK_END.Migrations
                             Id = 1003,
                             Acreage = (byte)0,
                             Address = "789 Đường Núi, Quận 3, TP. HCM",
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1482),
+                            CreateDate = new DateTime(2024, 10, 20, 20, 37, 21, 513, DateTimeKind.Local).AddTicks(6428),
                             Location = "10.762624, 106.660174",
                             Name = "Tro C",
                             Status = (byte)1,
@@ -164,7 +167,7 @@ namespace BACK_END.Migrations
                             Id = 1004,
                             Acreage = (byte)0,
                             Address = "101 Đường Biển, Quận 4, TP. HCM",
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1483),
+                            CreateDate = new DateTime(2024, 10, 20, 20, 37, 21, 513, DateTimeKind.Local).AddTicks(6429),
                             Location = "10.762625, 106.660175",
                             Name = "Tro D",
                             Status = (byte)1,
@@ -175,7 +178,7 @@ namespace BACK_END.Migrations
                             Id = 1005,
                             Acreage = (byte)0,
                             Address = "202 Đường Mặt Trăng, Quận 5, TP. HCM",
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1484),
+                            CreateDate = new DateTime(2024, 10, 20, 20, 37, 21, 513, DateTimeKind.Local).AddTicks(6430),
                             Location = "10.762626, 106.660176",
                             Name = "Tro E",
                             Status = (byte)0,
@@ -186,7 +189,7 @@ namespace BACK_END.Migrations
                             Id = 1006,
                             Acreage = (byte)0,
                             Address = "303 Đường Bình Yên, Quận 6, TP. HCM",
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1485),
+                            CreateDate = new DateTime(2024, 10, 20, 20, 37, 21, 513, DateTimeKind.Local).AddTicks(6431),
                             Location = "10.762627, 106.660177",
                             Name = "Tro f",
                             Status = (byte)1,
@@ -197,7 +200,7 @@ namespace BACK_END.Migrations
                             Id = 1007,
                             Acreage = (byte)0,
                             Address = "404 Đường Hồng Hà, Quận 7, TP. HCM",
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1511),
+                            CreateDate = new DateTime(2024, 10, 20, 20, 37, 21, 513, DateTimeKind.Local).AddTicks(6433),
                             Location = "10.762628, 106.660178",
                             Name = "Tro g",
                             Status = (byte)1,
@@ -208,7 +211,7 @@ namespace BACK_END.Migrations
                             Id = 1008,
                             Acreage = (byte)0,
                             Address = "505 Đường Biển Xanh, Quận 8, TP. HCM",
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1513),
+                            CreateDate = new DateTime(2024, 10, 20, 20, 37, 21, 513, DateTimeKind.Local).AddTicks(6434),
                             Location = "10.762629, 106.660179",
                             Name = "Tro H",
                             Status = (byte)0,
@@ -219,7 +222,7 @@ namespace BACK_END.Migrations
                             Id = 1009,
                             Acreage = (byte)0,
                             Address = "606 Đường Núi Ngàn, Quận 9, TP. HCM",
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1514),
+                            CreateDate = new DateTime(2024, 10, 20, 20, 37, 21, 513, DateTimeKind.Local).AddTicks(6435),
                             Location = "10.762630, 106.660180",
                             Name = "Tro I",
                             Status = (byte)1,
@@ -230,7 +233,7 @@ namespace BACK_END.Migrations
                             Id = 1010,
                             Acreage = (byte)0,
                             Address = "707 Đường An Bình, Quận 10, TP. HCM",
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1515),
+                            CreateDate = new DateTime(2024, 10, 20, 20, 37, 21, 513, DateTimeKind.Local).AddTicks(6436),
                             Location = "10.762631, 106.660181",
                             Name = "Tro j",
                             Status = (byte)1,
@@ -271,9 +274,6 @@ namespace BACK_END.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreateDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<int>("Electric")
                         .HasColumnType("int");
 
@@ -299,7 +299,6 @@ namespace BACK_END.Migrations
                         new
                         {
                             Id = 1001,
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1541),
                             Electric = 3000,
                             IsActive = true,
                             MotelId = 1001,
@@ -309,7 +308,6 @@ namespace BACK_END.Migrations
                         new
                         {
                             Id = 1002,
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1547),
                             Electric = 3500,
                             IsActive = true,
                             MotelId = 1002,
@@ -319,7 +317,6 @@ namespace BACK_END.Migrations
                         new
                         {
                             Id = 1003,
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1549),
                             Electric = 3200,
                             IsActive = false,
                             MotelId = 1003,
@@ -329,7 +326,6 @@ namespace BACK_END.Migrations
                         new
                         {
                             Id = 1004,
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1550),
                             Electric = 3400,
                             IsActive = true,
                             MotelId = 1004,
@@ -339,7 +335,6 @@ namespace BACK_END.Migrations
                         new
                         {
                             Id = 1005,
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1551),
                             Electric = 3100,
                             IsActive = false,
                             MotelId = 1005,
@@ -349,7 +344,6 @@ namespace BACK_END.Migrations
                         new
                         {
                             Id = 1006,
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1552),
                             Electric = 3600,
                             IsActive = true,
                             MotelId = 1006,
@@ -359,7 +353,6 @@ namespace BACK_END.Migrations
                         new
                         {
                             Id = 1007,
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1553),
                             Electric = 3300,
                             IsActive = true,
                             MotelId = 1007,
@@ -369,7 +362,6 @@ namespace BACK_END.Migrations
                         new
                         {
                             Id = 1008,
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1554),
                             Electric = 3400,
                             IsActive = false,
                             MotelId = 1008,
@@ -379,7 +371,6 @@ namespace BACK_END.Migrations
                         new
                         {
                             Id = 1009,
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1556),
                             Electric = 3200,
                             IsActive = true,
                             MotelId = 1009,
@@ -389,7 +380,6 @@ namespace BACK_END.Migrations
                         new
                         {
                             Id = 1010,
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1557),
                             Electric = 3500,
                             IsActive = true,
                             MotelId = 1010,
@@ -425,192 +415,6 @@ namespace BACK_END.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Review");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1001,
-                            Content = "Review cho MotelId 1001",
-                            MotelId = 1001,
-                            Rating = 3f,
-                            UserId = 1002
-                        },
-                        new
-                        {
-                            Id = 1002,
-                            Content = "Review cho MotelId 1001",
-                            MotelId = 1001,
-                            Rating = 1f,
-                            UserId = 1001
-                        },
-                        new
-                        {
-                            Id = 1003,
-                            Content = "Review cho MotelId 1001",
-                            MotelId = 1001,
-                            Rating = 5f,
-                            UserId = 1001
-                        },
-                        new
-                        {
-                            Id = 1004,
-                            Content = "Review cho MotelId 1002",
-                            MotelId = 1002,
-                            Rating = 2f,
-                            UserId = 1002
-                        },
-                        new
-                        {
-                            Id = 1005,
-                            Content = "Review cho MotelId 1002",
-                            MotelId = 1002,
-                            Rating = 2f,
-                            UserId = 1002
-                        },
-                        new
-                        {
-                            Id = 1006,
-                            Content = "Review cho MotelId 1002",
-                            MotelId = 1002,
-                            Rating = 2f,
-                            UserId = 1003
-                        },
-                        new
-                        {
-                            Id = 1007,
-                            Content = "Review cho MotelId 1003",
-                            MotelId = 1003,
-                            Rating = 1f,
-                            UserId = 1001
-                        },
-                        new
-                        {
-                            Id = 1008,
-                            Content = "Review cho MotelId 1004",
-                            MotelId = 1004,
-                            Rating = 4f,
-                            UserId = 1002
-                        },
-                        new
-                        {
-                            Id = 1009,
-                            Content = "Review cho MotelId 1004",
-                            MotelId = 1004,
-                            Rating = 4f,
-                            UserId = 1002
-                        },
-                        new
-                        {
-                            Id = 1010,
-                            Content = "Review cho MotelId 1004",
-                            MotelId = 1004,
-                            Rating = 4f,
-                            UserId = 1001
-                        },
-                        new
-                        {
-                            Id = 1011,
-                            Content = "Review cho MotelId 1005",
-                            MotelId = 1005,
-                            Rating = 2f,
-                            UserId = 1003
-                        },
-                        new
-                        {
-                            Id = 1012,
-                            Content = "Review cho MotelId 1005",
-                            MotelId = 1005,
-                            Rating = 5f,
-                            UserId = 1003
-                        },
-                        new
-                        {
-                            Id = 1013,
-                            Content = "Review cho MotelId 1006",
-                            MotelId = 1006,
-                            Rating = 1f,
-                            UserId = 1002
-                        },
-                        new
-                        {
-                            Id = 1014,
-                            Content = "Review cho MotelId 1007",
-                            MotelId = 1007,
-                            Rating = 4f,
-                            UserId = 1003
-                        },
-                        new
-                        {
-                            Id = 1015,
-                            Content = "Review cho MotelId 1007",
-                            MotelId = 1007,
-                            Rating = 4f,
-                            UserId = 1003
-                        },
-                        new
-                        {
-                            Id = 1016,
-                            Content = "Review cho MotelId 1008",
-                            MotelId = 1008,
-                            Rating = 3f,
-                            UserId = 1003
-                        },
-                        new
-                        {
-                            Id = 1017,
-                            Content = "Review cho MotelId 1008",
-                            MotelId = 1008,
-                            Rating = 4f,
-                            UserId = 1002
-                        },
-                        new
-                        {
-                            Id = 1018,
-                            Content = "Review cho MotelId 1008",
-                            MotelId = 1008,
-                            Rating = 3f,
-                            UserId = 1002
-                        },
-                        new
-                        {
-                            Id = 1019,
-                            Content = "Review cho MotelId 1008",
-                            MotelId = 1008,
-                            Rating = 5f,
-                            UserId = 1002
-                        },
-                        new
-                        {
-                            Id = 1020,
-                            Content = "Review cho MotelId 1008",
-                            MotelId = 1008,
-                            Rating = 5f,
-                            UserId = 1003
-                        },
-                        new
-                        {
-                            Id = 1021,
-                            Content = "Review cho MotelId 1009",
-                            MotelId = 1009,
-                            Rating = 1f,
-                            UserId = 1001
-                        },
-                        new
-                        {
-                            Id = 1022,
-                            Content = "Review cho MotelId 1010",
-                            MotelId = 1010,
-                            Rating = 1f,
-                            UserId = 1003
-                        },
-                        new
-                        {
-                            Id = 1023,
-                            Content = "Review cho MotelId 1010",
-                            MotelId = 1010,
-                            Rating = 5f,
-                            UserId = 1001
-                        });
                 });
 
             modelBuilder.Entity("BACK_END.Models.Room", b =>
@@ -839,7 +643,7 @@ namespace BACK_END.Migrations
                         {
                             Id = 1001,
                             Avatar = "avatar1.png",
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1354),
+                            CreateDate = new DateTime(2024, 10, 20, 20, 37, 21, 513, DateTimeKind.Local).AddTicks(6240),
                             Email = "vana@example.com",
                             FullName = "Nguyễn Văn A",
                             Phone = "0901234567",
@@ -849,7 +653,7 @@ namespace BACK_END.Migrations
                         {
                             Id = 1002,
                             Avatar = "avatar2.png",
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1357),
+                            CreateDate = new DateTime(2024, 10, 20, 20, 37, 21, 513, DateTimeKind.Local).AddTicks(6243),
                             Email = "thib@example.com",
                             FullName = "Trần Thị B",
                             Phone = "0902345678",
@@ -859,7 +663,7 @@ namespace BACK_END.Migrations
                         {
                             Id = 1003,
                             Avatar = "avatar3.png",
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1358),
+                            CreateDate = new DateTime(2024, 10, 20, 20, 37, 21, 513, DateTimeKind.Local).AddTicks(6245),
                             Email = "vanc@example.com",
                             FullName = "Lê Văn C",
                             Phone = "0903456789",
@@ -1130,7 +934,7 @@ namespace BACK_END.Migrations
             modelBuilder.Entity("BACK_END.Models.Price", b =>
                 {
                     b.HasOne("BACK_END.Models.Motel", "Motel")
-                        .WithMany("Prices")
+                        .WithMany()
                         .HasForeignKey("MotelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1141,7 +945,7 @@ namespace BACK_END.Migrations
             modelBuilder.Entity("BACK_END.Models.Review", b =>
                 {
                     b.HasOne("BACK_END.Models.Motel", "Motel")
-                        .WithMany("Reviews")
+                        .WithMany()
                         .HasForeignKey("MotelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1291,10 +1095,6 @@ namespace BACK_END.Migrations
             modelBuilder.Entity("BACK_END.Models.Motel", b =>
                 {
                     b.Navigation("Images");
-
-                    b.Navigation("Prices");
-
-                    b.Navigation("Reviews");
 
                     b.Navigation("Rooms");
                 });

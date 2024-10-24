@@ -13,6 +13,7 @@ namespace BACK_END.Data
             services.AddScoped<IRoom, RoomRepository>();
             services.AddScoped<INoti, NofRespository>();
             services.AddScoped<ITicket, TicketRepository>();
+            services.AddScoped<FirebaseStorageService>();
         }
     }
 }
