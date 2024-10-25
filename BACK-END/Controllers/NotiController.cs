@@ -38,7 +38,7 @@ namespace BACK_END.Controllers
             }));
         }
 
-        [HttpPost]
+        [HttpPost("/addNoti")]
 
         public async Task<IActionResult> AddNotification([FromBody] addNotification addNotification)
         {
@@ -51,7 +51,7 @@ namespace BACK_END.Controllers
                 {
                     Code = 200,
                     Status = "success",
-                    Message = "Lấy danh sách thông báo thành công",
+                    Message = "Thêm thông báo thành công",
                     Data = CreateNoti
                 }));
             }
