@@ -19,6 +19,7 @@ namespace BACK_END.Services.Repositories
 
         public async Task<Notification> addNotificationAsync(Notification notification)
         {
+            notification.Status = 0;
             await _db.AddAsync(notification);
             await _db.SaveChangesAsync();
             return notification;
@@ -83,7 +84,7 @@ namespace BACK_END.Services.Repositories
             notiExist.Type = notification.Type;
             notiExist.Title = notification.Title;
             notiExist.Content = notification.Content;
-            notiExist.Status = notification.Status;
+            notiExist.Status = 0;
             await _db.SaveChangesAsync();
             return notification;
         }
