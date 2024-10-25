@@ -14,8 +14,5 @@ namespace BACK_END.DTOs.NotiDto
         [StringLength(500, ErrorMessage = "Nội dung không quá 500 kí tự")]
         public string? Content { get; set; }
 
-        [Range(0, 4, ErrorMessage = ("Trạng thái không hợp lệ"))]
-        [Required(ErrorMessage = "Nội dung không được để trống")]
-        public byte Status { get; set; }
     }
 }
