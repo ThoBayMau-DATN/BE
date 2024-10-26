@@ -1,3 +1,4 @@
+using AutoMapper;
 using BACK_END.Data;
 using BACK_END.DTOs.RoomDto;
 using BACK_END.Mappers;
@@ -15,10 +16,12 @@ namespace BACK_END.Services.Repositories
     {
         private readonly BACK_ENDContext _db;
         private readonly FirebaseStorageService _firebaseStorageService;
-        public RoomRepository(BACK_ENDContext db, FirebaseStorageService firebaseStorageService)
+        private readonly IMapper _mapper;
+        public RoomRepository(BACK_ENDContext db, FirebaseStorageService firebaseStorageService, IMapper mapper)
         {
             _db = db;
             _firebaseStorageService = firebaseStorageService;
+            _mapper = mapper;
         }
 
         public async Task<List<GetAllMotelByAdminDto>?> GetAllMotelByAdmin(MotelQueryDto queryDto)
@@ -383,7 +386,56 @@ namespace BACK_END.Services.Repositories
         {
             return await _db.Room.AnyAsync(x => x.MotelId == motelId && x.RoomNumber == roomNumber);
         }
+
+        public async Task<bool> AddMultiRoom(AddMultiRoomDto dto)
+        {
+            var lastRoom = await _db.Room
+               .Where(x => x.MotelId == dto.MotelId)
+               .OrderByDescending(x => x.RoomNumber)
+               .FirstOrDefaultAsync();
+
+            var countRoom = lastRoom?.RoomNumber ?? 0;
+            for (int i = 0; i < dto.QuantityRoom; i++)
+            {
+                var room = new Room
+                {
+                    MotelId = dto.MotelId,
+                    RoomNumber = ++countRoom,
+                    Area = dto.Area,
+                    Price = dto.Price,
+                    Status = 1
+                };
+                await _db.Room.AddAsync(room);
+            }
+            return await _db.SaveChangesAsync() > 0;
+        }
+
+        public async Task<bool> EditRoomById(int motelId, EditRoomByIdDto dto)
+        {
+            var room = await _db.Room.FindAsync(motelId);
+            if (room == null)
+            {
+                return false;
+            }
+
+            room.RoomNumber = dto.RoomNumber != 0 ? dto.RoomNumber : room.RoomNumber;
+            room.Area = dto.Area != 0 ? dto.Area : room.Area;
+            room.Price = dto.Price != 0 ? dto.Price : room.Price;
+
+            _db.Room.Update(room);
+            return await _db.SaveChangesAsync() > 0;
+        }
+
+        public async Task<GetRoomById?> GetRoomById(int RoomId)
+        {
+            var room = await _db.Room.FindAsync(RoomId);
+            if (room == null)
+            {
+                return null;
+            }
+            // Mapping
+            var getRoomById = _mapper.Map<GetRoomById>(room);
+            return getRoomById;
+        }
     }
-
-
 }

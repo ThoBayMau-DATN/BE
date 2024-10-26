@@ -49,9 +49,14 @@ namespace BACK_END.Mappers
                 Name = model.Name,
                 Address = model.Address,
                 CreateDate = model.CreateDate,
-                NameOwner = model.User?.FullName ?? "",
                 TotalRoom = model?.Rooms?.Count ?? 0,
-                Status = model?.Status ?? 0
+                Status = model?.Status ?? 0,
+                Images = model?.Images?.Where(x => x.Link != null).Select(x => x.Link!).ToList(),
+                Owner = model?.User != null ? new GetOwnerDto
+                {
+                    Id = model.User?.Id ?? 0,
+                    FullName = model.User?.FullName ?? ""
+                } : null
             };
         }
 
