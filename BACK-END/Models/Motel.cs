@@ -13,8 +13,6 @@ namespace BACK_END.Models
         [Column(TypeName = "nvarchar(max)")]
         public string? Location { get; set; }
         [Column(TypeName = "tinyint")]
-        public int Acreage { get; set; }
-        [Column(TypeName = "tinyint")]
         public int Status { get; set; }
         public DateTime CreateDate { get; set; } = DateTime.Now;
         public DateTime? ExpriryDate { get; set; }

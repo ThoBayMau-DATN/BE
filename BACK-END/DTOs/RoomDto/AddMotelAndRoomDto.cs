@@ -9,7 +9,7 @@ namespace BACK_END.DTOs.RoomDto
     {
         public string? Name { get; set; }
         public string? Address { get; set; }
-        public int Acreage { get; set; }
+        public int Area { get; set; }
         public int Price { get; set; }
         public int TotalRoom { get; set; }
         public int UserId { get; set; }

@@ -48,7 +48,7 @@ namespace BACK_END.Controllers
         {
             try
             {
-                var motel = await _room.GetAllRoomByAdmin(queryDto);
+                var motel = await _room.GetAllMotelByAdmin(queryDto);
                 return Ok(new ApiResponse<object>
                 {
                     Code = 200,
@@ -62,9 +62,27 @@ namespace BACK_END.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
+        [HttpGet("get-motel-by-owner")]
+        public async Task<IActionResult> GetMotelByOwner(int userId, [FromQuery] MotelQueryDto queryDto)
+        {
+            try
+            {
+                var motel = await _room.GetMotelByOwner(userId, queryDto);
+                return Ok(new ApiResponse<object>
+                {
+                    Code = 200,
+                    Status = "success",
+                    Message = "lấy dãy trọ thành công",
+                    Data = motel
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         [HttpPost("add-motel-and-room")]
-        public async Task<IActionResult> AddMotelAndRoom( [FromForm] AddMotelAndRoomDto dto,[FromForm] List<IFormFile>? imageFile)
+        public async Task<IActionResult> AddMotelAndRoom([FromForm] AddMotelAndRoomDto dto, [FromForm] List<IFormFile>? imageFile)
         {
             try
             {
@@ -148,13 +166,14 @@ namespace BACK_END.Controllers
         public async Task<IActionResult> RejectMotel(int motelId)
         {
             var result = await _room.RejectMotel(motelId);
-            if (!result || result == false){
+            if (!result || result == false)
+            {
                 return BadRequest(new ApiResponse<object>
-                    {
-                        Code = 400,
-                        Status = "error",
-                        Message = "Từ chối phòng trọ thất bại",
-                    });
+                {
+                    Code = 400,
+                    Status = "error",
+                    Message = "Từ chối phòng trọ thất bại",
+                });
             }
             return Ok(new ApiResponse<object> { Code = 200, Status = "success", Message = "Từ chối phòng trọ thành công" });
         }
@@ -166,11 +185,11 @@ namespace BACK_END.Controllers
             if (!result || result == false)
             {
                 return BadRequest(new ApiResponse<object>
-                    {
-                        Code = 400,
-                        Status = "error",
-                        Message = "Phê duyệt phòng trọ thất bại",
-                    });
+                {
+                    Code = 400,
+                    Status = "error",
+                    Message = "Phê duyệt phòng trọ thất bại",
+                });
             }
             return Ok(new ApiResponse<object> { Code = 200, Status = "success", Message = "Phê duyệt phòng trọ thành công" });
         }
@@ -182,13 +201,72 @@ namespace BACK_END.Controllers
             if (!result || result == false)
             {
                 return BadRequest(new ApiResponse<object>
-                    {
-                        Code = 400,
-                        Status = "error",
-                        Message = "Vô hiệu hóa phòng trọ thất bại",
-                    });
+                {
+                    Code = 400,
+                    Status = "error",
+                    Message = "Vô hiệu hóa phòng trọ thất bại",
+                });
             }
             return Ok(new ApiResponse<object> { Code = 200, Status = "success", Message = "Vô hiệu hóa phòng trọ thành công" });
+        }
+        [HttpGet("get-room-by-motel-id")]
+        public async Task<IActionResult> GetRoomByMotelId(int motelId)
+        {
+            try
+            {
+                var room = await _room.GetRoomByMotelId(motelId);
+                if (room == null)
+                {
+                    return BadRequest(new ApiResponse<object> { Code = 400, Status = "error", Message = "Không tìm thấy phòng trọ" });
+                }
+                return Ok(new ApiResponse<object> { Code = 200, Status = "success", Message = "Lấy phòng trọ thành công", Data = room });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpPost("add-room")]
+        public async Task<IActionResult> AddRoom([FromBody] AddRoomDto dto)
+        {
+            try
+            {
+                var errors = new List<string>();
+
+                // Kiểm tra bổ sung
+                if (dto.MotelId <= 0)
+                    errors.Add("MotelId phải khác 0");
+                if (dto.Area <= 0)
+                    errors.Add("Diện tích phòng phải lớn hơn 0");
+                if (dto.Price <= 0)
+                    errors.Add("Giá phòng phải lớn hơn 0");
+
+                var motelExists = await _room.GetMotelByIdEdit(dto.MotelId);
+                if (motelExists == null)
+                    errors.Add("Không tìm thấy dãy trọ " + dto.MotelId);
+
+                // Kiểm tra số phòng đã tồn tại
+                var roomExists = await _room.RoomNumberExists(dto.MotelId, dto.RoomNumber);
+                if (roomExists)
+                    errors.Add("Số phòng đã tồn tại trong nhà trọ này");
+
+                // Nếu có lỗi, trả về BadRequest với tất cả lỗi
+                if (errors.Any())
+                {
+                    var errorMessage = string.Join(", ", errors);
+                    return BadRequest(new ApiResponse<object> { Code = 400, Status = "error", Message = errorMessage });
+                }
+                var result = await _room.AddRoom(dto);
+                if (!result || result == false)
+                {
+                    return BadRequest(new ApiResponse<object> { Code = 400, Status = "error", Message = "Thêm phòng trọ thất bại" });
+                }
+                return Ok(new ApiResponse<object> { Code = 200, Status = "success", Message = "Thêm phòng trọ thành công" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
     }
