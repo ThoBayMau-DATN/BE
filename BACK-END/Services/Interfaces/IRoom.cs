@@ -16,6 +16,9 @@ namespace BACK_END.Services.Interfaces
         Task<bool> DeactivateMotel(int motelId);
         Task<List<GetRoomByMotelIdDto>?> GetRoomByMotelId(int motelId);
         Task<bool> AddRoom(AddRoomDto dto);
+        Task<bool> AddMultiRoom(AddMultiRoomDto dto);
         Task<bool> RoomNumberExists(int motelId, int roomNumber);
+        Task<bool> EditRoomById(int motelId, EditRoomByIdDto dto);
+        Task<GetRoomById?> GetRoomById(int RoomId);
     }
 }
