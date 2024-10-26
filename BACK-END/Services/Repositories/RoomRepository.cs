@@ -21,7 +21,7 @@ namespace BACK_END.Services.Repositories
             _firebaseStorageService = firebaseStorageService;
         }
 
-        public async Task<List<GetAllMotelByAdminDto>?> GetAllRoomByAdmin(MotelQueryDto queryDto)
+        public async Task<List<GetAllMotelByAdminDto>?> GetAllMotelByAdmin(MotelQueryDto queryDto)
         {
             var motel = _db.Motel
                 .Include(x => x.Rooms)
@@ -50,6 +50,38 @@ namespace BACK_END.Services.Repositories
 
             return pagedResult;
         }
+
+        public async Task<List<GetAllMotelByAdminDto>?> GetMotelByOwner(int userId, MotelQueryDto queryDto)
+        {
+            var motel = _db.Motel
+                .Include(x => x.Rooms)
+                .Include(x => x.User)
+                .Where(x => x.UserId == userId)
+                .AsQueryable();
+
+            //Tìm kiếm
+            if (!string.IsNullOrEmpty(queryDto.Search))
+            {
+                motel = motel.Where(x => x.Address.Contains(queryDto.Search));
+            }
+
+            // Sắp xếp
+            if (!string.IsNullOrEmpty(queryDto.SortColumn))
+            {
+                motel = queryDto.SortOrder == "desc"
+                    ? motel.OrderByDescending(GetSortPropertyByMotel(queryDto.SortColumn))
+                    : motel.OrderBy(GetSortPropertyByMotel(queryDto.SortColumn));
+            }
+
+            // Áp dụng mapping và phân trang
+            var pagedResult = await PagedList<GetAllMotelByAdminDto>.CreateAsync(
+                motel.Select(x => x.MapToGetAllMotelByAdmin()),
+                queryDto.PageNumber,
+                queryDto.PageSize);
+
+            return pagedResult;
+        }
+
 
         public async Task<List<GetAllRoomRepositoryDto>?> GetAllRoomByUser(
             string searchAddress,
@@ -182,7 +214,6 @@ namespace BACK_END.Services.Repositories
                 Id = motel.Id,
                 Name = motel.Name ?? string.Empty,
                 Address = motel.Address ?? string.Empty,
-                Acreage = motel.Acreage,
                 PriceNow = PriceNow != null ? new EditPriceDto
                 {
                     Water = PriceNow?.Water ?? 0,
@@ -215,7 +246,6 @@ namespace BACK_END.Services.Repositories
                 // Cập nhật thông tin motel
                 motel.Name = !string.IsNullOrWhiteSpace(updateDto.Name) ? updateDto.Name : motel.Name;
                 motel.Address = !string.IsNullOrWhiteSpace(updateDto.Address) ? updateDto.Address : motel.Address;
-                motel.Acreage = updateDto.Acreage > 0 ? updateDto.Acreage : motel.Acreage;
 
                 _db.Update(motel);
 
@@ -320,6 +350,40 @@ namespace BACK_END.Services.Repositories
             return false;
         }
 
+        public async Task<List<GetRoomByMotelIdDto>?> GetRoomByMotelId(int motelId)
+        {
+            var room = await _db.Room.Where(x => x.MotelId == motelId).ToListAsync();
+            if (room == null)
+            {
+                return null;
+            }
+            return room.Select(x => x.MapToGetRoomByMotelIdDto()).ToList();
+        }
 
+        public async Task<bool> AddRoom(AddRoomDto dto)
+        {
+            var lastRoom = await _db.Room
+                .Where(x => x.MotelId == dto.MotelId)
+                .OrderByDescending(x => x.RoomNumber)
+                .FirstOrDefaultAsync();
+
+            var countRoom = lastRoom?.RoomNumber ?? 0;
+            var room = new Room
+            {
+                MotelId = dto.MotelId,
+                RoomNumber = dto.RoomNumber != 0 ? dto.RoomNumber : ++countRoom,
+                Area = dto.Area,
+                Price = dto.Price,
+                Status = 1
+            };
+            await _db.Room.AddAsync(room);
+            return await _db.SaveChangesAsync() > 0;
+        }
+        public async Task<bool> RoomNumberExists(int motelId, int roomNumber)
+        {
+            return await _db.Room.AnyAsync(x => x.MotelId == motelId && x.RoomNumber == roomNumber);
+        }
     }
+
+
 }

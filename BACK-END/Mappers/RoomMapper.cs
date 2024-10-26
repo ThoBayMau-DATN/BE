@@ -48,7 +48,6 @@ namespace BACK_END.Mappers
                 Id = model.Id,
                 Name = model.Name,
                 Address = model.Address,
-                Acreage = model.Acreage,
                 CreateDate = model.CreateDate,
                 NameOwner = model.User?.FullName ?? "",
                 TotalRoom = model?.Rooms?.Count ?? 0,
@@ -62,17 +61,18 @@ namespace BACK_END.Mappers
             {
                 Name = dto.Name,
                 Address = dto.Address,
-                Acreage = dto.Acreage,
                 UserId = dto.UserId,
                 Status = 1,
                 CreateDate = DateTime.Now
             };
+
 
             var ListRoom = new List<Room>();
             for(int i = 0; i < dto.TotalRoom; i++)
             {
                 ListRoom.Add(new Room{
                     RoomNumber = i + 1,
+                    Area = dto.Area,
                     Price = dto.Price,
                     Status = 1
                 });
@@ -94,7 +94,6 @@ namespace BACK_END.Mappers
             {
                 Name = dto.Name,
                 Address = dto.Address,
-                Acreage = dto.Acreage
             };
 
             var price = new Price
@@ -112,13 +111,23 @@ namespace BACK_END.Mappers
             {
                 Name = motel.Name,
                 Address = motel.Address,
-                Acreage = motel.Acreage,
                 Price = motel.Prices.Select(x => new UpdatePriceDto
                 {
                     Water = x.Water,
                     Electric = x.Electric,
                     Other = x.Other
                 }).FirstOrDefault()
+            };
+        }
+        public static GetRoomByMotelIdDto MapToGetRoomByMotelIdDto(this Room room)
+        {
+            return new GetRoomByMotelIdDto
+            {
+                Id = room.Id,
+                RoomNumber = room.RoomNumber,
+                Area = room.Area,
+                Price = room.Price,
+                Status = room.Status
             };
         }
     }
