@@ -17,6 +17,7 @@ namespace BACK_END.Mappers
                 .ForMember(dest => dest.RoomNumber, opt => opt.MapFrom(src => src.RoomNumber))
                 .ForMember(dest => dest.Area, opt => opt.MapFrom(src => src.Area))
                 .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Price));
+
         }
     }
 }
