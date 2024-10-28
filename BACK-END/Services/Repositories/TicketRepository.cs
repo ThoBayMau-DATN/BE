@@ -1,4 +1,5 @@
-﻿using BACK_END.Data;
+﻿using AutoMapper;
+using BACK_END.Data;
 using BACK_END.Models;
 using BACK_END.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -8,15 +9,21 @@ namespace BACK_END.Services.Repositories
     public class TicketRepository : ITicket
     {
         private readonly BACK_ENDContext _db;
+        private readonly IMapper _mapper;
 
-        public TicketRepository(BACK_ENDContext db)
+        public TicketRepository(BACK_ENDContext db, IMapper mapper)
         {
             _db = db;
+            _mapper = mapper;
         }
 
-        public async Task<IEnumerable<Ticket>?> GetAllTicketAsync()
+        public async Task<IEnumerable<DTOs.Ticket.Tickets>?> GetAllTicketAsync()
         {
-            return await _db.Ticket.ToListAsync();
+            var data = await _db.Ticket.Include(t => t.Images).ToListAsync();
+
+            var map = _mapper.Map<IEnumerable<DTOs.Ticket.Tickets>>(data);
+
+            return map;
         }
 
         public async Task<Ticket?> CreateTicketAsync(DTOs.Ticket.Create data)
