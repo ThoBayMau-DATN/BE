@@ -1,5 +1,4 @@
-﻿using BACK_END.Models;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 
 namespace BACK_END.Data
 {
@@ -52,7 +51,7 @@ namespace BACK_END.Data
                         FullName = "Admin",
                         Email = powerUser.Email,
                         Phone = "1234567890",
-                        TimeCreated = DateTime.Now,
+                        CreateDate = DateTime.Now,
                         Status = true
                     };
 
@@ -63,4 +62,3 @@ namespace BACK_END.Data
         }
     }
 }
- 

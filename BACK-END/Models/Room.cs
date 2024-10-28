@@ -6,10 +6,7 @@ namespace BACK_END.Models
     {
         public int Id { get; set; }
         public int RoomNumber { get; set; }
-        [Column(TypeName = "decimal(18,2)")]
-        public double Area { get; set; }
-        [Column(TypeName ="decimal(18,1)")]
-        public double Price { get; set; }
+        public int Price { get; set; }
         [Column(TypeName = "tinyint")]
         public int Status { get; set; }
         public int MotelId { get; set; }
