@@ -194,7 +194,7 @@ namespace BACK_END.Controllers
             return Ok(new ApiResponse<object> { Code = 200, Status = "success", Message = "Phê duyệt phòng trọ thành công" });
         }
 
-        [HttpPut("deactivate/{motelId}")]
+        [HttpPut("lock/{motelId}")]
         public async Task<IActionResult> DeactivateMotel(int motelId)
         {
             var result = await _room.DeactivateMotel(motelId);
