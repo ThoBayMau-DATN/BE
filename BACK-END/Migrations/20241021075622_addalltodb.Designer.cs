@@ -4,6 +4,7 @@ using BACK_END.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BACK_END.Migrations
 {
     [DbContext(typeof(BACK_ENDContext))]
-    partial class BACK_ENDContextModelSnapshot : ModelSnapshot
+    [Migration("20241021075622_addalltodb")]
+    partial class addalltodb
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -122,13 +125,16 @@ namespace BACK_END.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<byte>("Acreage")
+                        .HasColumnType("tinyint");
+
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("ExpriryDate")
+                    b.Property<DateTime>("ExpriryDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Location")
@@ -137,7 +143,7 @@ namespace BACK_END.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<DateTime?>("RegisterDate")
+                    b.Property<DateTime>("RegisterDate")
                         .HasColumnType("datetime2");
 
                     b.Property<byte>("Status")
@@ -185,9 +191,6 @@ namespace BACK_END.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreateDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<int>("Electric")
                         .HasColumnType("int");
@@ -248,16 +251,10 @@ namespace BACK_END.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<byte>("Area")
-                        .HasColumnType("tinyint");
-
                     b.Property<int>("MotelId")
                         .HasColumnType("int");
 
                     b.Property<int>("Price")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("PriceLatest")
                         .HasColumnType("int");
 
                     b.Property<int>("RoomNumber")
@@ -660,7 +657,7 @@ namespace BACK_END.Migrations
             modelBuilder.Entity("BACK_END.Models.Price", b =>
                 {
                     b.HasOne("BACK_END.Models.Motel", "Motel")
-                        .WithMany("Prices")
+                        .WithMany()
                         .HasForeignKey("MotelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -671,7 +668,7 @@ namespace BACK_END.Migrations
             modelBuilder.Entity("BACK_END.Models.Review", b =>
                 {
                     b.HasOne("BACK_END.Models.Motel", "Motel")
-                        .WithMany("Reviews")
+                        .WithMany()
                         .HasForeignKey("MotelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -821,10 +818,6 @@ namespace BACK_END.Migrations
             modelBuilder.Entity("BACK_END.Models.Motel", b =>
                 {
                     b.Navigation("Images");
-
-                    b.Navigation("Prices");
-
-                    b.Navigation("Reviews");
 
                     b.Navigation("Rooms");
                 });
