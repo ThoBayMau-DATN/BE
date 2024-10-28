@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BACK_END.Migrations
 {
     [DbContext(typeof(BACK_ENDContext))]
-    [Migration("20241022162556_themCreateDateInPrice")]
-    partial class themCreateDateInPrice
+    [Migration("20241028121908_newDb")]
+    partial class newDb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -95,9 +95,6 @@ namespace BACK_END.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<byte>("Acreage")
-                        .HasColumnType("tinyint");
-
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
@@ -127,118 +124,6 @@ namespace BACK_END.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Motel");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1001,
-                            Acreage = (byte)0,
-                            Address = "123 Đường Biển, Quận 1, TP. HCM",
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1474),
-                            Location = "10.762622, 106.660172",
-                            Name = "Tro A",
-                            Status = (byte)1,
-                            UserId = 1001
-                        },
-                        new
-                        {
-                            Id = 1002,
-                            Acreage = (byte)0,
-                            Address = "456 Đường Sông, Quận 2, TP. HCM",
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1480),
-                            Location = "10.762623, 106.660173",
-                            Name = "Tro B",
-                            Status = (byte)0,
-                            UserId = 1002
-                        },
-                        new
-                        {
-                            Id = 1003,
-                            Acreage = (byte)0,
-                            Address = "789 Đường Núi, Quận 3, TP. HCM",
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1482),
-                            Location = "10.762624, 106.660174",
-                            Name = "Tro C",
-                            Status = (byte)1,
-                            UserId = 1003
-                        },
-                        new
-                        {
-                            Id = 1004,
-                            Acreage = (byte)0,
-                            Address = "101 Đường Biển, Quận 4, TP. HCM",
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1483),
-                            Location = "10.762625, 106.660175",
-                            Name = "Tro D",
-                            Status = (byte)1,
-                            UserId = 1001
-                        },
-                        new
-                        {
-                            Id = 1005,
-                            Acreage = (byte)0,
-                            Address = "202 Đường Mặt Trăng, Quận 5, TP. HCM",
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1484),
-                            Location = "10.762626, 106.660176",
-                            Name = "Tro E",
-                            Status = (byte)0,
-                            UserId = 1002
-                        },
-                        new
-                        {
-                            Id = 1006,
-                            Acreage = (byte)0,
-                            Address = "303 Đường Bình Yên, Quận 6, TP. HCM",
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1485),
-                            Location = "10.762627, 106.660177",
-                            Name = "Tro f",
-                            Status = (byte)1,
-                            UserId = 1003
-                        },
-                        new
-                        {
-                            Id = 1007,
-                            Acreage = (byte)0,
-                            Address = "404 Đường Hồng Hà, Quận 7, TP. HCM",
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1511),
-                            Location = "10.762628, 106.660178",
-                            Name = "Tro g",
-                            Status = (byte)1,
-                            UserId = 1001
-                        },
-                        new
-                        {
-                            Id = 1008,
-                            Acreage = (byte)0,
-                            Address = "505 Đường Biển Xanh, Quận 8, TP. HCM",
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1513),
-                            Location = "10.762629, 106.660179",
-                            Name = "Tro H",
-                            Status = (byte)0,
-                            UserId = 1002
-                        },
-                        new
-                        {
-                            Id = 1009,
-                            Acreage = (byte)0,
-                            Address = "606 Đường Núi Ngàn, Quận 9, TP. HCM",
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1514),
-                            Location = "10.762630, 106.660180",
-                            Name = "Tro I",
-                            Status = (byte)1,
-                            UserId = 1003
-                        },
-                        new
-                        {
-                            Id = 1010,
-                            Acreage = (byte)0,
-                            Address = "707 Đường An Bình, Quận 10, TP. HCM",
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1515),
-                            Location = "10.762631, 106.660181",
-                            Name = "Tro j",
-                            Status = (byte)1,
-                            UserId = 1001
-                        });
                 });
 
             modelBuilder.Entity("BACK_END.Models.Notification", b =>
@@ -297,108 +182,6 @@ namespace BACK_END.Migrations
                     b.HasIndex("MotelId");
 
                     b.ToTable("Price");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1001,
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1541),
-                            Electric = 3000,
-                            IsActive = true,
-                            MotelId = 1001,
-                            Other = 1000,
-                            Water = 5000
-                        },
-                        new
-                        {
-                            Id = 1002,
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1547),
-                            Electric = 3500,
-                            IsActive = true,
-                            MotelId = 1002,
-                            Other = 1500,
-                            Water = 6000
-                        },
-                        new
-                        {
-                            Id = 1003,
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1549),
-                            Electric = 3200,
-                            IsActive = false,
-                            MotelId = 1003,
-                            Other = 1200,
-                            Water = 5500
-                        },
-                        new
-                        {
-                            Id = 1004,
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1550),
-                            Electric = 3400,
-                            IsActive = true,
-                            MotelId = 1004,
-                            Other = 1300,
-                            Water = 6200
-                        },
-                        new
-                        {
-                            Id = 1005,
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1551),
-                            Electric = 3100,
-                            IsActive = false,
-                            MotelId = 1005,
-                            Other = 1400,
-                            Water = 5800
-                        },
-                        new
-                        {
-                            Id = 1006,
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1552),
-                            Electric = 3600,
-                            IsActive = true,
-                            MotelId = 1006,
-                            Other = 1600,
-                            Water = 6100
-                        },
-                        new
-                        {
-                            Id = 1007,
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1553),
-                            Electric = 3300,
-                            IsActive = true,
-                            MotelId = 1007,
-                            Other = 1100,
-                            Water = 5700
-                        },
-                        new
-                        {
-                            Id = 1008,
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1554),
-                            Electric = 3400,
-                            IsActive = false,
-                            MotelId = 1008,
-                            Other = 1700,
-                            Water = 5900
-                        },
-                        new
-                        {
-                            Id = 1009,
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1556),
-                            Electric = 3200,
-                            IsActive = true,
-                            MotelId = 1009,
-                            Other = 1800,
-                            Water = 5600
-                        },
-                        new
-                        {
-                            Id = 1010,
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1557),
-                            Electric = 3500,
-                            IsActive = true,
-                            MotelId = 1010,
-                            Other = 1900,
-                            Water = 6000
-                        });
                 });
 
             modelBuilder.Entity("BACK_END.Models.Review", b =>
@@ -428,192 +211,6 @@ namespace BACK_END.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Review");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1001,
-                            Content = "Review cho MotelId 1001",
-                            MotelId = 1001,
-                            Rating = 3f,
-                            UserId = 1002
-                        },
-                        new
-                        {
-                            Id = 1002,
-                            Content = "Review cho MotelId 1001",
-                            MotelId = 1001,
-                            Rating = 1f,
-                            UserId = 1001
-                        },
-                        new
-                        {
-                            Id = 1003,
-                            Content = "Review cho MotelId 1001",
-                            MotelId = 1001,
-                            Rating = 5f,
-                            UserId = 1001
-                        },
-                        new
-                        {
-                            Id = 1004,
-                            Content = "Review cho MotelId 1002",
-                            MotelId = 1002,
-                            Rating = 2f,
-                            UserId = 1002
-                        },
-                        new
-                        {
-                            Id = 1005,
-                            Content = "Review cho MotelId 1002",
-                            MotelId = 1002,
-                            Rating = 2f,
-                            UserId = 1002
-                        },
-                        new
-                        {
-                            Id = 1006,
-                            Content = "Review cho MotelId 1002",
-                            MotelId = 1002,
-                            Rating = 2f,
-                            UserId = 1003
-                        },
-                        new
-                        {
-                            Id = 1007,
-                            Content = "Review cho MotelId 1003",
-                            MotelId = 1003,
-                            Rating = 1f,
-                            UserId = 1001
-                        },
-                        new
-                        {
-                            Id = 1008,
-                            Content = "Review cho MotelId 1004",
-                            MotelId = 1004,
-                            Rating = 4f,
-                            UserId = 1002
-                        },
-                        new
-                        {
-                            Id = 1009,
-                            Content = "Review cho MotelId 1004",
-                            MotelId = 1004,
-                            Rating = 4f,
-                            UserId = 1002
-                        },
-                        new
-                        {
-                            Id = 1010,
-                            Content = "Review cho MotelId 1004",
-                            MotelId = 1004,
-                            Rating = 4f,
-                            UserId = 1001
-                        },
-                        new
-                        {
-                            Id = 1011,
-                            Content = "Review cho MotelId 1005",
-                            MotelId = 1005,
-                            Rating = 2f,
-                            UserId = 1003
-                        },
-                        new
-                        {
-                            Id = 1012,
-                            Content = "Review cho MotelId 1005",
-                            MotelId = 1005,
-                            Rating = 5f,
-                            UserId = 1003
-                        },
-                        new
-                        {
-                            Id = 1013,
-                            Content = "Review cho MotelId 1006",
-                            MotelId = 1006,
-                            Rating = 1f,
-                            UserId = 1002
-                        },
-                        new
-                        {
-                            Id = 1014,
-                            Content = "Review cho MotelId 1007",
-                            MotelId = 1007,
-                            Rating = 4f,
-                            UserId = 1003
-                        },
-                        new
-                        {
-                            Id = 1015,
-                            Content = "Review cho MotelId 1007",
-                            MotelId = 1007,
-                            Rating = 4f,
-                            UserId = 1003
-                        },
-                        new
-                        {
-                            Id = 1016,
-                            Content = "Review cho MotelId 1008",
-                            MotelId = 1008,
-                            Rating = 3f,
-                            UserId = 1003
-                        },
-                        new
-                        {
-                            Id = 1017,
-                            Content = "Review cho MotelId 1008",
-                            MotelId = 1008,
-                            Rating = 4f,
-                            UserId = 1002
-                        },
-                        new
-                        {
-                            Id = 1018,
-                            Content = "Review cho MotelId 1008",
-                            MotelId = 1008,
-                            Rating = 3f,
-                            UserId = 1002
-                        },
-                        new
-                        {
-                            Id = 1019,
-                            Content = "Review cho MotelId 1008",
-                            MotelId = 1008,
-                            Rating = 5f,
-                            UserId = 1002
-                        },
-                        new
-                        {
-                            Id = 1020,
-                            Content = "Review cho MotelId 1008",
-                            MotelId = 1008,
-                            Rating = 5f,
-                            UserId = 1003
-                        },
-                        new
-                        {
-                            Id = 1021,
-                            Content = "Review cho MotelId 1009",
-                            MotelId = 1009,
-                            Rating = 1f,
-                            UserId = 1001
-                        },
-                        new
-                        {
-                            Id = 1022,
-                            Content = "Review cho MotelId 1010",
-                            MotelId = 1010,
-                            Rating = 1f,
-                            UserId = 1003
-                        },
-                        new
-                        {
-                            Id = 1023,
-                            Content = "Review cho MotelId 1010",
-                            MotelId = 1010,
-                            Rating = 5f,
-                            UserId = 1001
-                        });
                 });
 
             modelBuilder.Entity("BACK_END.Models.Room", b =>
@@ -624,10 +221,16 @@ namespace BACK_END.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<byte>("Area")
+                        .HasColumnType("tinyint");
+
                     b.Property<int>("MotelId")
                         .HasColumnType("int");
 
                     b.Property<int>("Price")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PriceLatest")
                         .HasColumnType("int");
 
                     b.Property<int>("RoomNumber")
@@ -641,88 +244,6 @@ namespace BACK_END.Migrations
                     b.HasIndex("MotelId");
 
                     b.ToTable("Room");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1001,
-                            MotelId = 1001,
-                            Price = 500000,
-                            RoomNumber = 101,
-                            Status = (byte)1
-                        },
-                        new
-                        {
-                            Id = 1002,
-                            MotelId = 1002,
-                            Price = 600000,
-                            RoomNumber = 102,
-                            Status = (byte)0
-                        },
-                        new
-                        {
-                            Id = 1003,
-                            MotelId = 1003,
-                            Price = 700000,
-                            RoomNumber = 103,
-                            Status = (byte)1
-                        },
-                        new
-                        {
-                            Id = 1004,
-                            MotelId = 1004,
-                            Price = 800000,
-                            RoomNumber = 104,
-                            Status = (byte)1
-                        },
-                        new
-                        {
-                            Id = 1005,
-                            MotelId = 1005,
-                            Price = 900000,
-                            RoomNumber = 105,
-                            Status = (byte)0
-                        },
-                        new
-                        {
-                            Id = 1006,
-                            MotelId = 1006,
-                            Price = 1000000,
-                            RoomNumber = 106,
-                            Status = (byte)1
-                        },
-                        new
-                        {
-                            Id = 1007,
-                            MotelId = 1007,
-                            Price = 1100000,
-                            RoomNumber = 107,
-                            Status = (byte)1
-                        },
-                        new
-                        {
-                            Id = 1008,
-                            MotelId = 1008,
-                            Price = 1200000,
-                            RoomNumber = 108,
-                            Status = (byte)0
-                        },
-                        new
-                        {
-                            Id = 1009,
-                            MotelId = 1009,
-                            Price = 1300000,
-                            RoomNumber = 109,
-                            Status = (byte)1
-                        },
-                        new
-                        {
-                            Id = 1010,
-                            MotelId = 1010,
-                            Price = 1400000,
-                            RoomNumber = 110,
-                            Status = (byte)1
-                        });
                 });
 
             modelBuilder.Entity("BACK_END.Models.Term", b =>
@@ -836,38 +357,6 @@ namespace BACK_END.Migrations
                     b.HasIndex("RoomId");
 
                     b.ToTable("User");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1001,
-                            Avatar = "avatar1.png",
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1354),
-                            Email = "vana@example.com",
-                            FullName = "Nguyễn Văn A",
-                            Phone = "0901234567",
-                            Status = (byte)1
-                        },
-                        new
-                        {
-                            Id = 1002,
-                            Avatar = "avatar2.png",
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1357),
-                            Email = "thib@example.com",
-                            FullName = "Trần Thị B",
-                            Phone = "0902345678",
-                            Status = (byte)1
-                        },
-                        new
-                        {
-                            Id = 1003,
-                            Avatar = "avatar3.png",
-                            CreateDate = new DateTime(2024, 10, 22, 23, 25, 54, 955, DateTimeKind.Local).AddTicks(1358),
-                            Email = "vanc@example.com",
-                            FullName = "Lê Văn C",
-                            Phone = "0903456789",
-                            Status = (byte)1
-                        });
                 });
 
             modelBuilder.Entity("BACK_END.Models.User_Notification", b =>
