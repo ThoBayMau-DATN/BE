@@ -38,7 +38,28 @@ namespace BACK_END.DTOs.UserDto
         public string Role { get; set; } = string.Empty;
 
     }
-   
-   
-   
+
+    public class UpdateUserRepositoryDto
+    {
+        [Required(ErrorMessage = "Họ và tên là bắt buộc.")]
+        [StringLength(50, ErrorMessage = "Họ và tên không được dài quá 50 ký tự.")]
+        public string FullName { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Số điện thoại là bắt buộc.")]
+        [RegularExpression(@"^\d{10}$", ErrorMessage = "Số điện thoại phải có 10 chữ số.")]
+        public string Phone { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Email là bắt buộc.")]
+        [EmailAddress(ErrorMessage = "Định dạng email không hợp lệ.")]
+        public string Email { get; set; } = string.Empty;
+        public string? Avatar { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Vai trò là bắt buộc.")]
+        public string Role { get; set; } = string.Empty;
+
+    }
+
+
+
+
 }
