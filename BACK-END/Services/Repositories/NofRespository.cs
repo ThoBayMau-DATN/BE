@@ -19,6 +19,7 @@ namespace BACK_END.Services.Repositories
 
         public async Task<Notification> addNotificationAsync(Notification notification)
         {
+            notification.Status = 0;
             await _db.AddAsync(notification);
             await _db.SaveChangesAsync();
             return notification;
@@ -41,7 +42,7 @@ namespace BACK_END.Services.Repositories
             var userEmails = new List<User>();
             foreach (var e in usersInRole)
             {
-                var users =  _db.User.Where(x => x.Email == e.Email);
+                var users = _db.User.Where(x => x.Email == e.Email);
                 if (users.Any())
                 {
                     userEmails.AddRange(users);  // Thêm tất cả user vào danh sách
@@ -54,13 +55,19 @@ namespace BACK_END.Services.Repositories
                 // Tạo thông báo cho từng người dùng
                 var userNotification = new Notification
                 {
-                    UserId = user.Id,
                     Title = notification.Title,
                     Content = notification.Content,
                     Status = 1,
                     Type = notification.Type
                 };
                 await _db.AddAsync(userNotification);
+                await _db.SaveChangesAsync();
+                var userIdnotification = new User_Notification
+                {
+                    UserId = user.Id,
+                    NotificationId = userNotification.Id,
+                };
+                await _db.AddAsync(userIdnotification);
             }
             await _db.SaveChangesAsync();
 
@@ -77,8 +84,7 @@ namespace BACK_END.Services.Repositories
             notiExist.Type = notification.Type;
             notiExist.Title = notification.Title;
             notiExist.Content = notification.Content;
-            notiExist.Status = notification.Status;
-            notiExist.UserId = notification.UserId;
+            notiExist.Status = 0;
             await _db.SaveChangesAsync();
             return notification;
         }

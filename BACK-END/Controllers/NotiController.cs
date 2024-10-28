@@ -38,11 +38,11 @@ namespace BACK_END.Controllers
             }));
         }
 
-        [HttpPost]
+        [HttpPost("/addNoti")]
 
         public async Task<IActionResult> AddNotification([FromBody] addNotification addNotification)
         {
-            if (ModelState.IsValid) 
+            if (ModelState.IsValid)
             {
                 var Noti = _mapper.Map<Notification>(addNotification);
                 var CreateNoti = await _noti.addNotificationAsync(Noti);
@@ -51,12 +51,12 @@ namespace BACK_END.Controllers
                 {
                     Code = 200,
                     Status = "success",
-                    Message = "Lấy danh sách thông báo thành công",
+                    Message = "Thêm thông báo thành công",
                     Data = CreateNoti
                 }));
             }
             return BadRequest(ModelState);
-            
+
         }
 
         [HttpPut("{id}")]
@@ -68,7 +68,7 @@ namespace BACK_END.Controllers
             {
                 return BadRequest(ModelState);
             }
-            if(NotiUpdate == null)
+            if (NotiUpdate == null)
             {
                 return NotFound(new ApiResponse<object>
                 {
@@ -94,7 +94,7 @@ namespace BACK_END.Controllers
             if (ModelState.IsValid)
             {
                 var map = _mapper.Map<Notification>(sendNotificationDto);
-                var sendnoti =  await _noti.SendNotificationToRolesAsync(roleName, map);
+                var sendnoti = await _noti.SendNotificationToRolesAsync(roleName, map);
                 return Ok((new ApiResponse<object>
                 {
                     Code = 200,
@@ -107,7 +107,7 @@ namespace BACK_END.Controllers
             {
                 Code = 400,
                 Status = "error",
-                Message = "Gửi không thành công!!.",
+                Message = "Gửi thông báo thất bại!!.",
                 Data = null,
             });
         }

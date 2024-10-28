@@ -13,10 +13,11 @@ namespace BACK_END.Mappers
             CreateMap<Notification, updateNotification>().ReverseMap();
             CreateMap<Notification, SendNotificationDto>().ReverseMap();
             CreateMap<Motel, MotelAvailabilityDTO>()
-            .ForMember(dest => dest.AvailableRooms, opt => opt.MapFrom(src => src.TotalRoom - src.Rooms.Count)) 
-            .ForMember(dest => dest.MotelName, opt => opt.MapFrom(src => src.Name))
-            .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
-            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status));
+    .ForMember(dest => dest.MotelName, opt => opt.MapFrom(src => src.Name))
+    .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
+    .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status));
+
+
         }
     }
 }
