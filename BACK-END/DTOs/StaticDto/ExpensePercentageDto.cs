@@ -2,7 +2,7 @@
 {
     public class ExpensePercentageDto
     {
-        public string Name { get; set; }
+        public string? Name { get; set; }
         public decimal Percentage { get; set; }
     }
 }
