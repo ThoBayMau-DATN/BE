@@ -24,12 +24,19 @@ namespace BACK_END.Services.Repositories
             _mapper = mapper;
         }
 
-        public async Task<List<GetAllMotelByAdminDto>?> GetAllMotelByAdmin(MotelQueryDto queryDto)
+        public async Task<List<GetMotelByAdminDto>?> GetAllMotelByAdmin(MotelQueryDto queryDto)
         {
             var motel = _db.Motel
                 .Include(x => x.Rooms)
                 .Include(x => x.User)
+                .Include(x => x.Prices)
+                .Include(x => x.Images)
                 .AsQueryable();
+
+            if (!string.IsNullOrEmpty(queryDto.Status))
+            {
+                motel = motel.Where(x => x.Status == int.Parse(queryDto.Status));
+            }
 
             //Tìm kiếm
             if (!string.IsNullOrEmpty(queryDto.Search))
@@ -46,15 +53,15 @@ namespace BACK_END.Services.Repositories
             }
 
             // Áp dụng mapping và phân trang
-            var pagedResult = await PagedList<GetAllMotelByAdminDto>.CreateAsync(
-                motel.Select(x => x.MapToGetAllMotelByAdmin()),
+            var pagedResult = await PagedList<GetMotelByAdminDto>.CreateAsync(
+                motel.Select(x => _mapper.Map<GetMotelByAdminDto>(x)),
                 queryDto.PageNumber,
                 queryDto.PageSize);
 
             return pagedResult;
         }
 
-        public async Task<List<GetAllMotelByAdminDto>?> GetMotelByOwner(int userId, MotelQueryDto queryDto)
+        public async Task<List<GetMotelByAdminDto>?> GetMotelByOwner(int userId, MotelQueryDto queryDto)
         {
             var motel = _db.Motel
                 .Include(x => x.Rooms)
@@ -77,8 +84,8 @@ namespace BACK_END.Services.Repositories
             }
 
             // Áp dụng mapping và phân trang
-            var pagedResult = await PagedList<GetAllMotelByAdminDto>.CreateAsync(
-                motel.Select(x => x.MapToGetAllMotelByAdmin()),
+            var pagedResult = await PagedList<GetMotelByAdminDto>.CreateAsync(
+                motel.Select(x => _mapper.Map<GetMotelByAdminDto>(x)), 
                 queryDto.PageNumber,
                 queryDto.PageSize);
 
@@ -86,7 +93,7 @@ namespace BACK_END.Services.Repositories
         }
 
 
-        public async Task<List<GetAllRoomRepositoryDto>?> GetAllRoomByUser(
+        /*public async Task<List<GetAllRoomRepositoryDto>?> GetAllRoomByUser(
             string searchAddress,
             string sortColumn,
             string sortOrder,
@@ -125,7 +132,7 @@ namespace BACK_END.Services.Repositories
                 pageSize);
 
             return pagedResult;
-        }
+        }*/
 
         private Expression<Func<Room, object>> GetSortPropertyByRoom(string sortColumn)
         {
@@ -198,11 +205,14 @@ namespace BACK_END.Services.Repositories
             }
         }
 
-        public async Task<GetMotelBydEdit?> GetMotelByIdEdit(int motelId)
+        public async Task<GetMotelByIdDto?> GetMotelById(int id)
         {
             var motel = await _db.Motel
                 .Include(m => m.Prices)
-                .FirstOrDefaultAsync(m => m.Id == motelId);
+                .Include(m => m.Rooms)
+                .Include(m => m.Images)
+                .Include(m => m.User)
+                .FirstOrDefaultAsync(m => m.Id == id);
 
             if (motel == null)
             {
@@ -212,25 +222,7 @@ namespace BACK_END.Services.Repositories
 
             var latestPrice = motel.Prices.Where(x => x.IsActive == false).FirstOrDefault();
 
-            var getMotelDto = new GetMotelBydEdit
-            {
-                Id = motel.Id,
-                Name = motel.Name ?? string.Empty,
-                Address = motel.Address ?? string.Empty,
-                PriceNow = PriceNow != null ? new EditPriceDto
-                {
-                    Water = PriceNow?.Water ?? 0,
-                    Electric = PriceNow?.Electric ?? 0,
-                    Other = PriceNow?.Other ?? 0
-                } : null,
-                Price = latestPrice != null ? new EditPriceDto
-                {
-                    Water = latestPrice.Water,
-                    Electric = latestPrice.Electric,
-                    Other = latestPrice.Other
-                } : null,
-                Status = motel.Status
-            };
+            var getMotelDto = _mapper.Map<GetMotelByIdDto>(motel);
 
             return getMotelDto;
         }

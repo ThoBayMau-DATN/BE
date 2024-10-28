@@ -17,7 +17,7 @@ namespace BACK_END.Controllers
             _room = room;
         }
 
-        [HttpGet]
+        /*[HttpGet]
         public async Task<IActionResult> GetAllRoomByUser(
             [FromQuery] string searchaddress,
             [FromQuery] string sortcolumn,
@@ -41,7 +41,7 @@ namespace BACK_END.Controllers
                 return BadRequest(ex.Message);
             }
 
-        }
+        }*/
 
         [HttpGet("get-all-room-by-admin")]
         public async Task<IActionResult> GetAllMotelByAdmin([FromQuery] MotelQueryDto queryDto)
@@ -113,12 +113,12 @@ namespace BACK_END.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpGet("get-motel-by-id-edit")]
-        public async Task<IActionResult> GetMotelByIdEdit(int motelId)
+        [HttpGet("get-motel-by-id/{id}")]
+        public async Task<IActionResult> GetMotelById(int id)
         {
             try
             {
-                var motel = await _room.GetMotelByIdEdit(motelId);
+                var motel = await _room.GetMotelById(id);
                 if (motel == null)
                 {
                     return BadRequest(new ApiResponse<object> { Code = 400, Status = "error", Message = "Không tìm thấy phòng trọ" });
@@ -241,7 +241,7 @@ namespace BACK_END.Controllers
                 if (dto.Price <= 0)
                     errors.Add("Giá phòng phải lớn hơn 0");
 
-                var motelExists = await _room.GetMotelByIdEdit(dto.MotelId);
+                var motelExists = await _room.GetMotelById(dto.MotelId);
                 if (motelExists == null)
                     errors.Add("Không tìm thấy dãy trọ " + dto.MotelId);
 

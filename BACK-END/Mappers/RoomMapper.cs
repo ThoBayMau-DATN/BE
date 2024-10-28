@@ -10,7 +10,7 @@ namespace BACK_END.Mappers
 {
     public static class RoomMapper
     {
-        public static GetAllRoomRepositoryDto MapToGetAllRoomRepository(this Room model)
+        /*public static GetAllRoomRepositoryDto MapToGetAllRoomRepository(this Room model)
         {
             var room = new GetAllRoomRepositoryDto
             {
@@ -40,8 +40,8 @@ namespace BACK_END.Mappers
                 }
             }
             return room;
-        }
-        public static GetAllMotelByAdminDto MapToGetAllMotelByAdmin(this Motel model)
+        }*/
+        /*public static GetAllMotelByAdminDto MapToGetAllMotelByAdmin(this Motel model)
         {
             return new GetAllMotelByAdminDto
             {
@@ -56,9 +56,17 @@ namespace BACK_END.Mappers
                 {
                     Id = model.User?.Id ?? 0,
                     FullName = model.User?.FullName ?? ""
-                } : null
+                } : null,
+                Price = model?.Prices?.Where(x => x.IsActive == true).Select(x => new GetAllMotelByAdminPriceDto
+                {
+                    Id = x.Id,
+                    Water = x?.Water ?? 0,
+                    Electric = x?.Electric ?? 0,
+                    Other = x?.Other ?? 0
+                }).FirstOrDefault(),
+               
             };
-        }
+        }*/
 
         public static (Motel motel, List<Room> ListRoom, Price price) MapToMotelAndRoom(this AddMotelAndRoomDto dto)
         {
@@ -135,5 +143,13 @@ namespace BACK_END.Mappers
                 Status = room.Status
             };
         }
+        /*public static ImageDto MapToImageDto(this Image image)
+        {
+            return new ImageDto
+            {
+                Id = image.Id,
+                Link = image.Link ?? ""
+            };
+        }*/
     }
 }
