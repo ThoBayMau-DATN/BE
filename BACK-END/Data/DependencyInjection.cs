@@ -1,8 +1,6 @@
-﻿using BACK_END.Models;
-using BACK_END.Services.Interfaces;
+﻿using BACK_END.Services.Interfaces;
 using BACK_END.Services.MyServices;
 using BACK_END.Services.Repositories;
-using Microsoft.AspNetCore.Identity;
 
 namespace BACK_END.Data
 {
@@ -18,6 +16,7 @@ namespace BACK_END.Data
             services.AddScoped<IUser, UserRepository>();
             services.AddScoped<ITicket, TicketRepository>();
             services.AddScoped<FirebaseStorageService>();
+            services.AddScoped<IHome, HomeRespository>();
         }
     }
 }
