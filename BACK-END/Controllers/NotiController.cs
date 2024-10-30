@@ -87,28 +87,40 @@ namespace BACK_END.Controllers
             }));
         }
 
-        [HttpPost("SendByRole/{roleName}")]
-        public async Task<IActionResult> SendNotification([FromBody] SendNotificationDto sendNotificationDto, string roleName)
+        [HttpPost("SendByRole/{roleName}/{notificationId}")]
+        public async Task<IActionResult> SendNotification(int notificationId, string roleName)
         {
-            // Kiểm tra nếu yêu cầu hợp lệ
             if (ModelState.IsValid)
             {
-                var map = _mapper.Map<Notification>(sendNotificationDto);
-                var sendnoti = await _noti.SendNotificationToRolesAsync(roleName, map);
-                return Ok((new ApiResponse<object>
+                var sendnoti = await _noti.SendNotificationToRolesByIdAsync(notificationId, roleName);
+                if (sendnoti != null)
                 {
-                    Code = 200,
-                    Status = "success",
-                    Message = "Gửi thông báo thành công",
-                    Data = sendnoti
-                }));
+                    return Ok(new ApiResponse<object>
+                    {
+                        Code = 200,
+                        Status = "success",
+                        Message = "Gửi thông báo thành công",
+                        Data = new
+                        {
+                            Notification = sendnoti,
+                            RoleName = roleName
+                        }
+                    });
+                }
+                return NotFound(new ApiResponse<object>
+                {
+                    Code = 404,
+                    Status = "error",
+                    Message = "Không tìm thấy thông báo với ID yêu cầu.",
+                    Data = null
+                });
             }
             return BadRequest(new ApiResponse<object>
             {
                 Code = 400,
                 Status = "error",
-                Message = "Gửi thông báo thất bại!!.",
-                Data = null,
+                Message = "Gửi thông báo thất bại!",
+                Data = null
             });
         }
     }
