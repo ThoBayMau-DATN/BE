@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
+
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<BACK_ENDContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("BACK_ENDContext") ?? throw new InvalidOperationException("Connection string 'BACK_ENDContext' not found.")));
@@ -87,6 +90,11 @@ builder.Services.AddCors(options =>
 //});
 
 var app = builder.Build();
+
+FirebaseApp.Create(new AppOptions()
+{
+    Credential = GoogleCredential.FromFile("firebase-config.json")
+});
 
 using (var scope = app.Services.CreateScope())
 {

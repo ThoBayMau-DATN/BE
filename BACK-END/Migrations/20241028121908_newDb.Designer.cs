@@ -4,6 +4,7 @@ using BACK_END.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BACK_END.Migrations
 {
     [DbContext(typeof(BACK_ENDContext))]
-    partial class BACK_ENDContextModelSnapshot : ModelSnapshot
+    [Migration("20241028121908_newDb")]
+    partial class newDb
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,33 +24,6 @@ namespace BACK_END.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("BACK_END.Models.Consumption", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Electricity")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RoomId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("Time")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Water")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RoomId");
-
-                    b.ToTable("Consumption");
-                });
 
             modelBuilder.Entity("BACK_END.Models.Image", b =>
                 {
@@ -100,9 +76,6 @@ namespace BACK_END.Migrations
 
                     b.Property<bool>("Status")
                         .HasColumnType("bit");
-
-                    b.Property<DateTime>("TimeCreated")
-                        .HasColumnType("datetime2");
 
                     b.Property<int>("Water")
                         .HasColumnType("int");
@@ -305,7 +278,7 @@ namespace BACK_END.Migrations
                     b.Property<string>("Content")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("MotelId")
+                    b.Property<int>("MotelId")
                         .HasColumnType("int");
 
                     b.Property<string>("Receiver")
@@ -320,7 +293,7 @@ namespace BACK_END.Migrations
                     b.Property<byte>("Type")
                         .HasColumnType("tinyint");
 
-                    b.Property<int?>("UserId")
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -607,17 +580,6 @@ namespace BACK_END.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("BACK_END.Models.Consumption", b =>
-                {
-                    b.HasOne("BACK_END.Models.Room", "Room")
-                        .WithMany()
-                        .HasForeignKey("RoomId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Room");
-                });
-
             modelBuilder.Entity("BACK_END.Models.Image", b =>
                 {
                     b.HasOne("BACK_END.Models.Motel", "Motel")
@@ -627,7 +589,7 @@ namespace BACK_END.Migrations
                         .IsRequired();
 
                     b.HasOne("BACK_END.Models.Ticket", "Ticket")
-                        .WithMany("Images")
+                        .WithMany()
                         .HasForeignKey("TicketId");
 
                     b.Navigation("Motel");
@@ -713,11 +675,15 @@ namespace BACK_END.Migrations
                 {
                     b.HasOne("BACK_END.Models.Motel", "Motel")
                         .WithMany()
-                        .HasForeignKey("MotelId");
+                        .HasForeignKey("MotelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("BACK_END.Models.User", "User")
                         .WithMany()
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Motel");
 
@@ -823,11 +789,6 @@ namespace BACK_END.Migrations
                     b.Navigation("Reviews");
 
                     b.Navigation("Rooms");
-                });
-
-            modelBuilder.Entity("BACK_END.Models.Ticket", b =>
-                {
-                    b.Navigation("Images");
                 });
 
             modelBuilder.Entity("BACK_END.Models.User", b =>

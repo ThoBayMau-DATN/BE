@@ -15,7 +15,7 @@ namespace BACK_END.Data
 			      services.AddScoped<IStatictical, StaticticalRepository>();
             services.AddScoped<IUser, UserRepository>();
             services.AddScoped<ITicket, TicketRepository>();
-
+            services.AddScoped<FirebaseStorageService>();
             services.AddScoped<IHome, HomeRespository>();
         }
     }
