@@ -26,7 +26,7 @@ namespace BACK_END.Services.Repositories
         public async Task<List<GetAllUserRepositoryDto>> GetAllUser(string searchString, string sortColumn, string sortOrder, int pageNumber, int pageSize)
         {
 
-            var query = _db.User.AsQueryable();
+            var query = _db.User.Where(x=>x.Status==true).AsQueryable();
             if (!string.IsNullOrEmpty(searchString))
             {
                 query = query.Where(x => x.FullName.Contains(searchString) || x.Email.Contains(searchString) || x.Phone.Contains(searchString));
@@ -66,7 +66,6 @@ namespace BACK_END.Services.Repositories
                 Console.WriteLine("Email người dùng: " + user.Email);
             }
             //
-
             //Dictionary<string, User> userDict = new Dictionary<string, User>();
             //for (int i = 0; i < users.Count; i++)
             //{
@@ -74,7 +73,7 @@ namespace BACK_END.Services.Repositories
             //    Console.WriteLine("Email người dùng: " + users[i].Email);
             //}
             //lấy danh sách sau đó tìm kiếm
-            
+
             var usersWithRoles = query.Select(user => new GetAllUserRepositoryDto
             {   
                 Id = userDict[user.Email].Id,
@@ -86,7 +85,8 @@ namespace BACK_END.Services.Repositories
                 Status = userDict[user.Email].Status,
                 Role = userRoles.GetValueOrDefault(user.Email, "")
             });
-            //trả về người dùng
+            //trả về người dùng active 
+           
 
             //sắp xếp
             if (!string.IsNullOrEmpty(sortColumn))
@@ -161,31 +161,66 @@ namespace BACK_END.Services.Repositories
 
         public Task<GetAllUserRepositoryDto> GetUserById(int id)
         {
-            var query = _db.User.AsQueryable().Where(x=> x.Id == id).FirstOrDefaultAsync();
+            //lấy người dùng theo id
+            var query = _db.User.Where(x => x.Id == id).FirstOrDefault();
+            ////nếu có người dùng
+            if (query == null)
+            {
+                throw new KeyNotFoundException($"User with ID {id} not found.");
+            }
+
+
             //lấy người dùng theo email trong identity
-            var identityUser = _userManager.FindByEmailAsync(query.Result.Email).Result;
+            var identityUser = _userManager.FindByEmailAsync(query.Email).Result;
             Console.WriteLine("Email người dùng: " + identityUser.Email);
             if (identityUser == null)
             {
-                throw new KeyNotFoundException($"Identity user with ID {query.Result.Id} not found.");
+                throw new KeyNotFoundException($"Identity user with ID {query.Id} not found.");
             }
             //lấy role của người dùng
             var roles = _userManager.GetRolesAsync(identityUser).Result;
             Console.WriteLine("Role của người dùng: " + roles[0]);
-            //tạo user mới add role
+            ////tạo user mới add role
             var users = new GetAllUserRepositoryDto
             {
-                Id = query.Result.Id,
-                FullName = query.Result.FullName,
-                Phone = query.Result.Phone,
-                Email = query.Result.Email,
-                Avatar = query.Result.Avatar,
-                TimeCreated = query.Result.CreateDate,
-                Status = query.Result.Status,
+                Id = query.Id,
+                FullName = query.FullName,
+                Phone = query.Phone,
+                Email = query.Email,
+                Avatar = query.Avatar,
+                TimeCreated = query.CreateDate,
+                Status = query.Status,
                 Role = roles[0]
             };
 
             return Task.FromResult(users);
+
+            //var query = _db.User.AsQueryable().Where(x => x.Id == id).FirstOrDefaultAsync();
+            ////lấy người dùng theo email trong identity
+            //var identityUser = _userManager.FindByEmailAsync(query.Result.Email).Result;
+            //Console.WriteLine("Email người dùng: " + identityUser.Email);
+            //if (identityUser == null)
+            //{
+            //    throw new KeyNotFoundException($"Identity user with ID {query.Result.Id} not found.");
+            //}
+            ////lấy role của người dùng
+            //var roles = _userManager.GetRolesAsync(identityUser).Result;
+            //Console.WriteLine("Role của người dùng: " + roles[0]);
+            ////tạo user mới add role
+            //var users = new GetAllUserRepositoryDto
+            //{
+            //    Id = query.Result.Id,
+            //    FullName = query.Result.FullName,
+            //    Phone = query.Result.Phone,
+            //    Email = query.Result.Email,
+            //    Avatar = query.Result.Avatar,
+            //    TimeCreated = query.Result.CreateDate,
+            //    Status = query.Result.Status,
+            //    Role = roles[0]
+            //};
+
+            //return Task.FromResult(users);
+
 
         }
         public async Task<User?> CreateUser(CreateUserRepositoryDto userDto)
@@ -194,9 +229,19 @@ namespace BACK_END.Services.Repositories
             var existingUser = await _userManager.FindByEmailAsync(userDto.Email);
             if (existingUser != null)
             {
-                return null; // Có thể ném ngoại lệ hoặc trả về null nếu người dùng đã tồn tại
+                //ném ngoại lệ email đã tồn tại
+                throw new InvalidOperationException("Email đã tồn tại.");
             }
+            //kiểm tra dữ liệu  đầu vào có hợp lệ model
 
+
+            // Kiểm tra xem có người dùng nào đã tồn tại với số điện thoại này không
+            var existingPhone = await _db.User.FirstOrDefaultAsync(x => x.Phone == userDto.Phone);
+            if (existingPhone != null)
+            {
+                throw new InvalidOperationException("Số điện thoại đã tồn tại.");
+            }
+           
 
             // Tạo một thực thể User mới
             var newUser = new User
@@ -231,7 +276,8 @@ namespace BACK_END.Services.Repositories
             var createUserResult = await _userManager.CreateAsync(identityUser, userDto.Password);
             if (!createUserResult.Succeeded)
             {
-                return null; // Hoặc ném new Exception("Không thể tạo người dùng danh tính.");
+                //trả về tin nhắn lỗi
+                throw new Exception("Failed to create identity user: " + string.Join(", ", createUserResult.Errors.Select(e => e.Description)));
             }
 
             // Gán vai trò cho người dùng vừa tạo
@@ -248,20 +294,38 @@ namespace BACK_END.Services.Repositories
             throw new NotImplementedException();
         }
 
-        public async Task<User> UpdateUser(int id, CreateUserRepositoryDto user)
+        public async Task<User> UpdateUser(int id, UpdateUserRepositoryDto user)
         {
             // Tìm người dùng theo ID
             var existingUser = await _db.User.FindAsync(id);
+            if (existingUser == null)
+                {
+                throw new KeyNotFoundException($"Không tìm thấy người dùng.");
+            }
             //tìm người dùng trong identity trước khi cập nhật
             var identityUser = await _userManager.FindByEmailAsync(existingUser.Email);
-
-            if (existingUser == null)
-            {
-                throw new KeyNotFoundException($"User with ID {id} not found.");
-            }
+          
             if (identityUser == null)
             {
                 throw new KeyNotFoundException($"Identity user with ID {existingUser.Id} not found.");
+            }
+            //kiểm tra dữ liệu người dùng có thay đổi và có trùng với người dùng khác không
+            if (user.Email != existingUser.Email && user.Email != existingUser.Email)
+            {
+                var existingEmail = await _db.User.FirstOrDefaultAsync(x => x.Email == user.Email);
+                if (existingEmail != null)
+                {
+                    throw new InvalidOperationException("Email đã tồn tại.");
+                }
+            }
+            //kiểm tra dữ liệu người dùng có thay đổi và có trùng với người dùng khác không
+            if (user.Phone != existingUser.Phone && user.Phone != existingUser.Phone)
+            {
+                var existingPhone = await _db.User.FirstOrDefaultAsync(x => x.Phone == user.Phone);
+                if (existingPhone != null)
+                {
+                    throw new InvalidOperationException("Số điện thoại đã tồn tại.");
+                }
             }
 
             // Cập nhật thông tin người dùng
@@ -305,13 +369,13 @@ namespace BACK_END.Services.Repositories
             var existingUser = _db.User.Find(id);
             if (existingUser == null)
             {
-                throw new KeyNotFoundException($"User with ID {id} not found.");
+                throw new KeyNotFoundException("404");
             }
             //tìm người dùng trong identity trước khi xóa
             var identityUser = _userManager.FindByEmailAsync(existingUser.Email).Result;
             if (identityUser == null)
             {
-                throw new KeyNotFoundException($"Identity user with ID {existingUser.Id} not found.");
+                throw new KeyNotFoundException("404");
             }
 
            //đổi trạng thái người dùng

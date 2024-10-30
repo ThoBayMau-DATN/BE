@@ -9,7 +9,6 @@ namespace BACK_END.Controllers
     [ApiController]
     public class HomeController : Controller
     {
-
         private readonly IHome _home;
 
         public HomeController(IHome home)
