@@ -305,7 +305,7 @@ namespace BACK_END.Migrations
                     b.Property<string>("Content")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("MotelId")
+                    b.Property<int?>("MotelId")
                         .HasColumnType("int");
 
                     b.Property<string>("Receiver")
@@ -320,7 +320,7 @@ namespace BACK_END.Migrations
                     b.Property<byte>("Type")
                         .HasColumnType("tinyint");
 
-                    b.Property<int>("UserId")
+                    b.Property<int?>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -627,7 +627,7 @@ namespace BACK_END.Migrations
                         .IsRequired();
 
                     b.HasOne("BACK_END.Models.Ticket", "Ticket")
-                        .WithMany()
+                        .WithMany("Images")
                         .HasForeignKey("TicketId");
 
                     b.Navigation("Motel");
@@ -713,15 +713,11 @@ namespace BACK_END.Migrations
                 {
                     b.HasOne("BACK_END.Models.Motel", "Motel")
                         .WithMany()
-                        .HasForeignKey("MotelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("MotelId");
 
                     b.HasOne("BACK_END.Models.User", "User")
                         .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
 
                     b.Navigation("Motel");
 
@@ -827,6 +823,11 @@ namespace BACK_END.Migrations
                     b.Navigation("Reviews");
 
                     b.Navigation("Rooms");
+                });
+
+            modelBuilder.Entity("BACK_END.Models.Ticket", b =>
+                {
+                    b.Navigation("Images");
                 });
 
             modelBuilder.Entity("BACK_END.Models.User", b =>

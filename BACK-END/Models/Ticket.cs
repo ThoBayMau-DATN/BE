@@ -14,9 +14,11 @@ namespace BACK_END.Models
         [Column(TypeName = "tinyint")]
         public int Status { get; set; }
         public string? Receiver { get; set; }
-        public int UserId { get; set; }
+        public int? UserId { get; set; }
         public User? User { get; set; }
-        public int MotelId { get; set; }
+        public int? MotelId { get; set; }
         public Motel? Motel { get; set; }
+
+        public virtual ICollection<Image>? Images { get; set; }
     }
 }

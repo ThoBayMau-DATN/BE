@@ -21,10 +21,14 @@ namespace BACK_END.Mappers
                 .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Price));
 
             CreateMap<Motel, MotelAvailabilityDTO>()
-    .ForMember(dest => dest.MotelName, opt => opt.MapFrom(src => src.Name))
-    .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
-    .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status));
+            .ForMember(dest => dest.MotelName, opt => opt.MapFrom(src => src.Name))
+            .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status));
 
+            //ticket
+            CreateMap<Models.Ticket, DTOs.Ticket.Tickets>()
+            .ForMember(dest => dest.Imgs, opt => opt.MapFrom(src => src.Images.Select(i => i.Link)))
+            .ForMember(dest => dest.UserName, opt => opt.MapFrom(x => x.User.FullName));
         }
     }
 }
