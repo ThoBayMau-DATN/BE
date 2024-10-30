@@ -34,9 +34,17 @@ namespace BACK_END.Services.Repositories
         {
             return await _userManager.GetUsersInRoleAsync(roleName);
         }
-        public async Task<Notification> SendNotificationToRolesAsync(string roleName, Notification notification)
+        public async Task<Notification?> SendNotificationToRolesByIdAsync(int notificationId, string roleName)
         {
-            // Lấy danh sách tất cả người dùng trong các vai trò được chỉ định
+            var notification = await _db.Notification.FindAsync(notificationId);
+            if (notification == null)
+            {
+                return null;
+            }
+
+            notification.Status = 2;
+            _db.Notification.Update(notification);
+
             var usersInRole = await GetUsersByRoleAsync(roleName);
 
             var userEmails = new List<User>();
@@ -45,29 +53,17 @@ namespace BACK_END.Services.Repositories
                 var users = _db.User.Where(x => x.Email == e.Email);
                 if (users.Any())
                 {
-                    userEmails.AddRange(users);  // Thêm tất cả user vào danh sách
+                    userEmails.AddRange(users); 
                 }
-
-
             }
             foreach (var user in userEmails)
             {
-                // Tạo thông báo cho từng người dùng
-                var userNotification = new Notification
-                {
-                    Title = notification.Title,
-                    Content = notification.Content,
-                    Status = 1,
-                    Type = notification.Type
-                };
-                await _db.AddAsync(userNotification);
-                await _db.SaveChangesAsync();
-                var userIdnotification = new User_Notification
+                var userNotification = new User_Notification
                 {
                     UserId = user.Id,
-                    NotificationId = userNotification.Id,
+                    NotificationId = notification.Id,
                 };
-                await _db.AddAsync(userIdnotification);
+                await _db.AddAsync(userNotification);
             }
             await _db.SaveChangesAsync();
 
