@@ -14,6 +14,5 @@ namespace BACK_END.Models
         public int Status { get; set; }
         public int MotelId { get; set; }
         public Motel? Motel { get; set; }
-        
     }
 }
