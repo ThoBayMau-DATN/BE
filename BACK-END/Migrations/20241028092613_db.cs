@@ -232,10 +232,11 @@ namespace BACK_END.Migrations
                     Name = table.Column<string>(type: "nvarchar(50)", nullable: true),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Location = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Acreage = table.Column<byte>(type: "tinyint", nullable: false),
                     Status = table.Column<byte>(type: "tinyint", nullable: false),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ExpriryDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    RegisterDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ExpriryDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    RegisterDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -253,7 +254,6 @@ namespace BACK_END.Migrations
                     Electric = table.Column<int>(type: "int", nullable: false),
                     Other = table.Column<int>(type: "int", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     MotelId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -274,9 +274,7 @@ namespace BACK_END.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     RoomNumber = table.Column<int>(type: "int", nullable: false),
-                    Area = table.Column<byte>(type: "tinyint", nullable: false),
                     Price = table.Column<int>(type: "int", nullable: false),
-                    PriceLatest = table.Column<int>(type: "int", nullable: true),
                     Status = table.Column<byte>(type: "tinyint", nullable: false),
                     MotelId = table.Column<int>(type: "int", nullable: false)
                 },
@@ -333,34 +331,6 @@ namespace BACK_END.Migrations
                         column: x => x.RoomId,
                         principalTable: "Room",
                         principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Rental",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    RoomId = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Rental", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Rental_Room_RoomId",
-                        column: x => x.RoomId,
-                        principalTable: "Room",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Rental_User_UserId",
-                        column: x => x.UserId,
-                        principalTable: "User",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -535,16 +505,6 @@ namespace BACK_END.Migrations
                 column: "MotelId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Rental_RoomId",
-                table: "Rental",
-                column: "RoomId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Rental_UserId",
-                table: "Rental",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Review_MotelId",
                 table: "Review",
                 column: "MotelId");
@@ -667,9 +627,6 @@ namespace BACK_END.Migrations
 
             migrationBuilder.DropTable(
                 name: "Price");
-
-            migrationBuilder.DropTable(
-                name: "Rental");
 
             migrationBuilder.DropTable(
                 name: "Review");
