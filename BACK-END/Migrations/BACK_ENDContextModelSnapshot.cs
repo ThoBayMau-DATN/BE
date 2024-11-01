@@ -211,6 +211,35 @@ namespace BACK_END.Migrations
                     b.ToTable("Price");
                 });
 
+            modelBuilder.Entity("BACK_END.Models.Rental", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("RoomId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoomId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Rental");
+                });
+
             modelBuilder.Entity("BACK_END.Models.Review", b =>
                 {
                     b.Property<int>("Id")
@@ -666,6 +695,25 @@ namespace BACK_END.Migrations
                         .IsRequired();
 
                     b.Navigation("Motel");
+                });
+
+            modelBuilder.Entity("BACK_END.Models.Rental", b =>
+                {
+                    b.HasOne("BACK_END.Models.Room", "Room")
+                        .WithMany()
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BACK_END.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Room");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("BACK_END.Models.Review", b =>
