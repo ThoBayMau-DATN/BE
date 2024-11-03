@@ -10,7 +10,7 @@ namespace BACK_END.Models
         public string? Content { get; set; }
         public int UserId { get; set; }
         public User? User { get; set; }
-        public int MotelId { get; set; }
+        public int? MotelId { get; set; }
         public Motel? Motel { get; set; }
     }
 }

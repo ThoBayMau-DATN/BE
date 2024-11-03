@@ -2,6 +2,7 @@
 using BACK_END.Data;
 using BACK_END.Models;
 using BACK_END.Services.Interfaces;
+using BACK_END.Services.MyServices;
 using Microsoft.EntityFrameworkCore;
 
 namespace BACK_END.Services.Repositories
@@ -17,13 +18,36 @@ namespace BACK_END.Services.Repositories
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<DTOs.Ticket.Tickets>?> GetAllTicketAsync()
+        public async Task<DTOs.Ticket.TicketPagination?> GetAllTicketAsync(DTOs.Ticket.TicketQuery ticketQuery)
         {
-            var data = await _db.Ticket.Include(t => t.Images).ToListAsync();
+            IQueryable<Ticket> data = _db.Ticket.Include(x => x.Images).OrderByDescending(x => x.CreateDate);
 
-            var map = _mapper.Map<IEnumerable<DTOs.Ticket.Tickets>>(data);
+            if (ticketQuery.Status > 0)
+            {
+                data = data.Where(x => x.Status == ticketQuery.Status);
+            }
 
-            return map;
+            if (!string.IsNullOrEmpty(ticketQuery.Search))
+            {
+                data = data.Where(x => x.Title.ToLower().Contains(ticketQuery.Search.ToLower()));
+            }
+
+            var page = await PagedList<Ticket>.CreateAsync(data, ticketQuery.PageNumber, ticketQuery.PageSize);
+
+            var paginationResult = _mapper.Map<DTOs.Ticket.TicketPagination>(page);
+
+            return paginationResult;
+        }
+
+        public async Task<DTOs.Ticket.Infoticket?> GetTicketByIdAsync(int ticketId)
+        {
+            var ticket = await _db.Ticket.Include(x => x.Images).Include(x => x.User).FirstOrDefaultAsync(x => x.Id == ticketId);
+            if (ticket != null)
+            {
+                var map = _mapper.Map<DTOs.Ticket.Infoticket>(ticket);
+                return map;
+            }
+            return null;
         }
 
         public async Task<Ticket?> CreateTicketAsync(DTOs.Ticket.Create data)

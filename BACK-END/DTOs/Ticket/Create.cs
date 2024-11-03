@@ -9,6 +9,7 @@ namespace BACK_END.DTOs.Ticket
         public string Title { get; set; }
         [Required(ErrorMessage = "Nội dung không được để trống")]
         public string Content { get; set; }
+        public DateTime CreateDate { get; set; } = DateTime.Now;
         public int Status { get; set; }
         public string? Receiver { get; set; }
         public int UserId { get; set; }
