@@ -22,7 +22,6 @@ namespace BACK_END.Services.MyServices
             PageSize = pageSize;
             CurrentPage = pageNumber;
             TotalPages = (int)Math.Ceiling(count / (double)pageSize);
-
             AddRange(items);
         }
 
@@ -33,4 +32,6 @@ namespace BACK_END.Services.MyServices
             return new PagedList<T>(items, count, pageNumber, pageSize);
         }
     }
+
+   
 }
