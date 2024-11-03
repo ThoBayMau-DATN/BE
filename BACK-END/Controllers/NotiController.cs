@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BACK_END.DTOs.NotiDto;
 using BACK_END.DTOs.Repository;
+using BACK_END.DTOs.Ticket;
 using BACK_END.Models;
 using BACK_END.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
@@ -26,16 +27,30 @@ namespace BACK_END.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> getListNotification()
+        public async Task<IActionResult> getListNotification([FromQuery] NotiQuery notiQuery)
         {
-            var notification = await _noti.getAllNotificationAsync();
-            return Ok((new ApiResponse<object>
+            try
             {
-                Code = 200,
-                Status = "success",
-                Message = "Lấy danh sách thông báo thành công",
-                Data = notification
-            }));
+                var notis = await _noti.GetAllNotiAsync(notiQuery);
+                return Ok(new ApiResponse<object>
+                {
+                    Code = 200,
+                    Status = "success",
+                    Message = "Lấy danh sách thông báo thành công",
+                    Data = notis
+                });
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(new ApiResponse<object>
+                {
+                    Code = 400,
+                    Status = "error",
+                    Message = $"Lỗi api :{ex.Message}",
+                    Data = null
+                });
+            }
         }
 
         [HttpPost("/addNoti")]

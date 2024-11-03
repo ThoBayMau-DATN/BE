@@ -16,4 +16,6 @@ namespace BACK_END.DTOs.NotiDto
         public string? Content { get; set; }
 
     }
+
+
 }
