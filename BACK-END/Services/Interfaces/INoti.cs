@@ -1,10 +1,12 @@
-﻿using BACK_END.Models;
+﻿using BACK_END.DTOs.NotiDto;
+using BACK_END.DTOs.Ticket;
+using BACK_END.Models;
 
 namespace BACK_END.Services.Interfaces
 {
     public interface INoti
     {
-        Task<IEnumerable<Notification>> getAllNotificationAsync();
+        Task<listNotificationDto> GetAllNotiAsync(NotiQuery notiQuery);
 
         Task<Notification> addNotificationAsync(Notification notification);
 
