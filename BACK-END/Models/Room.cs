@@ -12,8 +12,8 @@ namespace BACK_END.Models
         public int? PriceLatest { get; set; }
         [Column(TypeName = "tinyint")]
         public int Status { get; set; }
-        public int MotelId { get; set; }
+        public int? MotelId { get; set; }
         public Motel? Motel { get; set; }
-        
+
     }
 }

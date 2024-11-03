@@ -4,7 +4,8 @@ namespace BACK_END.Services.Interfaces
 {
     public interface ITicket
     {
-        Task<IEnumerable<DTOs.Ticket.Tickets>?> GetAllTicketAsync();
+        Task<DTOs.Ticket.TicketPagination> GetAllTicketAsync(DTOs.Ticket.TicketQuery ticketQuery);
+        Task<DTOs.Ticket.Infoticket?> GetTicketByIdAsync(int ticketId);
         Task<Ticket?> CreateTicketAsync(DTOs.Ticket.Create data);
         Task<Ticket?> UpdateTicketAsync(DTOs.Ticket.Update data);
     }

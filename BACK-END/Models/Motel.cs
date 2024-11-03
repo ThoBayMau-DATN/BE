@@ -17,7 +17,7 @@ namespace BACK_END.Models
         public DateTime CreateDate { get; set; } = DateTime.Now;
         public DateTime? ExpriryDate { get; set; }
         public DateTime? RegisterDate { get; set; }
-        public int UserId { get; set; }
+        public int? UserId { get; set; }
         [DeleteBehavior(DeleteBehavior.Restrict)]
         public User? User { get; set; }
 
