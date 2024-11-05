@@ -287,6 +287,14 @@ namespace BACK_END.Migrations
                     b.Property<int>("MotelId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("MotelId");
@@ -701,7 +709,7 @@ namespace BACK_END.Migrations
             modelBuilder.Entity("BACK_END.Models.Term", b =>
                 {
                     b.HasOne("BACK_END.Models.Motel", "Motel")
-                        .WithMany()
+                        .WithMany("Terms")
                         .HasForeignKey("MotelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -738,7 +746,7 @@ namespace BACK_END.Migrations
             modelBuilder.Entity("BACK_END.Models.User", b =>
                 {
                     b.HasOne("BACK_END.Models.Room", "Room")
-                        .WithMany()
+                        .WithMany("Users")
                         .HasForeignKey("RoomId");
 
                     b.Navigation("Room");
@@ -823,6 +831,13 @@ namespace BACK_END.Migrations
                     b.Navigation("Reviews");
 
                     b.Navigation("Rooms");
+
+                    b.Navigation("Terms");
+                });
+
+            modelBuilder.Entity("BACK_END.Models.Room", b =>
+                {
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("BACK_END.Models.Ticket", b =>
