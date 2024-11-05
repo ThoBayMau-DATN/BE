@@ -9,10 +9,10 @@ namespace BACK_END.Services.Interfaces
     {
 
         /*Task<List<GetAllRoomRepositoryDto>?> GetAllRoomByUser(string searchAddress, string sortColumn, string sortOrder, int pageNumber, int pageSize);*/
-        Task<List<GetMotelByAdminDto>?> GetAllMotelByAdmin(MotelQueryDto queryDto);
-        Task<List<GetMotelByAdminDto>?> GetMotelByOwner(int userId, MotelQueryDto queryDto);
-        Task<string?> AddMotelAndRoom(AddMotelAndRoomDto model, List<IFormFile>? imageFile);
-        Task<UpdateMotelDto?> UpdateMotel(int motelId, UpdateMotelDto dto);
+        Task<PagedResultDto<GetMotelByAdminDto>?> GetAllMotelByAdmin(MotelQueryDto queryDto);
+        Task<List<GetMotelByIdDto>?> GetMotelByOwner(int userId, MotelQueryDto queryDto);
+        Task<string?> AddMotelAndRoom(AddMotelAndRoomDto model, List<IFormFile>? imageFile, IFormFile? fileTerm);
+        Task<GetMotelByIdDto?> EditMotel(int motelId, UpdateMotelDto dto);
         Task<GetMotelByIdDto?> GetMotelById(int id);
         Task<bool> RejectMotel(int motelId);
         Task<bool> ApproveMotel(int motelId);
@@ -23,7 +23,7 @@ namespace BACK_END.Services.Interfaces
         Task<bool> RoomNumberExists(int motelId, int roomNumber);
         Task<bool> EditRoomById(int motelId, EditRoomByIdDto dto);
         Task<GetRoomById?> GetRoomById(int RoomId);
-
+        Task<bool> DeleteUserFromRoom(int RoomId, int userId);
 
         //Task<List<GetAllRoomRepositoryDto>?> GetAllRoomByUser(string searchAddress,string sortColumn, string sortOrder, int pageNumber, int pageSize);
 

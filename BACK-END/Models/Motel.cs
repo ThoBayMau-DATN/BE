@@ -25,5 +25,6 @@ namespace BACK_END.Models
         public virtual ICollection<Room>? Rooms { get; set; }
         public virtual ICollection<Price>? Prices { get; set; }
         public virtual ICollection<Review>? Reviews { get; set; }
+        public virtual ICollection<Term>? Terms { get; set; }
     }
 }

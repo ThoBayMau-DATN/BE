@@ -232,11 +232,10 @@ namespace BACK_END.Migrations
                     Name = table.Column<string>(type: "nvarchar(50)", nullable: true),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Location = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Acreage = table.Column<byte>(type: "tinyint", nullable: false),
                     Status = table.Column<byte>(type: "tinyint", nullable: false),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ExpriryDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    RegisterDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ExpriryDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    RegisterDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UserId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -254,6 +253,7 @@ namespace BACK_END.Migrations
                     Electric = table.Column<int>(type: "int", nullable: false),
                     Other = table.Column<int>(type: "int", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     MotelId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -274,7 +274,9 @@ namespace BACK_END.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     RoomNumber = table.Column<int>(type: "int", nullable: false),
+                    Area = table.Column<byte>(type: "tinyint", nullable: false),
                     Price = table.Column<int>(type: "int", nullable: false),
+                    PriceLatest = table.Column<int>(type: "int", nullable: true),
                     Status = table.Column<byte>(type: "tinyint", nullable: false),
                     MotelId = table.Column<int>(type: "int", nullable: false)
                 },
@@ -295,6 +297,8 @@ namespace BACK_END.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Link = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MotelId = table.Column<int>(type: "int", nullable: false)
                 },
