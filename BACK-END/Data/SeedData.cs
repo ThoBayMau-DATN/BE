@@ -26,7 +26,8 @@ namespace BACK_END.Data
 
             // Kiểm tra xem tài khoản admin đã tồn tại chưa
             var adminUser = await userManager.FindByEmailAsync("admin@gmail.com");
-            Console.WriteLine(adminUser);
+            var staffUser = await userManager.FindByEmailAsync("staff@gmail.com");
+
             if (adminUser == null)
             {
                 // Tạo tài khoản admin mặc định
@@ -34,13 +35,17 @@ namespace BACK_END.Data
                 {
                     UserName = "admin",
                     Email = "admin@gmail.com",
+                    PhoneNumber = "0123456789"
                 };
 
-                string adminPassword = "Admin@123";
+                string adminPassword = "Admin123";
 
-                var createPowerUser = await userManager.CreateAsync(powerUser, adminPassword);
+                
 
-                if (createPowerUser.Succeeded)
+                var createPowerAdmin = await userManager.CreateAsync(powerUser, adminPassword);
+                
+
+                if (createPowerAdmin.Succeeded)
                 {
 
                     // Gán role Admin cho tài khoản admin
@@ -50,12 +55,44 @@ namespace BACK_END.Data
                     {
                         FullName = "Admin",
                         Email = powerUser.Email,
-                        Phone = "1234567890",
+                        Phone = "0123456789",
                         CreateDate = DateTime.Now,
                         Status = true
                     };
 
                     dbContext.User.Add(newUser);
+                    dbContext.SaveChanges();
+                }
+
+                
+            }
+            if (staffUser == null)
+            {
+                // Tạo tài khoản saff mặc định
+                var powerStaff = new IdentityUser
+                {
+                    UserName = "staff",
+                    Email = "staff@gmail.com",
+                    PhoneNumber = "0123456788"
+                };
+
+                string adminStaff = "Staff123";
+
+                var createPowerStaff = await userManager.CreateAsync(powerStaff, adminStaff);
+
+                if (createPowerStaff.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(powerStaff, "Staff");
+
+                    var newStaff = new Models.User
+                    {
+                        FullName = "Staff",
+                        Email = powerStaff.Email,
+                        Phone = "0123456788",
+                        CreateDate = DateTime.Now,
+                        Status = true
+                    };
+                    dbContext.User.Add(newStaff);
                     dbContext.SaveChanges();
                 }
             }
