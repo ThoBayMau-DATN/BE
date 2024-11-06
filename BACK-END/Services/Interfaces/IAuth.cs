@@ -18,5 +18,7 @@ namespace BACK_END.Services.Interfaces
         Task<bool> ChangePassword(ChangePassWord model);
 
         bool CheckOtp(string model);
+        Task<GetUserDto> GetUserByToken(string token);
+        Task<string> EditRoleCustomerToOwner(string token);
     }
 }
