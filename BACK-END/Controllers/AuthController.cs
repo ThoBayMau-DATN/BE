@@ -513,5 +513,30 @@ namespace BACK_END.Controllers
                 return StatusCode(500, $"Exception: {ex.Message}");
             }
         }
+        [HttpGet("getUserByToken")]
+        public async Task<IActionResult> GetUserByToken(string token)
+        {
+            try
+            {
+                var user = await _auth.GetUserByToken(token);
+                return Ok(new ApiResponse<object>
+                {
+                    Code = 200,
+                    Status = "success",
+                    Message = "Lấy thông tin người dùng thành công.",
+                    Data = user
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ApiResponse<object>
+                {
+                    Code = 500,
+                    Status = "error",
+                    Message = ex.Message,
+                    Data = null
+                });
+            }
+        }
     }
 }

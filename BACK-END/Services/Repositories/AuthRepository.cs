@@ -1,4 +1,6 @@
-﻿using BACK_END.Data;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using BACK_END.Data;
 using BACK_END.DTOs.Auth;
 using BACK_END.Mappers;
 using BACK_END.Models;
@@ -225,10 +227,10 @@ namespace BACK_END.Services.Repositories
             try
             {
                 var user = await _userManager.Users.FirstOrDefaultAsync(x => x.PhoneNumber == model.Phone);
-                if (user != null && await _userManager.CheckPasswordAsync(user, model.Password)) 
+                if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
                 {
                     var token = await _tokenService.GenerateTokenAsync(user);
-                    return new AuthResultDto { Success = true, Message = "Đăng nhập thành công công", Token = token };
+                    return new AuthResultDto { Success = true, Message = "Đăng nhập thành công", Token = token };
                 }
                 else
                 {
@@ -419,6 +421,61 @@ namespace BACK_END.Services.Repositories
             }
         }
 
+        public async Task<GetUserDto?> GetUserByToken(string token)
+        {
+            //tìm user theo token
+            var userNameIdentity = HandlerToken(token);
+            if (string.IsNullOrEmpty(userNameIdentity)) return null; // Thêm kiểm tra email
 
+            var user = await _userManager.FindByNameAsync(userNameIdentity);
+            if (user == null) return null;
+
+            var myUser = await _db.User.FirstOrDefaultAsync(x => x.Email == user.Email);
+            if (myUser == null) return null;
+
+            var userDto = new GetUserDto
+            {
+                Id = myUser.Id,
+                Name = myUser.FullName,
+                Email = myUser.Email,
+                PhoneNumber = myUser.Phone,
+                Role = (await _userManager.GetRolesAsync(user)).FirstOrDefault()
+            };
+
+            return userDto;
+        }
+        private string? HandlerToken(string token)
+        {
+            try
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var jwtToken = tokenHandler.ReadJwtToken(token);
+
+                return jwtToken.Claims.FirstOrDefault(x => x.Type == "sub")?.Value;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Token error: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<string> EditRoleCustomerToOwner(string token)
+        {
+            var userNameIdentity = HandlerToken(token);
+            if (string.IsNullOrEmpty(userNameIdentity)) return null;
+
+            var user = await _userManager.FindByNameAsync(userNameIdentity);
+            if (user == null) return null;
+
+            var role = await _userManager.GetRolesAsync(user);
+            if (role.Contains("Customer"))
+            {
+                var result = await _userManager.RemoveFromRoleAsync(user, "Customer");
+                await _userManager.AddToRoleAsync(user, "Owner");
+            }
+
+            return "Thay đổi quyền thành công";
+        }
     }
 }
