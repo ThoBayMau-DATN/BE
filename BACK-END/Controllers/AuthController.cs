@@ -20,7 +20,7 @@ namespace BACK_END.Controllers
             _userManager = userManager;
         }
 
-        /*[HttpPost("register")]
+        [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto model)
         {
             try
@@ -34,15 +34,16 @@ namespace BACK_END.Controllers
             }
         }
 
+
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto model)
         {
             try
             {
-                var token = await _auth.LoginAsync(model);
-                if (token != null)
+                var user = await _auth.LoginAsync(model);
+                if (user != null)
                 {
-                    return Ok(new { Token = token });
+                    return Ok(user);
                 }
                 return Unauthorized();
             }
@@ -50,7 +51,7 @@ namespace BACK_END.Controllers
             {
                 return BadRequest(ex.Message);
             }
-        }*/
+        }
         [HttpPost("register-customer")]
         public async Task<IActionResult> RegisterCustomer([FromBody] DangKyUserDto model)
         {
@@ -355,58 +356,58 @@ namespace BACK_END.Controllers
             }
 
         }
-        [HttpPost("dang-nhap")]
-        public async Task<IActionResult> DangNhap([FromBody] LoginDto model)
-        {
-            //kiểm lỗi nhập vào dto
-            if (!ModelState.IsValid)
-            {
-                var errorMessages = ModelState.Values
-                    .SelectMany(v => v.Errors)
-                    .Select(e => e.ErrorMessage);
+        // [HttpPost("dang-nhap")]
+        // public async Task<IActionResult> DangNhap([FromBody] LoginDto model)
+        // {
+        //     //kiểm lỗi nhập vào dto
+        //     if (!ModelState.IsValid)
+        //     {
+        //         var errorMessages = ModelState.Values
+        //             .SelectMany(v => v.Errors)
+        //             .Select(e => e.ErrorMessage);
 
-                var fullErrorMessage = string.Join("; ", errorMessages);
+        //         var fullErrorMessage = string.Join("; ", errorMessages);
 
-                return BadRequest(fullErrorMessage);
-            }
+        //         return BadRequest(fullErrorMessage);
+        //     }
 
-            var token = await _auth.LoginAsync(model);
-            //kiểm lỗi tài khoản hoặc mật khẩu không đúng
-            if (string.IsNullOrEmpty(token))
-            {
-                return Unauthorized(new ApiResponse<object>
-                {
-                    Code = 401,
-                    Status = "error",
-                    Message = "Tài khoản hoặc mật khẩu không đúng.",
-                    Data = null,
-                });
-            }
-            //kiểm lỗi không tìm thấy người dùng trong hệ thống
-            var nguoiDung = await _auth.CheckSDT(model.Phone);
-            if (nguoiDung == null)
-            {
-                return NotFound(new ApiResponse<object>
-                {
-                    Code = 404,
-                    Status = "error",
-                    Message = "Không tìm thấy người dùng trong hệ thống.",
-                    Data = null,
-                });
-            }
-            //thành công
-            return Ok(new ApiResponse<object>
-            {
-                Code = 200,
-                Status = "success",
-                Message = "Đăng nhập thành công.",
-                Data = new
-                {
-                    Token = token,
-                    User = nguoiDung
-                },
-            });
-        }
+        //     var userExist = await _auth.LoginAsync(model);
+        //     //kiểm lỗi tài khoản hoặc mật khẩu không đúng
+        //     if (userExist.Success == false)
+        //     {
+        //         return Unauthorized(new ApiResponse<object>
+        //         {
+        //             Code = 401,
+        //             Status = "error",
+        //             Message = "Tài khoản hoặc mật khẩu không đúng.",
+        //             Data = null,
+        //         });
+        //     }
+        //     //kiểm lỗi không tìm thấy người dùng trong hệ thống
+        //     var nguoiDung = await _auth.CheckSDT(model.Phone);
+        //     if (nguoiDung == null)
+        //     {
+        //         return NotFound(new ApiResponse<object>
+        //         {
+        //             Code = 404,
+        //             Status = "error",
+        //             Message = "Không tìm thấy người dùng trong hệ thống.",
+        //             Data = null,
+        //         });
+        //     }
+        //     //thành công
+        //     return Ok(new ApiResponse<object>
+        //     {
+        //         Code = 200,
+        //         Status = "success",
+        //         Message = "Đăng nhập thành công.",
+        //         Data = new
+        //         {
+        //             Token = token,
+        //             User = nguoiDung
+        //         },
+        //     });
+        // }
 
         [HttpPost("senderOtpToEmail")]
         public async Task<IActionResult> SenderOtpToEmail([FromBody] ForgetPassword model)
