@@ -1,6 +1,7 @@
 using BACK_END.DTOs.Repository;
 using BACK_END.DTOs.RoomDto;
 using BACK_END.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BACK_END.Controllers
@@ -44,6 +45,7 @@ namespace BACK_END.Controllers
         }*/
 
         [HttpGet("get-all-room-by-admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllMotelByAdmin([FromQuery] MotelQueryDto queryDto)
         {
             try
@@ -62,7 +64,8 @@ namespace BACK_END.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpGet("get-motel-by-owner")]
+        [HttpGet("get-motel-by-owner/{userId}")]
+        [Authorize(Roles = "Owner")]
         public async Task<IActionResult> GetMotelByOwner(int userId, [FromQuery] MotelQueryDto queryDto)
         {
             try
