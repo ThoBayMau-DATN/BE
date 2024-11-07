@@ -413,9 +413,6 @@ namespace BACK_END.Services.Repositories
 
         }
 
-        public Task<int> CountUser()
-        {
-            throw new NotImplementedException();
-        }
+
     }
 }
