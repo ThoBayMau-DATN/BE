@@ -19,12 +19,6 @@ namespace BACK_END.Controllers
         {
             _user = user;
         }
-        [HttpGet]
-        [Route("CountUser")]
-        public async Task<int>  Get()
-        {
-            return await _user.CountUser();
-        }
 
         class CustomData
         {
