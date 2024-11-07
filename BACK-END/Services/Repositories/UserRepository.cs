@@ -23,7 +23,7 @@ namespace BACK_END.Services.Repositories
         }
 
        
-        public async Task<List<GetAllUserRepositoryDto>> GetAllUser(string searchString, string sortColumn, string sortOrder, int pageNumber, int pageSize)
+        public async Task<PagedList<GetAllUserRepositoryDto>> GetAllUser(string searchString, string sortColumn, string sortOrder, int pageNumber, int pageSize)
         {
 
             var query = _db.User.Where(x=>x.Status==true).AsQueryable();
@@ -154,9 +154,8 @@ namespace BACK_END.Services.Repositories
                usersWithRoles,
                pageNumber,
                pageSize);
-
-            Console.WriteLine("Số lượng người dùng: " + pagedResult.Count);
-            return pagedResult;
+              //trả về phân trang và danh sách
+              return pagedResult;   
         }
 
         public Task<GetAllUserRepositoryDto> GetUserById(int id)
@@ -172,7 +171,6 @@ namespace BACK_END.Services.Repositories
 
             //lấy người dùng theo email trong identity
             var identityUser = _userManager.FindByEmailAsync(query.Email).Result;
-            Console.WriteLine("Email người dùng: " + identityUser.Email);
             if (identityUser == null)
             {
                 throw new KeyNotFoundException($"Identity user with ID {query.Id} not found.");
@@ -414,5 +412,7 @@ namespace BACK_END.Services.Repositories
             return Task.FromResult(existingUser);
 
         }
+
+
     }
 }

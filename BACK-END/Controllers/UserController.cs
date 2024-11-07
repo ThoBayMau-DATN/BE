@@ -2,6 +2,7 @@
 using BACK_END.DTOs.UserDto;
 using BACK_END.Models;
 using BACK_END.Services.Interfaces;
+using BACK_END.Services.MyServices;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -19,6 +20,12 @@ namespace BACK_END.Controllers
             _user = user;
         }
 
+        class CustomData
+        {
+           public List<GetAllUserRepositoryDto> list { get; set; }
+           public int TotalPage { get; set; }
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetAllUser(
             [FromQuery] string? searchString,
@@ -29,8 +36,9 @@ namespace BACK_END.Controllers
         {
             try
             {
-                var listUser = await _user.GetAllUser(searchString, sortColumn, sortOrder, pageNumber, pageSize);
-                if (listUser == null) {
+                PagedList<GetAllUserRepositoryDto>  listUser = await _user.GetAllUser(searchString, sortColumn, sortOrder, pageNumber, pageSize);
+                Console.WriteLine(listUser.TotalCount);
+                if (listUser == null ||!listUser.Any()) {
                     return NotFound(new ApiResponse<object>
                     {
                         Code = 404,
@@ -46,7 +54,11 @@ namespace BACK_END.Controllers
                         Code = 200,
                         Status = "success",
                         Message = "Lấy danh sách người dùng thành công",
-                        Data = listUser
+                        Data = new CustomData
+                        {
+                            list = listUser,
+                            TotalPage = listUser.TotalPages
+                        }
                     });
                 
                 }
