@@ -39,6 +39,8 @@ namespace BACK_END.Mappers
             .ForMember(dest => dest.Imgs, opt => opt.MapFrom(src => src.Images.Select(i => i.Link)))
             .ForMember(dest => dest.UserName, opt => opt.MapFrom(x => x.User.FullName));
 
+            CreateMap<Models.User, DTOs.Ticket.Receiver>().ReverseMap();
+
             ///map pagelist
             CreateMap<Services.MyServices.PagedList<Ticket>, DTOs.Ticket.TicketPagination>()
             .ForMember(dest => dest.TotalCount, opt => opt.MapFrom(src => src.TotalCount))

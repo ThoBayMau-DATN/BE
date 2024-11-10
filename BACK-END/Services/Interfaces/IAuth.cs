@@ -4,6 +4,9 @@ namespace BACK_END.Services.Interfaces
 {
     public interface IAuth
     {
+        Task<List<string>> GetEmailsByRoleAsync(string? roleName);
+        Task<string> RegisterAsync(RegisterDto model);
+        Task<string> LoginAsync(LoginDto model);
         Task<AuthResultDto> RegisterAsync(RegisterDto model);
         Task<AuthResultDto> LoginAsync(LoginDto model);
         Task<string> RegisterCustomer(DangKyUserDto model);
