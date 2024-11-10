@@ -27,13 +27,14 @@ namespace BACK_END.Services.Repositories
             _mapper = mapper;
         }
 
-        public async Task<List<GetMotelByAdminDto>?> GetAllMotelByAdmin(MotelQueryDto queryDto)
+        public async Task<PagedResultDto<GetMotelByAdminDto>> GetAllMotelByAdmin(MotelQueryDto queryDto)
         {
             var motel = _db.Motel
                 .Include(x => x.Rooms)
                 .Include(x => x.User)
                 .Include(x => x.Prices)
                 .Include(x => x.Images)
+                .Include(x => x.Terms)
                 .AsQueryable();
 
             if (!string.IsNullOrEmpty(queryDto.Status))
@@ -61,14 +62,21 @@ namespace BACK_END.Services.Repositories
                 queryDto.PageNumber,
                 queryDto.PageSize);
 
-            return pagedResult;
+            return new PagedResultDto<GetMotelByAdminDto>
+            {
+                Items = pagedResult,
+                PageNumber = queryDto.PageNumber,
+                PageSize = queryDto.PageSize,
+                TotalPages = (int)Math.Ceiling(await motel.CountAsync() / (double)queryDto.PageSize)
+            };
         }
 
-        public async Task<List<GetMotelByAdminDto>?> GetMotelByOwner(int userId, MotelQueryDto queryDto)
+        public async Task<List<GetMotelByIdDto>?> GetMotelByOwner(int userId, MotelQueryDto queryDto)
         {
             var motel = _db.Motel
                 .Include(x => x.Rooms)
                 .Include(x => x.User)
+                .Include(x => x.Prices)
                 .Where(x => x.UserId == userId)
                 .AsQueryable();
 
@@ -87,8 +95,8 @@ namespace BACK_END.Services.Repositories
             }
 
             // Áp dụng mapping và phân trang
-            var pagedResult = await PagedList<GetMotelByAdminDto>.CreateAsync(
-                motel.Select(x => _mapper.Map<GetMotelByAdminDto>(x)), 
+            var pagedResult = await PagedList<GetMotelByIdDto>.CreateAsync(
+                motel.Select(x => _mapper.Map<GetMotelByIdDto>(x)),
                 queryDto.PageNumber,
                 queryDto.PageSize);
 
@@ -157,7 +165,7 @@ namespace BACK_END.Services.Repositories
             };
         }
 
-        public async Task<string?> AddMotelAndRoom(AddMotelAndRoomDto model, List<IFormFile>? imageFiles)
+        public async Task<string?> AddMotelAndRoom(AddMotelAndRoomDto model, List<IFormFile>? imageFiles, IFormFile? fileTerm)
         {
             using var transaction = await _db.Database.BeginTransactionAsync();
             try
@@ -168,6 +176,7 @@ namespace BACK_END.Services.Repositories
                 await _db.SaveChangesAsync(); // Lưu motel để có Id
 
                 price.MotelId = motel.Id;
+                price.IsActive = true;
                 await _db.Price.AddAsync(price);
 
                 foreach (var room in listRoom)
@@ -179,20 +188,13 @@ namespace BACK_END.Services.Repositories
                 // Tải lên hình ảnh nếu có
                 if (imageFiles != null && imageFiles.Count > 0)
                 {
-                    foreach (var imageFile in imageFiles)
-                    {
-                        var imageUrl = await _firebaseStorageService.UploadFileAsync(imageFile);
-                        if (!string.IsNullOrEmpty(imageUrl))
-                        {
-                            var image = new Image
-                            {
-                                Link = imageUrl,
-                                Type = imageFile.ContentType,
-                                MotelId = motel.Id
-                            };
-                            await _db.Image.AddAsync(image);
-                        }
-                    }
+                    await AddImages(motel.Id, imageFiles);
+                }
+
+                // Tải lên điều khoản nếu có
+                if (fileTerm != null)
+                {
+                    await AddTerm(motel.Id, fileTerm);
                 }
 
                 await _db.SaveChangesAsync();
@@ -208,12 +210,56 @@ namespace BACK_END.Services.Repositories
             }
         }
 
+        private async Task AddImages(int motelId, List<IFormFile> imageFiles)
+        {
+            if (imageFiles != null && imageFiles.Count > 0)
+            {
+                foreach (var imageFile in imageFiles)
+                {
+                    var imageUrl = await _firebaseStorageService.UploadFileAsync(imageFile);
+                    if (!string.IsNullOrEmpty(imageUrl))
+                    {
+                        var image = new Image
+                        {
+                            Link = imageUrl,
+                            Type = imageFile.ContentType,
+                            MotelId = motelId
+                        };
+                        await _db.Image.AddAsync(image);
+                    }
+                }
+                await _db.SaveChangesAsync();
+            }
+        }
+
+        private async Task AddTerm(int motelId, IFormFile fileTerm)
+        {
+            if (fileTerm != null)
+            {
+                var termUrl = await _firebaseStorageService.UploadFileAsync(fileTerm);
+                if (!string.IsNullOrEmpty(termUrl))
+                {
+                    var term = new Term
+                    {
+                        Name = fileTerm.FileName,
+                        Type = fileTerm.ContentType,
+                        Link = termUrl,
+                        MotelId = motelId
+                    };
+                    await _db.Term.AddAsync(term);
+                }
+                await _db.SaveChangesAsync();
+            }
+        }
+
+
         public async Task<GetMotelByIdDto?> GetMotelById(int id)
         {
             var motel = await _db.Motel
                 .Include(m => m.Prices)
                 .Include(m => m.Rooms)
                 .Include(m => m.Images)
+                .Include(m => m.Terms)
                 .Include(m => m.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
@@ -230,7 +276,7 @@ namespace BACK_END.Services.Repositories
             return getMotelDto;
         }
 
-        public async Task<UpdateMotelDto?> UpdateMotel(int motelId, UpdateMotelDto updateDto)
+        public async Task<GetMotelByIdDto?> EditMotel(int motelId, UpdateMotelDto updateDto)
         {
             using var transaction = await _db.Database.BeginTransactionAsync();
             try
@@ -248,14 +294,35 @@ namespace BACK_END.Services.Repositories
                 _db.Update(motel);
 
                 // Cập nhật giá
-                if (updateDto.Price != null)
+                if (updateDto.Water != 0 || updateDto.Electric != 0 || updateDto.Other != 0)
                 {
-                    await UpdateMotelPrice(motelId, updateDto.Price);
+                    await UpdateMotelPrice(motelId, updateDto.Water, updateDto.Electric, updateDto.Other);
+                }
+
+                // Xóa hình ảnh
+                if (updateDto.RemoveImageId != null && updateDto.RemoveImageId.Count > 0)
+                {
+                    foreach (var imageId in updateDto.RemoveImageId)
+                    {
+                        await DeleteImages(motelId, updateDto.RemoveImageId);
+                    }
+                }
+
+                // Tải lên hình ảnh nếu có
+                if (updateDto.Images != null && updateDto.Images.Count > 0)
+                {
+                    await AddImages(motelId, updateDto.Images);
+                }
+
+                // Cập nhật điều khoản nếu có
+                if (updateDto.FileTerm != null)
+                {
+                    await UpdateTerm(motelId, updateDto.FileTerm);
                 }
 
                 await _db.SaveChangesAsync();
                 await transaction.CommitAsync();
-                return motel.MapToUpdateMotelDto();
+                return _mapper.Map<GetMotelByIdDto>(motel);
             }
             catch (Exception)
             {
@@ -264,23 +331,47 @@ namespace BACK_END.Services.Repositories
             }
         }
 
-        private async Task UpdateMotelPrice(int motelId, UpdatePriceDto priceDto)
+        private async Task DeleteImages(int motelId, List<int> removeImageId)
         {
-            var latestPrice = await CheckPrice(motelId, priceDto);
+            var images = await _db.Image.Where(x => x.MotelId == motelId && removeImageId.Contains(x.Id)).ToListAsync();
+            _db.Image.RemoveRange(images);
+            await _db.SaveChangesAsync();
+        }
+
+        private async Task UpdateTerm(int motelId, IFormFile fileTerm)
+        {
+            if (fileTerm != null)
+            {
+                var termUrl = await _firebaseStorageService.UploadFileAsync(fileTerm);
+                if (!string.IsNullOrEmpty(termUrl))
+                {
+                    var term = await _db.Term.Where(x => x.MotelId == motelId).FirstOrDefaultAsync();
+                    term.Name = fileTerm.FileName;
+                    term.Type = fileTerm.ContentType;
+                    term.Link = termUrl;
+                    _db.Update(term);
+                }
+                await _db.SaveChangesAsync();
+            }
+        }
+
+        private async Task UpdateMotelPrice(int motelId, int water, int electric, int other)
+        {
+            var latestPrice = await CheckPriceLatest(motelId);
             if (latestPrice != null)
             {
-                latestPrice.Water = priceDto.Water > 0 ? priceDto.Water : latestPrice.Water;
-                latestPrice.Electric = priceDto.Electric > 0 ? priceDto.Electric : latestPrice.Electric;
-                latestPrice.Other = priceDto.Other > 0 ? priceDto.Other : latestPrice.Other;
+                latestPrice.Water = water > 0 ? water : latestPrice.Water;
+                latestPrice.Electric = electric > 0 ? electric : latestPrice.Electric;
+                latestPrice.Other = other > 0 ? other : latestPrice.Other;
                 latestPrice.CreateDate = DateTime.Now;
             }
             else
             {
                 var newPrice = new Price
                 {
-                    Water = priceDto.Water,
-                    Electric = priceDto.Electric,
-                    Other = priceDto.Other,
+                    Water = water,
+                    Electric = electric,
+                    Other = other,
                     IsActive = false,
                     CreateDate = DateTime.Now,
                     MotelId = motelId
@@ -288,7 +379,7 @@ namespace BACK_END.Services.Repositories
                 await _db.Price.AddAsync(newPrice);
             }
         }
-        private async Task<Price?> CheckPrice(int motelId, UpdatePriceDto updateDto)
+        private async Task<Price?> CheckPriceLatest(int motelId)
         {
             var latestPrice = await _db.Price
                 .Where(p => p.MotelId == motelId)
@@ -350,10 +441,24 @@ namespace BACK_END.Services.Repositories
 
         public async Task<List<GetRoomByMotelIdDto>?> GetRoomByMotelId(int motelId)
         {
-            var room = await _db.Room.Where(x => x.MotelId == motelId).ToListAsync();
+            var room = await _db.Room.Where(x => x.MotelId == motelId).Include(x => x.Users).ToListAsync();
             if (room == null)
             {
                 return null;
+            }
+            foreach (var item in room)
+            {
+                if (item.Users?.Count > 0)
+                {
+                    item.Status = 2;
+                    _db.Update(item);
+                }
+                else
+                {
+                    item.Status = 1;
+                    _db.Update(item);
+                }
+                await _db.SaveChangesAsync();
             }
             return room.Select(x => x.MapToGetRoomByMotelIdDto()).ToList();
         }
@@ -402,7 +507,18 @@ namespace BACK_END.Services.Repositories
                 };
                 await _db.Room.AddAsync(room);
             }
-            return await _db.SaveChangesAsync() > 0;
+            if (await _db.SaveChangesAsync() > 0)
+            {
+                var motel = await _db.Motel.FindAsync(dto.MotelId);
+                motel.Status = 1;
+                _db.Update(motel);
+                await _db.SaveChangesAsync();
+            }
+            else
+            {
+                return false;
+            }
+            return true;
         }
 
         public async Task<bool> EditRoomById(int motelId, EditRoomByIdDto dto)
@@ -432,65 +548,17 @@ namespace BACK_END.Services.Repositories
             var getRoomById = _mapper.Map<GetRoomById>(room);
             return getRoomById;
         }
-        //private readonly BACK_ENDContext _db;
-        //public RoomRepository(BACK_ENDContext db)
-        //{
-        //    _db = db;
-        //}
-        //public async Task<List<GetAllRoomRepositoryDto>?> GetAllRoomByUser(
-        //    string searchAddress,
-        //    string sortColumn, 
-        //    string sortOrder, 
-        //    int pageNumber, 
-        //    int pageSize)
-        //{
 
-
-        //    var query = _db.Room
-        //        .Include(x => x.Motel)
-        //        .ThenInclude(x => x.Price)
-        //        .Include(x => x.Motel)
-        //        .ThenInclude(x => x.User)
-        //        .Include(x => x.Motel)
-        //        .ThenInclude(x => x.Reviews)
-        //        .Include(x => x.Motel)
-        //        .ThenInclude(x => x.Term)
-        //        .Where(x => x.Motel.Status == 1)
-        //        .Where(x => x.Status == 1)
-        //        .AsQueryable();
-
-        //    //Tìm kiếm
-        //    if (!string.IsNullOrEmpty(searchAddress))
-        //    {
-        //        query = query.Where(x => x.Motel.Address.Contains(searchAddress));
-        //    }
-
-        //    // Sắp xếp
-        //    if (!string.IsNullOrEmpty(sortColumn))
-        //    {
-        //        query = sortOrder == "desc" 
-        //            ? query.OrderByDescending(GetSortProperty(sortColumn))
-        //            : query.OrderBy(GetSortProperty(sortColumn));
-        //    }
-
-        //    // Áp dụng mapping và phân trang
-        //    var pagedResult = await PagedList<GetAllRoomRepositoryDto>.CreateAsync(
-        //        query.Select(x => x.MapToGetAllRoomRepository()),
-        //        pageNumber,
-        //        pageSize);
-
-
-        //    return pagedResult;
-        //}
-
-        //private Expression<Func<Room, object>> GetSortProperty(string sortColumn)
-        //{
-        //    return sortColumn.ToLower() switch
-        //    {
-        //        "area" => r => r.Area,
-        //        "price" => r => r.Price,
-        //        _ => r => r.Id // Mặc định sắp xếp theo Id
-        //    };
-        //}
+        public async Task<bool> DeleteUserFromRoom(int RoomId, int userId)
+        {
+            var user = await _db.User.FindAsync(userId);
+            if (user == null)
+            {
+                return false;
+            }
+            user.RoomId = null;
+            _db.Update(user);
+            return await _db.SaveChangesAsync() > 0;
+        }
     }
 }

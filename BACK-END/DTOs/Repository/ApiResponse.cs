@@ -1,4 +1,6 @@
-﻿namespace BACK_END.DTOs.Repository
+﻿using Microsoft.AspNetCore.Razor.Language.Intermediate;
+
+namespace BACK_END.DTOs.Repository
 {
     public class ApiResponse<T>
     {
