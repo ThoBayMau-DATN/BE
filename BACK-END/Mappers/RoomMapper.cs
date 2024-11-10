@@ -86,16 +86,16 @@ namespace BACK_END.Mappers
                 ListRoom.Add(new Room{
                     RoomNumber = i + 1,
                     Area = dto.Area,
-                    Price = dto.Price,
+                    Price = dto.PriceRoom,
                     Status = 1
                 });
             }
 
             var price = new Price
             {
-                Water = dto.Price,
-                Electric = dto.Price,
-                Other = dto.Price,
+                Water = dto.PriceWater,
+                Electric = dto.PriceElectric,
+                Other = dto.PriceOther,
                 MotelId = motel.Id
             };
 
@@ -111,26 +111,12 @@ namespace BACK_END.Mappers
 
             var price = new Price
             {
-                Water = dto.Price?.Water ?? 0,
-                Electric = dto.Price?.Electric ?? 0,
-                Other = dto.Price?.Other ?? 0
+                Water = dto?.Water ?? 0,
+                Electric = dto?.Electric ?? 0,
+                Other = dto?.Other ?? 0
             };
 
             return (motel, price);
-        }
-        public static UpdateMotelDto MapToUpdateMotelDto(this Motel motel)
-        {
-            return new UpdateMotelDto
-            {
-                Name = motel.Name,
-                Address = motel.Address,
-                Price = motel.Prices.Select(x => new UpdatePriceDto
-                {
-                    Water = x.Water,
-                    Electric = x.Electric,
-                    Other = x.Other
-                }).FirstOrDefault()
-            };
         }
         public static GetRoomByMotelIdDto MapToGetRoomByMotelIdDto(this Room room)
         {
@@ -139,6 +125,7 @@ namespace BACK_END.Mappers
                 Id = room.Id,
                 RoomNumber = room.RoomNumber,
                 Area = room.Area,
+                UserFromRoom = room.Users?.Count ?? 0,
                 Price = room.Price,
                 Status = room.Status
             };
