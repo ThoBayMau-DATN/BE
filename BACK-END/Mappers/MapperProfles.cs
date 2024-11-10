@@ -13,6 +13,12 @@ namespace BACK_END.Mappers
             CreateMap<Notification, addNotification>().ReverseMap();
             CreateMap<Notification, updateNotification>().ReverseMap();
             CreateMap<Notification, SendNotificationDto>().ReverseMap();
+            CreateMap<Services.MyServices.PagedList<Notification>, DTOs.NotiDto.listNotificationDto>()
+            .ForMember(dest => dest.TotalCount, opt => opt.MapFrom(src => src.TotalCount))
+            .ForMember(dest => dest.TotalPages, opt => opt.MapFrom(src => src.TotalPages))
+            .ForMember(dest => dest.PageNumber, opt => opt.MapFrom(src => src.CurrentPage))
+            .ForMember(dest => dest.PageSize, opt => opt.MapFrom(src => src.PageSize))
+            .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src));
 
             CreateMap<Room, GetRoomById>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
@@ -42,6 +48,9 @@ namespace BACK_END.Mappers
             .ForMember(dest => dest.PageNumber, opt => opt.MapFrom(src => src.CurrentPage))
             .ForMember(dest => dest.PageSize, opt => opt.MapFrom(src => src.PageSize))
             .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src));
+
+
+
         }
     }
 }

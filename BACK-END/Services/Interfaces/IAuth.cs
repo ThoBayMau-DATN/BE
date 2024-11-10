@@ -7,6 +7,8 @@ namespace BACK_END.Services.Interfaces
         Task<List<string>> GetEmailsByRoleAsync(string? roleName);
         Task<string> RegisterAsync(RegisterDto model);
         Task<string> LoginAsync(LoginDto model);
+        Task<AuthResultDto> RegisterAsync(RegisterDto model);
+        Task<AuthResultDto> LoginAsync(LoginDto model);
         Task<string> RegisterCustomer(DangKyUserDto model);
         Task<string> RegisterOwner(DangKyUserDto model);
         Task<string> RegisterSaff(DangKyUserDto model);
@@ -19,5 +21,7 @@ namespace BACK_END.Services.Interfaces
         Task<bool> ChangePassword(ChangePassWord model);
 
         bool CheckOtp(string model);
+        Task<GetUserDto> GetUserByToken(string token);
+        Task<string> EditRoleCustomerToOwner(string token);
     }
 }
