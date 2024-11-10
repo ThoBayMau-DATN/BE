@@ -17,6 +17,7 @@ namespace BACK_END.Data
             services.AddScoped<ITicket, TicketRepository>();
             services.AddScoped<FirebaseStorageService>();
             services.AddScoped<IHome, HomeRespository>();
+            services.AddScoped<IRole, RoleRepository>();
         }
     }
 }

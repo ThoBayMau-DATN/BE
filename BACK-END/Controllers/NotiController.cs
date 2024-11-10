@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BACK_END.DTOs.NotiDto;
 using BACK_END.DTOs.Repository;
+using BACK_END.DTOs.Ticket;
 using BACK_END.Models;
 using BACK_END.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
@@ -26,16 +27,30 @@ namespace BACK_END.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> getListNotification()
+        public async Task<IActionResult> getListNotification([FromQuery] NotiQuery notiQuery)
         {
-            var notification = await _noti.getAllNotificationAsync();
-            return Ok((new ApiResponse<object>
+            try
             {
-                Code = 200,
-                Status = "success",
-                Message = "Lấy danh sách thông báo thành công",
-                Data = notification
-            }));
+                var notis = await _noti.GetAllNotiAsync(notiQuery);
+                return Ok(new ApiResponse<object>
+                {
+                    Code = 200,
+                    Status = "success",
+                    Message = "Lấy danh sách thông báo thành công",
+                    Data = notis
+                });
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(new ApiResponse<object>
+                {
+                    Code = 400,
+                    Status = "error",
+                    Message = $"Lỗi api :{ex.Message}",
+                    Data = null
+                });
+            }
         }
 
         [HttpPost("/addNoti")]
@@ -87,28 +102,40 @@ namespace BACK_END.Controllers
             }));
         }
 
-        [HttpPost("SendByRole/{roleName}")]
-        public async Task<IActionResult> SendNotification([FromBody] SendNotificationDto sendNotificationDto, string roleName)
+        [HttpPost("SendByRole/{roleName}/{notificationId}")]
+        public async Task<IActionResult> SendNotification(int notificationId, string roleName)
         {
-            // Kiểm tra nếu yêu cầu hợp lệ
             if (ModelState.IsValid)
             {
-                var map = _mapper.Map<Notification>(sendNotificationDto);
-                var sendnoti = await _noti.SendNotificationToRolesAsync(roleName, map);
-                return Ok((new ApiResponse<object>
+                var sendnoti = await _noti.SendNotificationToRolesByIdAsync(notificationId, roleName);
+                if (sendnoti != null)
                 {
-                    Code = 200,
-                    Status = "success",
-                    Message = "Gửi thông báo thành công",
-                    Data = sendnoti
-                }));
+                    return Ok(new ApiResponse<object>
+                    {
+                        Code = 200,
+                        Status = "success",
+                        Message = "Gửi thông báo thành công",
+                        Data = new
+                        {
+                            Notification = sendnoti,
+                            RoleName = roleName
+                        }
+                    });
+                }
+                return NotFound(new ApiResponse<object>
+                {
+                    Code = 404,
+                    Status = "error",
+                    Message = "Không tìm thấy thông báo với ID yêu cầu.",
+                    Data = null
+                });
             }
             return BadRequest(new ApiResponse<object>
             {
                 Code = 400,
                 Status = "error",
-                Message = "Gửi thông báo thất bại!!.",
-                Data = null,
+                Message = "Gửi thông báo thất bại!",
+                Data = null
             });
         }
     }

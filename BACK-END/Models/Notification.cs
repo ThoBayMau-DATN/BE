@@ -14,4 +14,5 @@ namespace BACK_END.Models
         [Column(TypeName = "tinyint")]
         public int Status { get; set; }
     }
+    
 }
