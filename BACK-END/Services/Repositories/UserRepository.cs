@@ -251,16 +251,19 @@ namespace BACK_END.Services.Repositories
                 CreateDate = DateTime.Now, // Thiết lập thời gian tạo
                 Status = true // Trạng thái mặc định
             };
-
-            // Thêm người dùng mới vào ngữ cảnh cơ sở dữ liệu
-            await _db.User.AddAsync(newUser);
-
-            // Tạo vai trò nếu nó chưa tồn tại
             if (!await _roleManager.RoleExistsAsync(userDto.Role))
             {
                 var role = new IdentityRole { Name = userDto.Role };
                 await _roleManager.CreateAsync(role);
             }
+            else
+            {
+
+            }
+
+
+            // Thêm người dùng mới vào ngữ cảnh cơ sở dữ liệu
+            await _db.User.AddAsync(newUser);
 
             // Tạo một phiên bản IdentityUser
             var identityUser = new IdentityUser
@@ -413,6 +416,6 @@ namespace BACK_END.Services.Repositories
 
         }
 
-
+   
     }
 }
