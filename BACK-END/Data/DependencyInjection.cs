@@ -12,11 +12,12 @@ namespace BACK_END.Data
             services.AddScoped<TokenService>();
             services.AddScoped<IRoom, RoomRepository>();
             services.AddScoped<INoti, NofRespository>();
-			      services.AddScoped<IStatictical, StaticticalRepository>();
+			services.AddScoped<IStatictical, StaticticalRepository>();
             services.AddScoped<IUser, UserRepository>();
             services.AddScoped<ITicket, TicketRepository>();
             services.AddScoped<FirebaseStorageService>();
             services.AddScoped<IHome, HomeRespository>();
+            services.AddScoped<IRole, RoleRepository>();
         }
     }
 }

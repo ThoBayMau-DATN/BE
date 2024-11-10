@@ -10,7 +10,7 @@ namespace BACK_END.Data
             var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             var dbContext = serviceProvider.GetRequiredService<BACK_ENDContext>();
-            // Tạo các role mặc định
+            // Tạo các role mặc định 
             string[] roleNames = { "Admin", "Staff", "Owner", "Customer" };
             IdentityResult roleResult;
 
