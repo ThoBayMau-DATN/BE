@@ -7,7 +7,6 @@ using BACK_END.Services.MyServices;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 
 namespace BACK_END.Services.Repositories
 {
@@ -29,6 +28,34 @@ namespace BACK_END.Services.Repositories
             _db = db;
             _webHostEnvironment = webHostEnvironment;
             _cache = cache;
+        }
+
+        public async Task<List<string>> GetEmailsByRoleAsync(string? roleName)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(roleName))
+                {
+                    var adminEmails = await _userManager.GetUsersInRoleAsync("Admin");
+                    var staffEmails = await _userManager.GetUsersInRoleAsync("Staff");
+                    return adminEmails.Select(user => user.Email)
+                                      .Concat(staffEmails.Select(user => user.Email))
+                                      .ToList();
+                }
+                var roleExists = await _db.Roles.AnyAsync(r => r.Name == roleName);
+                if (!roleExists)
+                {
+                    return new List<string>();
+                }
+
+                var usersInRole = await _userManager.GetUsersInRoleAsync(roleName);
+                return usersInRole.Select(user => user.Email).ToList();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Lỗi: {ex.Message}");
+                return new List<string>();
+            }
         }
 
         public async Task<bool> CheckEmail(string email)
@@ -390,6 +417,6 @@ namespace BACK_END.Services.Repositories
             }
         }
 
-        
+
     }
 }

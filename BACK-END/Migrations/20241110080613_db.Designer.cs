@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BACK_END.Migrations
 {
     [DbContext(typeof(BACK_ENDContext))]
-    [Migration("20241031081726_db")]
+    [Migration("20241110080613_db")]
     partial class db
     {
         /// <inheritdoc />
@@ -63,7 +63,7 @@ namespace BACK_END.Migrations
                     b.Property<string>("Link")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("MotelId")
+                    b.Property<int?>("MotelId")
                         .HasColumnType("int");
 
                     b.Property<int?>("TicketId")
@@ -626,9 +626,7 @@ namespace BACK_END.Migrations
                 {
                     b.HasOne("BACK_END.Models.Motel", "Motel")
                         .WithMany("Images")
-                        .HasForeignKey("MotelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("MotelId");
 
                     b.HasOne("BACK_END.Models.Ticket", "Ticket")
                         .WithMany("Images")
