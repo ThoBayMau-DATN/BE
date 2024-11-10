@@ -60,7 +60,7 @@ namespace BACK_END.Migrations
                     b.Property<string>("Link")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("MotelId")
+                    b.Property<int?>("MotelId")
                         .HasColumnType("int");
 
                     b.Property<int?>("TicketId")
@@ -623,9 +623,7 @@ namespace BACK_END.Migrations
                 {
                     b.HasOne("BACK_END.Models.Motel", "Motel")
                         .WithMany("Images")
-                        .HasForeignKey("MotelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("MotelId");
 
                     b.HasOne("BACK_END.Models.Ticket", "Ticket")
                         .WithMany("Images")

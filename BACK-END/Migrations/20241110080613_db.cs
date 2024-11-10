@@ -196,7 +196,7 @@ namespace BACK_END.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Link = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Type = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    MotelId = table.Column<int>(type: "int", nullable: false),
+                    MotelId = table.Column<int>(type: "int", nullable: true),
                     TicketId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -562,8 +562,7 @@ namespace BACK_END.Migrations
                 table: "Image",
                 column: "MotelId",
                 principalTable: "Motel",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                principalColumn: "Id");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Image_Ticket_TicketId",
