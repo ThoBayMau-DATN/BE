@@ -138,5 +138,34 @@ namespace BACK_END.Controllers
                 Data = null
             });
         }
+
+        [HttpGet("get-sent-notifications")]
+        public async Task<IActionResult> GetSentNotificationsByEmail([FromQuery] string email)
+        {
+            // Tìm User theo email
+            var user = await _noti.GetUserByEmailAsync(email);
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found" });
+            }
+
+            // Lấy danh sách thông báo đã gửi với Status = 2
+            var sentNotifications = await _noti.GetSentNotificationsAsync(user.Id);
+
+            return Ok(new
+            {
+                UserId = user.Id,
+                Email = user.Email,
+                NotificationCount = sentNotifications.Count,
+                Notifications = sentNotifications.Select(n => new
+                {
+                    n.Id,
+                    n.Type,
+                    n.Title,
+                    n.Content,
+                    n.Status
+                })
+            });
+        }
     }
 }

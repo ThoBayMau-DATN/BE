@@ -1,6 +1,5 @@
 
 using BACK_END.DTOs.RoomDto;
-using BACK_END.Models;
 
 
 namespace BACK_END.Services.Interfaces
@@ -23,6 +22,7 @@ namespace BACK_END.Services.Interfaces
         Task<bool> RoomNumberExists(int motelId, int roomNumber);
         Task<bool> EditRoomById(int motelId, EditRoomByIdDto dto);
         Task<GetRoomById?> GetRoomById(int RoomId);
+        
 
 
         //Task<List<GetAllRoomRepositoryDto>?> GetAllRoomByUser(string searchAddress,string sortColumn, string sortOrder, int pageNumber, int pageSize);

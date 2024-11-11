@@ -50,6 +50,20 @@ namespace BACK_END.Services.Repositories
             return paginationResult;
         }
 
+        public async Task<List<Notification>> GetSentNotificationsAsync(int userId)
+        {
+            return await _db.User_Notification
+                .Where(un => un.UserId == userId && un.Notification!.Status == 2)
+                .Include(un => un.Notification)
+                .Select(un => un.Notification)
+                .ToListAsync();
+        }
+
+        public async Task<User?> GetUserByEmailAsync(string email)
+        {
+            return await _db.User.FirstOrDefaultAsync(u => u.Email == email);
+        }
+
         public async Task<IEnumerable<IdentityUser>> GetUsersByRoleAsync(string roleName)
         {
             return await _userManager.GetUsersInRoleAsync(roleName);
@@ -66,14 +80,13 @@ namespace BACK_END.Services.Repositories
             _db.Notification.Update(notification);
 
             var usersInRole = await GetUsersByRoleAsync(roleName);
-
             var userEmails = new List<User>();
             foreach (var e in usersInRole)
             {
                 var users = _db.User.Where(x => x.Email == e.Email);
                 if (users.Any())
                 {
-                    userEmails.AddRange(users); 
+                    userEmails.AddRange(users);
                 }
             }
             foreach (var user in userEmails)
@@ -89,6 +102,9 @@ namespace BACK_END.Services.Repositories
 
             return notification;
         }
+
+        
+
 
         public async Task<Notification> updateNotificationAsync(Notification notification, int id)
         {
