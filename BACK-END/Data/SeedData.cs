@@ -35,15 +35,15 @@ namespace BACK_END.Data
                 {
                     UserName = "admin",
                     Email = "admin@gmail.com",
-                    PhoneNumber = "0123456789"
+                    PhoneNumber = "0123456780"
                 };
 
                 string adminPassword = "Admin123";
 
-                
+
 
                 var createPowerAdmin = await userManager.CreateAsync(powerUser, adminPassword);
-                
+
 
                 if (createPowerAdmin.Succeeded)
                 {
@@ -55,7 +55,7 @@ namespace BACK_END.Data
                     {
                         FullName = "Admin",
                         Email = powerUser.Email,
-                        Phone = "0123456789",
+                        Phone = "0123456780",
                         CreateDate = DateTime.Now,
                         Status = true
                     };
@@ -63,8 +63,6 @@ namespace BACK_END.Data
                     dbContext.User.Add(newUser);
                     dbContext.SaveChanges();
                 }
-
-                
             }
             if (staffUser == null)
             {
