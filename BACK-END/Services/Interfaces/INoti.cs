@@ -13,5 +13,8 @@ namespace BACK_END.Services.Interfaces
         Task<Notification> updateNotificationAsync(Notification notification, int id);
 
         Task<Notification?> SendNotificationToRolesByIdAsync(int notificationId, string roleName);
+        Task<User?> GetUserByEmailAsync(string email);
+        Task<List<Notification>> GetSentNotificationsAsync(int userId);
+
     }
 }
