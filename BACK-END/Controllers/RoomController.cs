@@ -402,6 +402,41 @@ namespace BACK_END.Controllers
             }
             return Ok(new ApiResponse<object> { Code = 200, Status = "success", Message = "Lấy phòng trọ thành công", Data = result });
         }
+        [HttpPut("change-room-status-to-inactive/{roomId}")]
+        public async Task<IActionResult> ChangeRoomStatusToInactive(int roomId)
+        {
+            try
+            {
+                var result = await _room.ChangeRoomStatusToInactive(roomId);
+                if (!result || result == false)
+                {
+                return BadRequest(new ApiResponse<object> { Code = 400, Status = "error", Message = "Vô hiệu hóa phòng trọ thất bại" });
+            }
+                return Ok(new ApiResponse<object> { Code = 200, Status = "success", Message = "Vô hiệu hóa phòng trọ thành công" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut("change-room-status-to-active/{roomId}")]
+        public async Task<IActionResult> ChangeRoomStatusToActive(int roomId)
+        {
+            try
+            {
+                var result = await _room.ChangeRoomStatusToActive(roomId);
+                if (!result || result == false)
+                {
+                    return BadRequest(new ApiResponse<object> { Code = 400, Status = "error", Message = "Kích hoạt phòng trọ thất bại" });
+                }
+                return Ok(new ApiResponse<object> { Code = 200, Status = "success", Message = "Kích hoạt phòng trọ thành công" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
     }
 }

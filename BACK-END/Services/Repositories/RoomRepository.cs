@@ -731,5 +731,59 @@ namespace BACK_END.Services.Repositories
             var roomConsumption = _mapper.Map<MotelRoomDto>(room);
             return roomConsumption;
         }
+
+        //đổi trang thái room từ 1 sang 3
+        public async Task<bool> ChangeRoomStatusToInactive(int roomId)
+        {
+            using var transaction = await _db.Database.BeginTransactionAsync();
+            try
+            {
+                var room = await _db.Room.FindAsync(roomId);
+                //check room có tồn tại không và trạng thái có phải 1 không
+                if (room == null || room.Status != 1)
+                {
+                    return false;
+                }
+                room.Status = 3;
+                _db.Update(room);
+                await _db.SaveChangesAsync();
+                await transaction.CommitAsync();
+                return true;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                return false;
+            }
+        }
+
+        //đổi trang thái room từ 3 sang 1
+        public async Task<bool> ChangeRoomStatusToActive(int roomId)
+        {
+            using var transaction = await _db.Database.BeginTransactionAsync();
+            try
+            {
+                var room = await _db.Room.FindAsync(roomId);
+                //check room có tồn tại không và trạng thái có phải 3 không
+                if (room == null || room.Status != 3)
+                {
+                    return false;
+                }
+                room.Status = 1;
+                _db.Update(room);
+                await _db.SaveChangesAsync();
+                await transaction.CommitAsync();
+                return true;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                return false;
+            }
+        }
+
+
+
+
     }
 }
