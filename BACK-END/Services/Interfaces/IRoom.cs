@@ -27,7 +27,8 @@ namespace BACK_END.Services.Interfaces
         Task<bool> DeleteUserFromRoom(int RoomId, int userId);
         Task<bool> AddUserToRoom(AddUserToRoomDto dto);
         Task<MotelRoomDto?> Roomtest(int roomId);
-
+        Task<bool> ChangeRoomStatusToInactive(int roomId);
+        Task<bool> ChangeRoomStatusToActive(int roomId);
 
         //Task<List<GetAllRoomRepositoryDto>?> GetAllRoomByUser(string searchAddress,string sortColumn, string sortOrder, int pageNumber, int pageSize);
 
