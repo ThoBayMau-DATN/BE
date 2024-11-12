@@ -25,4 +25,10 @@ public class FirebaseStorageService
 
         return $"https://firebasestorage.googleapis.com/v0/b/{_bucketName}/o/{Uri.EscapeDataString(objectName)}?alt=media";
     }
+
+    public async Task DeleteFileAsync(string filePath)
+    {
+        var fileName = Path.GetFileName(filePath);
+        await _storageClient.DeleteObjectAsync(_bucketName, fileName);
+    }
 }

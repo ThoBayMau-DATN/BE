@@ -1,5 +1,7 @@
 
 
+using static BACK_END.DTOs.RoomDto.MotelRoomDto;
+
 namespace BACK_END.DTOs.RoomDto
 {
     public class GetMotelByIdDto
@@ -26,7 +28,8 @@ namespace BACK_END.DTOs.RoomDto
         public int Price { get; set; }
         public int? PriceLatest { get; set; }
         public int Status { get; set; }
-
+        public int QuantityUserInRoom { get; set; }
+        public List<RoomConsumptionDto>? Consumptions { get; set; }
     }
 
     public class MotelTermDto
@@ -36,4 +39,12 @@ namespace BACK_END.DTOs.RoomDto
         public string? Type { get; set; }
         public string? Link { get; set; }
     }
- }
+
+    public class RoomConsumptionDto
+    {
+        public int Id { get; set; }
+        public int Water { get; set; }
+        public int Electricity { get; set; }
+        public DateTime Time { get; set; }
+    }
+}

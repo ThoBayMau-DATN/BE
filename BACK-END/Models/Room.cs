@@ -16,5 +16,6 @@ namespace BACK_END.Models
         public Motel? Motel { get; set; }
         
         public ICollection<User>? Users { get; set; }
+        public virtual ICollection<Consumption>? Consumptions { get; set; }
     }
 }
