@@ -6,12 +6,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BACK_END.Services.Repositories
 {
-	public class LamChoAnhThinh : IGetTro
+    public class MainRespository : IGetTro
 	{
 		private readonly BACK_ENDContext _db;
 		private readonly FirebaseStorageService _firebaseStorageService;
 		private readonly IMapper _mapper;
-		public LamChoAnhThinh(BACK_ENDContext db, FirebaseStorageService firebaseStorageService, IMapper mapper)
+		public MainRespository(BACK_ENDContext db, FirebaseStorageService firebaseStorageService, IMapper mapper)
 		{
 			_db = db;
 			_firebaseStorageService = firebaseStorageService;
