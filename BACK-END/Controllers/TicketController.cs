@@ -22,7 +22,7 @@ namespace BACK_END.Controllers
         {
             try
             {
-                var tickets = await _ticketRepository.GetAllTicketAsync(ticketQuery);
+                var tickets = await _ticketRepository.GetAllTicketByRoleAsync(ticketQuery);
                 return Ok(new ApiResponse<object>
                 {
                     Code = 200,
@@ -44,11 +44,11 @@ namespace BACK_END.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetTicketById([FromQuery] int id)
+        public async Task<IActionResult> GetTicketById([FromQuery] DTOs.Ticket.InfoticketQuery infoticketQuery)
         {
             try
             {
-                var tickets = await _ticketRepository.GetTicketByIdAsync(id);
+                var tickets = await _ticketRepository.GetTicketByIdAsync(infoticketQuery);
                 if (tickets == null)
                 {
                     return BadRequest(new ApiResponse<object>

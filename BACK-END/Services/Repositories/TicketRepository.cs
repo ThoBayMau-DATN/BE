@@ -22,9 +22,25 @@ namespace BACK_END.Services.Repositories
             _firebase = firebase;
         }
 
-        public async Task<DTOs.Ticket.TicketPagination?> GetAllTicketAsync(DTOs.Ticket.TicketQuery ticketQuery)
+        public async Task<DTOs.Ticket.TicketPagination?> GetAllTicketByRoleAsync(DTOs.Ticket.TicketQuery ticketQuery)
         {
+            var user = await _auth.GetUserByToken(ticketQuery.Token);
+            if (user == null)
+            {
+                return null;
+            }
+
             IQueryable<Ticket> data = _db.Ticket.Include(x => x.Images).OrderByDescending(x => x.CreateDate);
+
+            if (user.Role == "Admin" || user.Role == "Staff")
+            {
+                data = data.Where(x => x.Type == 1 || x.Type == 3 || x.Receiver == user.Id.ToString());
+            }
+            if (user.Role == "Owner")
+            {
+                var motelId = await _db.Motel.Where(x => x.UserId == user.Id).Select(x => x.Id).ToListAsync();
+                data = data.Where(x => x.MotelId.HasValue && motelId.Contains(x.MotelId.Value) && x.Type != 1 && x.Type != 3);
+            }
 
             if (ticketQuery.Status > 0)
             {
@@ -43,9 +59,23 @@ namespace BACK_END.Services.Repositories
             return paginationResult;
         }
 
-        public async Task<DTOs.Ticket.Infoticket?> GetTicketByIdAsync(int ticketId)
+        public async Task<DTOs.Ticket.Infoticket?> GetTicketByIdAsync(DTOs.Ticket.InfoticketQuery infoticketQuery)
         {
-            var ticket = await _db.Ticket.Include(x => x.Images).Include(x => x.User).FirstOrDefaultAsync(x => x.Id == ticketId);
+            var user = await _auth.GetUserByToken(infoticketQuery.Token);
+            if (user == null)
+            {
+                return null;
+            }
+            var ticket = new Ticket();
+            if (user.Role == "Admin" || user.Role == "Staff")
+            {
+                ticket = await _db.Ticket.Include(x => x.Images).Include(x => x.User).FirstOrDefaultAsync(x => x.Id == infoticketQuery.Id && (x.Type == 1 || x.Type == 3 || x.Receiver == user.Id.ToString()));
+            }
+            if (user.Role == "Owner")
+            {
+                var motelId = await _db.Motel.Where(x => x.UserId == user.Id).Select(x => x.Id).ToListAsync();
+                ticket = await _db.Ticket.Include(x => x.Images).Include(x => x.User).FirstOrDefaultAsync(x => x.Id == infoticketQuery.Id && x.MotelId.HasValue && motelId.Contains(x.MotelId.Value) && x.Type != 1 && x.Type != 3);
+            }
             if (ticket != null)
             {
                 var map = _mapper.Map<DTOs.Ticket.Infoticket>(ticket);
