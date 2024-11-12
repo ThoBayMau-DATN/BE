@@ -10,17 +10,12 @@ namespace BACK_END.DTOs.RoomDto
         public string? Name { get; set; }
         public string? Address { get; set; }
         public int Area { get; set; }
-        public int Price { get; set; }
+        public int PriceRoom { get; set; }
+        public int PriceElectric { get; set; }
+        public int PriceWater { get; set; }
+        public int PriceOther { get; set; }
         public int TotalRoom { get; set; }
         public int UserId { get; set; }
-        public AddPriceDto? PriceOther { get; set; }
-
-    }
-    public class AddPriceDto
-    {
-        public int Water { get; set; }
-        public int Electric { get; set; }
-        public int Other { get; set; }
 
     }
 

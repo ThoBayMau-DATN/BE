@@ -257,7 +257,7 @@ namespace BACK_END.Services.Repositories
                 if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
                 {
                     var token = await _tokenService.GenerateTokenAsync(user);
-                    return new AuthResultDto { Success = true, Message = "Đăng nhập thành công", Token = token };
+                    return new AuthResultDto { Success = true, Message = "Đăng nhập thành công", Token = token, Email = user.Email, Username = user.UserName };
                 }
                 else
                 {

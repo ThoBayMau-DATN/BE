@@ -56,7 +56,7 @@ namespace BACK_END.Controllers
                     Code = 200,
                     Status = "success",
                     Message = "lấy phòng thành công",
-                    Data = (motel)
+                    Data = (motel),
                 });
             }
             catch (Exception ex)
@@ -65,7 +65,6 @@ namespace BACK_END.Controllers
             }
         }
         [HttpGet("get-motel-by-owner/{userId}")]
-        [Authorize(Roles = "Owner")]
         public async Task<IActionResult> GetMotelByOwner(int userId, [FromQuery] MotelQueryDto queryDto)
         {
             try
@@ -85,12 +84,11 @@ namespace BACK_END.Controllers
             }
         }
         [HttpPost("add-motel-and-room")]
-        public async Task<IActionResult> AddMotelAndRoom([FromForm] AddMotelAndRoomDto dto, [FromForm] List<IFormFile>? imageFile)
+        public async Task<IActionResult> AddMotelAndRoom([FromForm] AddMotelAndRoomDto dto, [FromForm] List<IFormFile>? imageFile,IFormFile? fileTerm)
         {
             try
             {
-
-                var result = await _room.AddMotelAndRoom(dto, imageFile);
+                var result = await _room.AddMotelAndRoom(dto, imageFile, fileTerm);
                 if (result == null || result != "Thêm phòng trọ thành công.")
                 {
                     return BadRequest(new ApiResponse<object>
@@ -133,12 +131,12 @@ namespace BACK_END.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpPut("update-motel")]
-        public async Task<IActionResult> UpdateMotel(int motelId, [FromBody] UpdateMotelDto dto)
+        [HttpPut("edit-motel/{motelId}")]
+        public async Task<IActionResult> EditMotel(int motelId, [FromForm] UpdateMotelDto dto)
         {
             try
             {
-                var result = await _room.UpdateMotel(motelId, dto);
+                var result = await _room.EditMotel(motelId, dto);
                 if (result == null)
                 {
                     return BadRequest(new ApiResponse<object>
@@ -212,7 +210,44 @@ namespace BACK_END.Controllers
             }
             return Ok(new ApiResponse<object> { Code = 200, Status = "success", Message = "Vô hiệu hóa phòng trọ thành công" });
         }
-        [HttpGet("get-room-by-motel-id")]
+
+        [HttpPut("active/{motelId}")]
+        public async Task<IActionResult> ActiveMotel(int motelId)
+        {
+            try
+            {
+                var result = await _room.ActiveMotel(motelId);
+                if (!result || result == false)
+                {
+                    return BadRequest(new ApiResponse<object> { Code = 400, Status = "error", Message = "Kích hoạt phòng trọ thất bại" });
+                }
+                return Ok(new ApiResponse<object> { Code = 200, Status = "success", Message = "Kích hoạt phòng trọ thành công" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpDelete("remove/{motelId}")]
+        public async Task<IActionResult> RemoveMotel(int motelId)
+        {
+            try
+            {
+                var result = await _room.RemoveMotel(motelId);
+                if (!result || result == false)
+                {
+                    return BadRequest(new ApiResponse<object> { Code = 400, Status = "error", Message = "Xóa phòng trọ thất bại" });
+                }
+                return Ok(new ApiResponse<object> { Code = 200, Status = "success", Message = "Xóa phòng trọ thành công" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("get-room-by-motel-id/{motelId}")]
         public async Task<IActionResult> GetRoomByMotelId(int motelId)
         {
             try
@@ -272,7 +307,7 @@ namespace BACK_END.Controllers
             }
         }
         [HttpPost("add-multi-room")]
-        public async Task<IActionResult> AddMultiRoom([FromForm] AddMultiRoomDto dto)
+        public async Task<IActionResult> AddMultiRoom([FromBody] AddMultiRoomDto dto)
         {
             try
             {
@@ -288,12 +323,12 @@ namespace BACK_END.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpPut("edit-room-by-id")]
-        public async Task<IActionResult> EditRoomById(int motelId, [FromBody] EditRoomByIdDto dto)
+        [HttpPut("edit-room-by-id/{roomId}")]
+        public async Task<IActionResult> EditRoomById(int roomId, [FromBody] EditRoomByIdDto dto)
         {
             try
             {
-                var result = await _room.EditRoomById(motelId, dto);
+                var result = await _room.EditRoomById(roomId, dto);
                 if (!result || result == false)
                 {
                     return BadRequest(new ApiResponse<object> { Code = 400, Status = "error", Message = "Cập nhật phòng trọ thất bại" });
@@ -305,7 +340,7 @@ namespace BACK_END.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpGet("get-room-by-id")]
+        [HttpGet("get-room-by-id/{roomId}")]
         public async Task<IActionResult> GetRoomById(int roomId)
         {
             try
@@ -321,6 +356,51 @@ namespace BACK_END.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+        [HttpDelete("delete-user-from-room")]
+        public async Task<IActionResult> DeleteUserFromRoom(int roomId, int userId)
+        {
+            try
+            {
+                var result = await _room.DeleteUserFromRoom(roomId, userId);
+                if (!result || result == false)
+                {
+                    return BadRequest(new ApiResponse<object> { Code = 400, Status = "error", Message = "Xóa người dùng khỏi phòng trọ thất bại" });
+                }
+                return Ok(new ApiResponse<object> { Code = 200, Status = "success", Message = "Xóa người dùng khỏi phòng trọ thành công" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpPost("add-user-to-room")]
+        public async Task<IActionResult> AddUserToRoom([FromBody] AddUserToRoomDto dto)
+        {
+            try
+            {
+                var result = await _room.AddUserToRoom(dto);
+                if (!result || result == false)
+                {
+                    return BadRequest(new ApiResponse<object> { Code = 400, Status = "error", Message = "Thêm người dùng vào phòng trọ thất bại" });
+                }
+                return Ok(new ApiResponse<object> { Code = 200, Status = "success", Message = "Thêm người dùng vào phòng trọ thành công" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("get-consumption-by-room-id")]
+        public async Task<IActionResult> GetConsumptionByRoomId(int roomId)
+        {
+            var result = await _room.Roomtest(roomId);
+            if (result == null)
+            {
+                return BadRequest(new ApiResponse<object> { Code = 400, Status = "error", Message = "Không tìm thấy phòng trọ" });
+            }
+            return Ok(new ApiResponse<object> { Code = 200, Status = "success", Message = "Lấy phòng trọ thành công", Data = result });
         }
 
     }
