@@ -11,6 +11,7 @@ namespace BACK_END.Models
         public string? Title { get; set; }
         [Column(TypeName = "nvarchar(max)")]
         public string? Content { get; set; }
+        public string? Sender { get; set; }
         [Column(TypeName = "tinyint")]
         public int Status { get; set; }
     }
