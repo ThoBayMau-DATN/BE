@@ -18,7 +18,7 @@ namespace BACK_END.Data
             services.AddScoped<FirebaseStorageService>();
             services.AddScoped<IHome, HomeRespository>();
             services.AddScoped<IRole, RoleRepository>();
-            services.AddScoped<IGetTro, LamChoAnhThinh>();
+            services.AddScoped<IGetTro, MainRespository>();
         }
     }
 }

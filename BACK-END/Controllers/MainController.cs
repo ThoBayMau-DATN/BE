@@ -6,11 +6,11 @@ namespace BACK_END.Controllers
 {
     [Route("api/[controller]")]
 	[ApiController]
-	public class LamChoAnhThinhController : ControllerBase
+	public class MainController : ControllerBase
 	{
 		private readonly IGetTro _repo;
 
-		public LamChoAnhThinhController(IGetTro repo)
+		public MainController(IGetTro repo)
 		{
 			_repo = repo;
 		}
