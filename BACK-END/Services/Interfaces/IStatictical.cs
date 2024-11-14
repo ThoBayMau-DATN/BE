@@ -1,17 +1,13 @@
-﻿//using BACK_END.DTOs.MotelDto;
-//using BACK_END.DTOs.StaticDto;
-//using BACK_END.Models;
+﻿using BACK_END.DTOs.StaticDto;
 
-//namespace BACK_END.Services.Interfaces
-//{
-//    public interface IStatictical
-//    {
+namespace BACK_END.Services.Interfaces
+{
+    public interface IStatictical
+    {
+        Task<List<MotelWithEmptyRoomsDto>> GetMotelsWithEmptyRoomsAsync();
 
+        //Task<List<MonthlyRevenueDto>> GetMonthlyRevenueLastSixMonthsAsync();
 
-//        Task<List<MotelAvailabilityDTO>> GetAvailableMotelsAsync();
-
-//        Task<List<MonthlyRevenueDto>> GetMonthlyRevenueLastSixMonthsAsync();
-
-//        Task<List<Invoice>> GetAllAsync();
-//    }
-//}
+        //Task<List<Bill>> GetAllAsync();
+    }
+}

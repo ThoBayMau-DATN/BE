@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BACK_END.Migrations
 {
     /// <inheritdoc />
-    public partial class db : Migration
+    public partial class updateAlltoDb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -59,7 +59,8 @@ namespace BACK_END.Migrations
                     Type = table.Column<byte>(type: "tinyint", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Content = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Sender = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Sender = table.Column<string>(type: "nvarchar(50)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Status = table.Column<byte>(type: "tinyint", nullable: false)
                 },
                 constraints: table =>
@@ -267,7 +268,8 @@ namespace BACK_END.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<int>(type: "int", nullable: true),
-                    NotificationId = table.Column<int>(type: "int", nullable: true)
+                    NotificationId = table.Column<int>(type: "int", nullable: true),
+                    isReaded = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -443,7 +445,8 @@ namespace BACK_END.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    TicketId = table.Column<int>(type: "int", nullable: true)
+                    TicketId = table.Column<int>(type: "int", nullable: true),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {

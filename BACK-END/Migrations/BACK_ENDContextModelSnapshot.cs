@@ -161,8 +161,11 @@ namespace BACK_END.Migrations
                     b.Property<string>("Content")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Sender")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<byte>("Status")
                         .HasColumnType("tinyint");
@@ -503,6 +506,9 @@ namespace BACK_END.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Content")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int?>("TicketId")
                         .HasColumnType("int");
 
@@ -557,6 +563,9 @@ namespace BACK_END.Migrations
 
                     b.Property<int?>("UserId")
                         .HasColumnType("int");
+
+                    b.Property<bool?>("isReaded")
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
