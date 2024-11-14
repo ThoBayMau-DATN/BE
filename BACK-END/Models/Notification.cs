@@ -13,7 +13,7 @@ namespace BACK_END.Models
         public string? Content { get; set; }
         [Column(TypeName = "nvarchar(50)")]
         public string? Sender { get; set; }
-        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime CreateDate { get; set; } = DateTime.Now;
         [Column(TypeName = "tinyint")]
         public bool Status { get; set; }
     }

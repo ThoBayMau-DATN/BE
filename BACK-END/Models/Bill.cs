@@ -3,14 +3,11 @@
     public class Bill
     {
         public int Id { get; set; }
-
-        public int Water { get; set; }
-        public int Electric { get; set; }
-        public int Price { get; set; }
-        public int Other { get; set; }
+        public int Price_Room { get; set; }
+        public int Total { get; set; }
         public bool Status { get; set; } = false;
+        public DateTime CreateDate { get; set; } = DateTime.Now;
         public int? RoomId { get; set; }
-        public DateTime TimeCreated { get; set; } = DateTime.Now;
         public Room? Room { get; set; }
 
     }
