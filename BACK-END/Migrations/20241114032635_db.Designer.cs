@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BACK_END.Migrations
 {
     [DbContext(typeof(BACK_ENDContext))]
-    [Migration("20241112131459_db")]
+    [Migration("20241114032635_db")]
     partial class db
     {
         /// <inheritdoc />
@@ -24,6 +24,42 @@ namespace BACK_END.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("BACK_END.Models.Bill", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Electric")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Other")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Price")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("RoomId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Status")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("TimeCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Water")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoomId");
+
+                    b.ToTable("Bill");
+                });
 
             modelBuilder.Entity("BACK_END.Models.Consumption", b =>
                 {
@@ -63,7 +99,7 @@ namespace BACK_END.Migrations
                     b.Property<string>("Link")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("MotelId")
+                    b.Property<int?>("Room_TypeId")
                         .HasColumnType("int");
 
                     b.Property<int?>("TicketId")
@@ -74,47 +110,11 @@ namespace BACK_END.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MotelId");
+                    b.HasIndex("Room_TypeId");
 
                     b.HasIndex("TicketId");
 
                     b.ToTable("Image");
-                });
-
-            modelBuilder.Entity("BACK_END.Models.Invoice", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Electric")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Other")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Price")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("RoomId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("Status")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("TimeCreated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Water")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RoomId");
-
-                    b.ToTable("Invoice");
                 });
 
             modelBuilder.Entity("BACK_END.Models.Motel", b =>
@@ -131,17 +131,14 @@ namespace BACK_END.Migrations
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("ExpriryDate")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Location")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime?>("RegisterDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<byte>("Status")
                         .HasColumnType("tinyint");
@@ -184,7 +181,7 @@ namespace BACK_END.Migrations
                     b.ToTable("Notification");
                 });
 
-            modelBuilder.Entity("BACK_END.Models.Price", b =>
+            modelBuilder.Entity("BACK_END.Models.Package", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -195,26 +192,56 @@ namespace BACK_END.Migrations
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Electric")
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte>("LimitMotel")
+                        .HasColumnType("tinyint");
+
+                    b.Property<byte>("LimitRoom")
+                        .HasColumnType("tinyint");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("Price")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsActive")
+                    b.Property<bool>("Status")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("MotelId")
+                    b.HasKey("Id");
+
+                    b.ToTable("Package");
+                });
+
+            modelBuilder.Entity("BACK_END.Models.Package_User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("Other")
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("CreateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("PackageId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Water")
+                    b.Property<int?>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MotelId");
+                    b.HasIndex("PackageId");
 
-                    b.ToTable("Price");
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Package_User");
                 });
 
             modelBuilder.Entity("BACK_END.Models.Review", b =>
@@ -228,18 +255,18 @@ namespace BACK_END.Migrations
                     b.Property<string>("Content")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("MotelId")
+                    b.Property<int>("Rating")
                         .HasColumnType("int");
 
-                    b.Property<float>("Rating")
-                        .HasColumnType("real");
+                    b.Property<int?>("Room_TypeId")
+                        .HasColumnType("int");
 
-                    b.Property<int>("UserId")
+                    b.Property<int?>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MotelId");
+                    b.HasIndex("Room_TypeId");
 
                     b.HasIndex("UserId");
 
@@ -254,19 +281,10 @@ namespace BACK_END.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<byte>("Area")
-                        .HasColumnType("tinyint");
-
-                    b.Property<int?>("MotelId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Price")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("PriceLatest")
-                        .HasColumnType("int");
-
                     b.Property<int>("RoomNumber")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Room_TypeId")
                         .HasColumnType("int");
 
                     b.Property<byte>("Status")
@@ -274,12 +292,12 @@ namespace BACK_END.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MotelId");
+                    b.HasIndex("Room_TypeId");
 
                     b.ToTable("Room");
                 });
 
-            modelBuilder.Entity("BACK_END.Models.Term", b =>
+            modelBuilder.Entity("BACK_END.Models.Room_History", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -287,25 +305,156 @@ namespace BACK_END.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Link")
+                    b.Property<DateTime?>("CreateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("RoomId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<byte?>("status")
+                        .HasColumnType("tinyint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoomId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Room_History");
+                });
+
+            modelBuilder.Entity("BACK_END.Models.Room_Type", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Area")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("MotelId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("NewPrice")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Price")
+                        .HasColumnType("int");
+
+                    b.Property<byte?>("Status")
+                        .HasColumnType("tinyint");
+
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
                     b.HasIndex("MotelId");
 
-                    b.ToTable("Term");
+                    b.ToTable("Room_Type");
+                });
+
+            modelBuilder.Entity("BACK_END.Models.Service", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("MotelId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("New_Price")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Price")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<byte>("status")
+                        .HasColumnType("tinyint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MotelId");
+
+                    b.ToTable("Service");
+                });
+
+            modelBuilder.Entity("BACK_END.Models.Service_Bill", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("BillId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("Price_Service")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BillId");
+
+                    b.ToTable("Service_Bill");
+                });
+
+            modelBuilder.Entity("BACK_END.Models.Service_Room", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("RoomId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ServiceId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoomId");
+
+                    b.HasIndex("ServiceId");
+
+                    b.ToTable("Service_Room");
                 });
 
             modelBuilder.Entity("BACK_END.Models.Ticket", b =>
@@ -390,15 +539,10 @@ namespace BACK_END.Migrations
                     b.Property<string>("Phone")
                         .HasColumnType("varchar(10)");
 
-                    b.Property<int?>("RoomId")
-                        .HasColumnType("int");
-
                     b.Property<byte>("Status")
                         .HasColumnType("tinyint");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("RoomId");
 
                     b.ToTable("User");
                 });
@@ -624,10 +768,19 @@ namespace BACK_END.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("BACK_END.Models.Bill", b =>
+                {
+                    b.HasOne("BACK_END.Models.Room", "Room")
+                        .WithMany()
+                        .HasForeignKey("RoomId");
+
+                    b.Navigation("Room");
+                });
+
             modelBuilder.Entity("BACK_END.Models.Consumption", b =>
                 {
                     b.HasOne("BACK_END.Models.Room", "Room")
-                        .WithMany("Consumptions")
+                        .WithMany()
                         .HasForeignKey("RoomId");
 
                     b.Navigation("Room");
@@ -635,80 +788,122 @@ namespace BACK_END.Migrations
 
             modelBuilder.Entity("BACK_END.Models.Image", b =>
                 {
-                    b.HasOne("BACK_END.Models.Motel", "Motel")
-                        .WithMany("Images")
-                        .HasForeignKey("MotelId");
+                    b.HasOne("BACK_END.Models.Room_Type", "Room_Type")
+                        .WithMany()
+                        .HasForeignKey("Room_TypeId");
 
                     b.HasOne("BACK_END.Models.Ticket", "Ticket")
                         .WithMany("Images")
                         .HasForeignKey("TicketId");
 
-                    b.Navigation("Motel");
+                    b.Navigation("Room_Type");
 
                     b.Navigation("Ticket");
-                });
-
-            modelBuilder.Entity("BACK_END.Models.Invoice", b =>
-                {
-                    b.HasOne("BACK_END.Models.Room", "Room")
-                        .WithMany()
-                        .HasForeignKey("RoomId");
-
-                    b.Navigation("Room");
                 });
 
             modelBuilder.Entity("BACK_END.Models.Motel", b =>
                 {
                     b.HasOne("BACK_END.Models.User", "User")
                         .WithMany("Motels")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("UserId");
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("BACK_END.Models.Price", b =>
+            modelBuilder.Entity("BACK_END.Models.Package_User", b =>
                 {
-                    b.HasOne("BACK_END.Models.Motel", "Motel")
-                        .WithMany("Prices")
-                        .HasForeignKey("MotelId");
+                    b.HasOne("BACK_END.Models.Package", "Package")
+                        .WithMany()
+                        .HasForeignKey("PackageId");
+
+                    b.HasOne("BACK_END.Models.User", "Motel")
+                        .WithMany()
+                        .HasForeignKey("UserId");
 
                     b.Navigation("Motel");
+
+                    b.Navigation("Package");
                 });
 
             modelBuilder.Entity("BACK_END.Models.Review", b =>
                 {
-                    b.HasOne("BACK_END.Models.Motel", "Motel")
-                        .WithMany("Reviews")
-                        .HasForeignKey("MotelId");
+                    b.HasOne("BACK_END.Models.Room_Type", "Room_Type")
+                        .WithMany()
+                        .HasForeignKey("Room_TypeId");
 
                     b.HasOne("BACK_END.Models.User", "User")
                         .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
 
-                    b.Navigation("Motel");
+                    b.Navigation("Room_Type");
 
                     b.Navigation("User");
                 });
 
             modelBuilder.Entity("BACK_END.Models.Room", b =>
                 {
+                    b.HasOne("BACK_END.Models.Room_Type", "Room_Type")
+                        .WithMany()
+                        .HasForeignKey("Room_TypeId");
+
+                    b.Navigation("Room_Type");
+                });
+
+            modelBuilder.Entity("BACK_END.Models.Room_History", b =>
+                {
+                    b.HasOne("BACK_END.Models.Room", "Room")
+                        .WithMany()
+                        .HasForeignKey("RoomId");
+
+                    b.HasOne("BACK_END.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Room");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BACK_END.Models.Room_Type", b =>
+                {
                     b.HasOne("BACK_END.Models.Motel", "Motel")
-                        .WithMany("Rooms")
+                        .WithMany()
                         .HasForeignKey("MotelId");
 
                     b.Navigation("Motel");
                 });
 
-            modelBuilder.Entity("BACK_END.Models.Term", b =>
+            modelBuilder.Entity("BACK_END.Models.Service", b =>
                 {
                     b.HasOne("BACK_END.Models.Motel", "Motel")
-                        .WithMany("Terms")
+                        .WithMany()
                         .HasForeignKey("MotelId");
 
                     b.Navigation("Motel");
+                });
+
+            modelBuilder.Entity("BACK_END.Models.Service_Bill", b =>
+                {
+                    b.HasOne("BACK_END.Models.Bill", "Bill")
+                        .WithMany()
+                        .HasForeignKey("BillId");
+
+                    b.Navigation("Bill");
+                });
+
+            modelBuilder.Entity("BACK_END.Models.Service_Room", b =>
+                {
+                    b.HasOne("BACK_END.Models.Room", "Room")
+                        .WithMany()
+                        .HasForeignKey("RoomId");
+
+                    b.HasOne("BACK_END.Models.Service", "Service")
+                        .WithMany()
+                        .HasForeignKey("ServiceId");
+
+                    b.Navigation("Room");
+
+                    b.Navigation("Service");
                 });
 
             modelBuilder.Entity("BACK_END.Models.Ticket", b =>
@@ -733,15 +928,6 @@ namespace BACK_END.Migrations
                         .HasForeignKey("TicketId");
 
                     b.Navigation("Ticket");
-                });
-
-            modelBuilder.Entity("BACK_END.Models.User", b =>
-                {
-                    b.HasOne("BACK_END.Models.Room", "Room")
-                        .WithMany("Users")
-                        .HasForeignKey("RoomId");
-
-                    b.Navigation("Room");
                 });
 
             modelBuilder.Entity("BACK_END.Models.User_Notification", b =>
@@ -808,26 +994,6 @@ namespace BACK_END.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("BACK_END.Models.Motel", b =>
-                {
-                    b.Navigation("Images");
-
-                    b.Navigation("Prices");
-
-                    b.Navigation("Reviews");
-
-                    b.Navigation("Rooms");
-
-                    b.Navigation("Terms");
-                });
-
-            modelBuilder.Entity("BACK_END.Models.Room", b =>
-                {
-                    b.Navigation("Consumptions");
-
-                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("BACK_END.Models.Ticket", b =>

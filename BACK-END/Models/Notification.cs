@@ -13,7 +13,7 @@ namespace BACK_END.Models
         public string? Content { get; set; }
         public string? Sender { get; set; }
         [Column(TypeName = "tinyint")]
-        public int Status { get; set; }
+        public bool Status { get; set; }
     }
-    
+
 }
