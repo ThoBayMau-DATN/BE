@@ -1,7 +1,10 @@
 ﻿using BACK_END.DTOs.Repository;
 using BACK_END.DTOs.UserDto;
+using BACK_END.Models;
 using BACK_END.Services.Interfaces;
+using BACK_END.Services.MyServices;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BACK_END.Controllers
@@ -17,6 +20,12 @@ namespace BACK_END.Controllers
             _user = user;
         }
 
+        class CustomData
+        {
+           public List<GetAllUserRepositoryDto> list { get; set; }
+           public int TotalPage { get; set; }
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetAllUser(
             [FromQuery] string? searchString,
@@ -27,8 +36,9 @@ namespace BACK_END.Controllers
         {
             try
             {
-                var listUser = await _user.GetAllUser(searchString, sortColumn, sortOrder, pageNumber, pageSize);
-                if (listUser == null) {
+                PagedList<GetAllUserRepositoryDto>  listUser = await _user.GetAllUser(searchString, sortColumn, sortOrder, pageNumber, pageSize);
+                Console.WriteLine(listUser.TotalCount);
+                if (listUser == null ||!listUser.Any()) {
                     return NotFound(new ApiResponse<object>
                     {
                         Code = 404,
@@ -44,7 +54,11 @@ namespace BACK_END.Controllers
                         Code = 200,
                         Status = "success",
                         Message = "Lấy danh sách người dùng thành công",
-                        Data = listUser
+                        Data = new CustomData
+                        {
+                            list = listUser,
+                            TotalPage = listUser.TotalPages
+                        }
                     });
                 
                 }
@@ -85,8 +99,14 @@ namespace BACK_END.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                return BadRequest(ex.Message);
+                return BadRequest(new ApiResponse<object>
+                {
+                    Code = 404,
+                    Status = "error",
+                    Message = "Không tìm thấy người dùng",
+                    Data = null
+                });
+
             }
         }
         [HttpPost]
@@ -120,12 +140,19 @@ namespace BACK_END.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                return BadRequest(ex.Message);
+
+                return BadRequest(
+                    new ApiResponse<object>
+                    {
+                        Code = 404,
+                        Status = "error",
+                        Message = ex.Message,
+                    }
+                    );
             }
         }
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser([FromRoute] int id, [FromBody] CreateUserRepositoryDto user)
+        public async Task<IActionResult> UpdateUser([FromRoute] int id, [FromBody] UpdateUserRepositoryDto? user)
         {
             try
             {
@@ -141,7 +168,13 @@ namespace BACK_END.Controllers
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                return BadRequest(ex.Message);
+                return BadRequest(new ApiResponse<object>
+                {
+                    Code = 404,
+                    Status = "error",
+                    Message = ex.Message,
+                    Data = null
+                });
             }
         }
         [HttpDelete("{id}")]
@@ -150,18 +183,37 @@ namespace BACK_END.Controllers
             try
             {
                 var result = await _user.DeleteUser(id);
-                return Ok(new ApiResponse<object>
+                if (result == null)
                 {
-                    Code = 200,
-                    Status = "success",
-                    Message = "Xóa người dùng thành công",
-                    Data = result
-                });
+                    return NotFound(new ApiResponse<object>
+                    {
+                        Code = 404,
+                        Status = "error",
+                        Message = "Không tìm thấy người dùng",
+                        Data = null
+                    });
+                }
+                else
+                {
+                    return Ok(new ApiResponse<object>
+                    {
+                        Code = 200,
+                        Status = "success",
+                        Message = "Xóa người dùng thành công",
+                        Data = result
+                    });
+                }
+               
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                return BadRequest(ex.Message);
+                return NotFound(new ApiResponse<object>
+                {
+                    Code = 404,
+                    Status = "error",
+                    Message = "Không tìm thấy người dùng",
+                    Data = null
+                });
             }
         }
 

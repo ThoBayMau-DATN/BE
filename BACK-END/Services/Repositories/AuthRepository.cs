@@ -1,4 +1,6 @@
-﻿using BACK_END.Data;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using BACK_END.Data;
 using BACK_END.DTOs.Auth;
 using BACK_END.Mappers;
 using BACK_END.Models;
@@ -7,7 +9,6 @@ using BACK_END.Services.MyServices;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 
 namespace BACK_END.Services.Repositories
 {
@@ -19,9 +20,10 @@ namespace BACK_END.Services.Repositories
         private readonly BACK_ENDContext _db;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IMemoryCache _cache;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
         public AuthRepository(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, TokenService tokenService, BACK_ENDContext db, IWebHostEnvironment webHostEnvironment,
-            IMemoryCache cache)
+            IMemoryCache cache, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -29,6 +31,35 @@ namespace BACK_END.Services.Repositories
             _db = db;
             _webHostEnvironment = webHostEnvironment;
             _cache = cache;
+            _roleManager = roleManager;
+        }
+
+        public async Task<List<string>> GetEmailsByRoleAsync(string? roleName)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(roleName))
+                {
+                    var adminEmails = await _userManager.GetUsersInRoleAsync("Admin");
+                    var staffEmails = await _userManager.GetUsersInRoleAsync("Staff");
+                    return adminEmails.Select(user => user.Email)
+                                      .Concat(staffEmails.Select(user => user.Email))
+                                      .ToList();
+                }
+                var roleExists = await _db.Roles.AnyAsync(r => r.Name == roleName);
+                if (!roleExists)
+                {
+                    return new List<string>();
+                }
+
+                var usersInRole = await _userManager.GetUsersInRoleAsync(roleName);
+                return usersInRole.Select(user => user.Email).ToList();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Lỗi: {ex.Message}");
+                return new List<string>();
+            }
         }
 
         public async Task<bool> CheckEmail(string email)
@@ -90,9 +121,9 @@ namespace BACK_END.Services.Repositories
                         Role = "Customer"
                     };
                     var resultRegister = await RegisterAsync(RegisterDto);
-                    if (resultRegister != "Thêm tài khoản vào IdentityUser thành công.")
+                    if (resultRegister.Success == false)
                     {
-                        return resultRegister;
+                        return resultRegister.Message;
                     }
                     var nguoiDung = new User
                     {
@@ -132,9 +163,9 @@ namespace BACK_END.Services.Repositories
                         Role = "Owner"
                     };
                     var resultRegister = await RegisterAsync(RegisterDto);
-                    if (resultRegister != "Thêm tài khoản vào IdentityUser thành công.")
+                    if (resultRegister.Success == false)
                     {
-                        return resultRegister;
+                        return resultRegister.Message;
                     }
                     var nguoiDung = new User
                     {
@@ -175,9 +206,9 @@ namespace BACK_END.Services.Repositories
                         Role = "Staff"
                     };
                     var resultRegister = await RegisterAsync(RegisterDto);
-                    if (resultRegister != "Thêm tài khoản vào IdentityUser thành công.")
+                    if (resultRegister.Success == false)
                     {
-                        return resultRegister;
+                        return resultRegister.Message;
                     }
                     var nguoiDung = new User
                     {
@@ -218,7 +249,7 @@ namespace BACK_END.Services.Repositories
             }
         }
 
-        public async Task<string> LoginAsync(LoginDto model)
+        public async Task<AuthResultDto> LoginAsync(LoginDto model)
         {
             try
             {
@@ -226,55 +257,82 @@ namespace BACK_END.Services.Repositories
                 if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
                 {
                     var token = await _tokenService.GenerateTokenAsync(user);
-                    return token;
+                    return new AuthResultDto { Success = true, Message = "Đăng nhập thành công", Token = token, Email = user.Email, Username = user.UserName };
                 }
                 else
                 {
-                    return string.Empty;
+                    return new AuthResultDto { Success = false, Message = "Sai tài khoản hoặc mật khẩu" };
                 }
             }
             catch (Exception ex)
             {
-                return ex.Message;
+                return new AuthResultDto { Success = false, Message = ex.Message };
             }
         }
 
-        public async Task<string> RegisterAsync(RegisterDto model)
+        public async Task<AuthResultDto> RegisterAsync(RegisterDto model)
         {
+            var emailExists = await _userManager.FindByEmailAsync(model.Email);
+            var phoneExists = await _userManager.Users.FirstOrDefaultAsync(x => x.PhoneNumber == model.PhoneNumber);
+            var roleExists = await _roleManager.FindByNameAsync(model.Role);
+
+            if (emailExists != null)
+                return new AuthResultDto { Success = false, Message = "Email đã tồn tại" };
+
+            if (phoneExists != null)
+                return new AuthResultDto { Success = false, Message = "Số điện thoại đã tồn tại" };
+
+            if (roleExists == null)
+                return new AuthResultDto { Success = false, Message = "Role không tồn tại" };
+
+            // Tạo user mới
+            var user = new IdentityUser
+            {
+                Email = model.Email,
+                UserName = model.Email,
+                PhoneNumber = model.PhoneNumber,
+                SecurityStamp = Guid.NewGuid().ToString()
+            };
+
+            // Tạo user và gán role trong một transaction
+            using var transaction = await _db.Database.BeginTransactionAsync();
             try
             {
-
-                string[] roleNames = { "Admin", "Staff", "Owner", "Customer" };
-                if (!roleNames.Contains(model.Role))
-                {
-                    return "Invalid role";
-                }
-                var user = new IdentityUser { UserName = model.Username, Email = model.Email, PhoneNumber = model.PhoneNumber };
-
-                var result = await _userManager.CreateAsync(user, model.Password);
-                int countAddRoleAndUser = 0;
-                if (result.Succeeded)
-                {
-                    var resultRole = await _userManager.AddToRoleAsync(user, model.Role);
-                    if (resultRole.Succeeded)
+                var createResult = await _userManager.CreateAsync(user, model.Password);
+                if (!createResult.Succeeded)
+                    return new AuthResultDto
                     {
-                        countAddRoleAndUser++;
-                    }
-                }
-                if (countAddRoleAndUser > 0)
-                {
+                        Success = false,
+                        Message = string.Join(", ", createResult.Errors.Select(x => x.Description))
+                    };
 
-                    return "Thêm tài khoản vào IdentityUser thành công.";
-                }
-                else
+                var roleResult = await _userManager.AddToRoleAsync(user, model.Role);
+                if (!roleResult.Succeeded)
                 {
-                    var errorMessage = string.Join(" ", result.Errors.Select(e => e.Description));
-                    return errorMessage;
+                    await transaction.RollbackAsync();
+                    return new AuthResultDto
+                    {
+                        Success = false,
+                        Message = "Không thể gán quyền cho người dùng"
+                    };
                 }
+
+                await transaction.CommitAsync();
+                return new AuthResultDto
+                {
+                    Success = true,
+                    Message = "Đăng ký thành công"
+                };
             }
             catch (Exception ex)
             {
-                return ex.Message;
+                await transaction.RollbackAsync();
+                // Log exception here
+                return new AuthResultDto
+                {
+                    Success = false,
+                    Message = "Đã xảy ra lỗi trong quá trình đăng ký"
+                };
             }
         }
 
@@ -390,6 +448,61 @@ namespace BACK_END.Services.Repositories
             }
         }
 
-        
+        public async Task<GetUserDto?> GetUserByToken(string token)
+        {
+            //tìm user theo token
+            var userNameIdentity = HandlerToken(token);
+            if (string.IsNullOrEmpty(userNameIdentity)) return null; // Thêm kiểm tra email
+
+            var user = await _userManager.FindByNameAsync(userNameIdentity);
+            if (user == null) return null;
+
+            var myUser = await _db.User.FirstOrDefaultAsync(x => x.Email == user.Email);
+            if (myUser == null) return null;
+
+            var userDto = new GetUserDto
+            {
+                Id = myUser.Id,
+                Name = myUser.FullName,
+                Email = myUser.Email,
+                PhoneNumber = myUser.Phone,
+                Role = (await _userManager.GetRolesAsync(user)).FirstOrDefault()
+            };
+
+            return userDto;
+        }
+        private string? HandlerToken(string token)
+        {
+            try
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var jwtToken = tokenHandler.ReadJwtToken(token);
+
+                return jwtToken.Claims.FirstOrDefault(x => x.Type == "sub")?.Value;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Token error: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<string> EditRoleCustomerToOwner(string token)
+        {
+            var userNameIdentity = HandlerToken(token);
+            if (string.IsNullOrEmpty(userNameIdentity)) return null;
+
+            var user = await _userManager.FindByNameAsync(userNameIdentity);
+            if (user == null) return null;
+
+            var role = await _userManager.GetRolesAsync(user);
+            if (role.Contains("Customer"))
+            {
+                var result = await _userManager.RemoveFromRoleAsync(user, "Customer");
+                await _userManager.AddToRoleAsync(user, "Owner");
+            }
+
+            return "Thay đổi quyền thành công";
+        }
     }
 }

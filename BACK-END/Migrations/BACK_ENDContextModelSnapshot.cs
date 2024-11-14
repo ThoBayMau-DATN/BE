@@ -33,7 +33,7 @@ namespace BACK_END.Migrations
                     b.Property<int>("Electricity")
                         .HasColumnType("int");
 
-                    b.Property<int>("RoomId")
+                    b.Property<int?>("RoomId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("Time")
@@ -60,7 +60,7 @@ namespace BACK_END.Migrations
                     b.Property<string>("Link")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("MotelId")
+                    b.Property<int?>("MotelId")
                         .HasColumnType("int");
 
                     b.Property<int?>("TicketId")
@@ -95,7 +95,7 @@ namespace BACK_END.Migrations
                     b.Property<int>("Price")
                         .HasColumnType("int");
 
-                    b.Property<int>("RoomId")
+                    b.Property<int?>("RoomId")
                         .HasColumnType("int");
 
                     b.Property<bool>("Status")
@@ -122,16 +122,13 @@ namespace BACK_END.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<byte>("Acreage")
-                        .HasColumnType("tinyint");
-
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("ExpriryDate")
+                    b.Property<DateTime?>("ExpriryDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Location")
@@ -140,13 +137,13 @@ namespace BACK_END.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<DateTime>("RegisterDate")
+                    b.Property<DateTime?>("RegisterDate")
                         .HasColumnType("datetime2");
 
                     b.Property<byte>("Status")
                         .HasColumnType("tinyint");
 
-                    b.Property<int>("UserId")
+                    b.Property<int?>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -165,6 +162,9 @@ namespace BACK_END.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Content")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Sender")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<byte>("Status")
@@ -189,13 +189,16 @@ namespace BACK_END.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("Electric")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<int>("MotelId")
+                    b.Property<int?>("MotelId")
                         .HasColumnType("int");
 
                     b.Property<int>("Other")
@@ -222,7 +225,7 @@ namespace BACK_END.Migrations
                     b.Property<string>("Content")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("MotelId")
+                    b.Property<int?>("MotelId")
                         .HasColumnType("int");
 
                     b.Property<float>("Rating")
@@ -248,10 +251,16 @@ namespace BACK_END.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("MotelId")
+                    b.Property<byte>("Area")
+                        .HasColumnType("tinyint");
+
+                    b.Property<int?>("MotelId")
                         .HasColumnType("int");
 
                     b.Property<int>("Price")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PriceLatest")
                         .HasColumnType("int");
 
                     b.Property<int>("RoomNumber")
@@ -278,8 +287,16 @@ namespace BACK_END.Migrations
                     b.Property<string>("Link")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("MotelId")
+                    b.Property<int?>("MotelId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -298,6 +315,9 @@ namespace BACK_END.Migrations
 
                     b.Property<string>("Content")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<int?>("MotelId")
                         .HasColumnType("int");
@@ -334,7 +354,7 @@ namespace BACK_END.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("TicketId")
+                    b.Property<int?>("TicketId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -388,10 +408,10 @@ namespace BACK_END.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("NotificationId")
+                    b.Property<int?>("NotificationId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserId")
+                    b.Property<int?>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -604,10 +624,8 @@ namespace BACK_END.Migrations
             modelBuilder.Entity("BACK_END.Models.Consumption", b =>
                 {
                     b.HasOne("BACK_END.Models.Room", "Room")
-                        .WithMany()
-                        .HasForeignKey("RoomId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany("Consumptions")
+                        .HasForeignKey("RoomId");
 
                     b.Navigation("Room");
                 });
@@ -616,9 +634,7 @@ namespace BACK_END.Migrations
                 {
                     b.HasOne("BACK_END.Models.Motel", "Motel")
                         .WithMany("Images")
-                        .HasForeignKey("MotelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("MotelId");
 
                     b.HasOne("BACK_END.Models.Ticket", "Ticket")
                         .WithMany("Images")
@@ -633,9 +649,7 @@ namespace BACK_END.Migrations
                 {
                     b.HasOne("BACK_END.Models.Room", "Room")
                         .WithMany()
-                        .HasForeignKey("RoomId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("RoomId");
 
                     b.Navigation("Room");
                 });
@@ -645,8 +659,7 @@ namespace BACK_END.Migrations
                     b.HasOne("BACK_END.Models.User", "User")
                         .WithMany("Motels")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("User");
                 });
@@ -654,10 +667,8 @@ namespace BACK_END.Migrations
             modelBuilder.Entity("BACK_END.Models.Price", b =>
                 {
                     b.HasOne("BACK_END.Models.Motel", "Motel")
-                        .WithMany()
-                        .HasForeignKey("MotelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany("Prices")
+                        .HasForeignKey("MotelId");
 
                     b.Navigation("Motel");
                 });
@@ -665,10 +676,8 @@ namespace BACK_END.Migrations
             modelBuilder.Entity("BACK_END.Models.Review", b =>
                 {
                     b.HasOne("BACK_END.Models.Motel", "Motel")
-                        .WithMany()
-                        .HasForeignKey("MotelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany("Reviews")
+                        .HasForeignKey("MotelId");
 
                     b.HasOne("BACK_END.Models.User", "User")
                         .WithMany()
@@ -685,9 +694,7 @@ namespace BACK_END.Migrations
                 {
                     b.HasOne("BACK_END.Models.Motel", "Motel")
                         .WithMany("Rooms")
-                        .HasForeignKey("MotelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("MotelId");
 
                     b.Navigation("Motel");
                 });
@@ -695,10 +702,8 @@ namespace BACK_END.Migrations
             modelBuilder.Entity("BACK_END.Models.Term", b =>
                 {
                     b.HasOne("BACK_END.Models.Motel", "Motel")
-                        .WithMany()
-                        .HasForeignKey("MotelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany("Terms")
+                        .HasForeignKey("MotelId");
 
                     b.Navigation("Motel");
                 });
@@ -722,9 +727,7 @@ namespace BACK_END.Migrations
                 {
                     b.HasOne("BACK_END.Models.Ticket", "Ticket")
                         .WithMany()
-                        .HasForeignKey("TicketId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("TicketId");
 
                     b.Navigation("Ticket");
                 });
@@ -732,7 +735,7 @@ namespace BACK_END.Migrations
             modelBuilder.Entity("BACK_END.Models.User", b =>
                 {
                     b.HasOne("BACK_END.Models.Room", "Room")
-                        .WithMany()
+                        .WithMany("Users")
                         .HasForeignKey("RoomId");
 
                     b.Navigation("Room");
@@ -742,15 +745,11 @@ namespace BACK_END.Migrations
                 {
                     b.HasOne("BACK_END.Models.Notification", "Notification")
                         .WithMany()
-                        .HasForeignKey("NotificationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("NotificationId");
 
                     b.HasOne("BACK_END.Models.User", "User")
                         .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
 
                     b.Navigation("Notification");
 
@@ -812,7 +811,20 @@ namespace BACK_END.Migrations
                 {
                     b.Navigation("Images");
 
+                    b.Navigation("Prices");
+
+                    b.Navigation("Reviews");
+
                     b.Navigation("Rooms");
+
+                    b.Navigation("Terms");
+                });
+
+            modelBuilder.Entity("BACK_END.Models.Room", b =>
+                {
+                    b.Navigation("Consumptions");
+
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("BACK_END.Models.Ticket", b =>
