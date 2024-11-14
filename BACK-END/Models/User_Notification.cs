@@ -7,6 +7,6 @@
         public User? User { get; set; }
         public int? NotificationId { get; set; }
         public Notification? Notification { get; set; }
-        public bool? isReaded { get; set; }
+        public bool? Is_Read { get; set; }
     }
 }
