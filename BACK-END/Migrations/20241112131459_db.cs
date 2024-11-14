@@ -59,6 +59,7 @@ namespace BACK_END.Migrations
                     Type = table.Column<byte>(type: "tinyint", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Content = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Sender = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Status = table.Column<byte>(type: "tinyint", nullable: false)
                 },
                 constraints: table =>
@@ -181,7 +182,7 @@ namespace BACK_END.Migrations
                     Water = table.Column<int>(type: "int", nullable: false),
                     Electricity = table.Column<int>(type: "int", nullable: false),
                     Time = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    RoomId = table.Column<int>(type: "int", nullable: false)
+                    RoomId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -196,7 +197,7 @@ namespace BACK_END.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Link = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Type = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    MotelId = table.Column<int>(type: "int", nullable: false),
+                    MotelId = table.Column<int>(type: "int", nullable: true),
                     TicketId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -215,7 +216,7 @@ namespace BACK_END.Migrations
                     Price = table.Column<int>(type: "int", nullable: false),
                     Other = table.Column<int>(type: "int", nullable: false),
                     Status = table.Column<bool>(type: "bit", nullable: false),
-                    RoomId = table.Column<int>(type: "int", nullable: false),
+                    RoomId = table.Column<int>(type: "int", nullable: true),
                     TimeCreated = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
@@ -232,12 +233,11 @@ namespace BACK_END.Migrations
                     Name = table.Column<string>(type: "nvarchar(50)", nullable: true),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Location = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Acreage = table.Column<byte>(type: "tinyint", nullable: false),
                     Status = table.Column<byte>(type: "tinyint", nullable: false),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ExpriryDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    RegisterDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false)
+                    ExpriryDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    RegisterDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UserId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -254,7 +254,8 @@ namespace BACK_END.Migrations
                     Electric = table.Column<int>(type: "int", nullable: false),
                     Other = table.Column<int>(type: "int", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    MotelId = table.Column<int>(type: "int", nullable: false)
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    MotelId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -263,8 +264,7 @@ namespace BACK_END.Migrations
                         name: "FK_Price_Motel_MotelId",
                         column: x => x.MotelId,
                         principalTable: "Motel",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -274,9 +274,11 @@ namespace BACK_END.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     RoomNumber = table.Column<int>(type: "int", nullable: false),
+                    Area = table.Column<byte>(type: "tinyint", nullable: false),
                     Price = table.Column<int>(type: "int", nullable: false),
+                    PriceLatest = table.Column<int>(type: "int", nullable: true),
                     Status = table.Column<byte>(type: "tinyint", nullable: false),
-                    MotelId = table.Column<int>(type: "int", nullable: false)
+                    MotelId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -285,8 +287,7 @@ namespace BACK_END.Migrations
                         name: "FK_Room_Motel_MotelId",
                         column: x => x.MotelId,
                         principalTable: "Motel",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -295,8 +296,10 @@ namespace BACK_END.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Link = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    MotelId = table.Column<int>(type: "int", nullable: false)
+                    MotelId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -305,8 +308,7 @@ namespace BACK_END.Migrations
                         name: "FK_Term_Motel_MotelId",
                         column: x => x.MotelId,
                         principalTable: "Motel",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -342,7 +344,7 @@ namespace BACK_END.Migrations
                     Rating = table.Column<float>(type: "real", nullable: false),
                     Content = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserId = table.Column<int>(type: "int", nullable: false),
-                    MotelId = table.Column<int>(type: "int", nullable: false)
+                    MotelId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -351,8 +353,7 @@ namespace BACK_END.Migrations
                         name: "FK_Review_Motel_MotelId",
                         column: x => x.MotelId,
                         principalTable: "Motel",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Review_User_UserId",
                         column: x => x.UserId,
@@ -371,6 +372,7 @@ namespace BACK_END.Migrations
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Content = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Status = table.Column<byte>(type: "tinyint", nullable: false),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Receiver = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserId = table.Column<int>(type: "int", nullable: true),
                     MotelId = table.Column<int>(type: "int", nullable: true)
@@ -396,8 +398,8 @@ namespace BACK_END.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    NotificationId = table.Column<int>(type: "int", nullable: false)
+                    UserId = table.Column<int>(type: "int", nullable: true),
+                    NotificationId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -406,14 +408,12 @@ namespace BACK_END.Migrations
                         name: "FK_User_Notification_Notification_NotificationId",
                         column: x => x.NotificationId,
                         principalTable: "Notification",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_User_Notification_User_UserId",
                         column: x => x.UserId,
                         principalTable: "User",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -422,7 +422,7 @@ namespace BACK_END.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    TicketId = table.Column<int>(type: "int", nullable: false)
+                    TicketId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -431,8 +431,7 @@ namespace BACK_END.Migrations
                         name: "FK_Ticket_Log_Ticket_TicketId",
                         column: x => x.TicketId,
                         principalTable: "Ticket",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
@@ -559,16 +558,14 @@ namespace BACK_END.Migrations
                 table: "Consumption",
                 column: "RoomId",
                 principalTable: "Room",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                principalColumn: "Id");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Image_Motel_MotelId",
                 table: "Image",
                 column: "MotelId",
                 principalTable: "Motel",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                principalColumn: "Id");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Image_Ticket_TicketId",
@@ -582,8 +579,7 @@ namespace BACK_END.Migrations
                 table: "Invoice",
                 column: "RoomId",
                 principalTable: "Room",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                principalColumn: "Id");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Motel_User_UserId",

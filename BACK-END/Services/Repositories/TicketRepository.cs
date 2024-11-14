@@ -2,6 +2,7 @@
 using BACK_END.Data;
 using BACK_END.Models;
 using BACK_END.Services.Interfaces;
+using BACK_END.Services.MyServices;
 using Microsoft.EntityFrameworkCore;
 
 namespace BACK_END.Services.Repositories
@@ -10,23 +11,92 @@ namespace BACK_END.Services.Repositories
     {
         private readonly BACK_ENDContext _db;
         private readonly IMapper _mapper;
+        private readonly IAuth _auth;
+        private readonly FirebaseStorageService _firebase;
 
-        public TicketRepository(BACK_ENDContext db, IMapper mapper)
+        public TicketRepository(BACK_ENDContext db, IMapper mapper, IAuth auth, FirebaseStorageService firebase)
         {
             _db = db;
             _mapper = mapper;
+            _auth = auth;
+            _firebase = firebase;
         }
 
-        public async Task<IEnumerable<DTOs.Ticket.Tickets>?> GetAllTicketAsync()
+        public async Task<DTOs.Ticket.TicketPagination?> GetAllTicketByRoleAsync(DTOs.Ticket.TicketQuery ticketQuery)
         {
-            var data = await _db.Ticket.Include(t => t.Images).ToListAsync();
+            var user = await _auth.GetUserByToken(ticketQuery.Token);
+            if (user == null)
+            {
+                return null;
+            }
 
-            var map = _mapper.Map<IEnumerable<DTOs.Ticket.Tickets>>(data);
+            IQueryable<Ticket> data = _db.Ticket.Include(x => x.Images).OrderByDescending(x => x.CreateDate);
 
-            return map;
+            if (user.Role == "Admin" || user.Role == "Staff")
+            {
+                data = data.Where(x => x.Type == 1 || x.Type == 3 || x.Receiver == user.Id.ToString());
+            }
+            if (user.Role == "Owner")
+            {
+                var motelId = await _db.Motel.Where(x => x.UserId == user.Id).Select(x => x.Id).ToListAsync();
+                data = data.Where(x => x.MotelId.HasValue && motelId.Contains(x.MotelId.Value) && x.Type != 1 && x.Type != 3);
+            }
+
+            if (ticketQuery.Status > 0)
+            {
+                data = data.Where(x => x.Status == ticketQuery.Status);
+            }
+
+            if (!string.IsNullOrEmpty(ticketQuery.Search))
+            {
+                data = data.Where(x => x.Title.ToLower().Contains(ticketQuery.Search.ToLower()));
+            }
+
+            var page = await PagedList<Ticket>.CreateAsync(data, ticketQuery.PageNumber, ticketQuery.PageSize);
+
+            var paginationResult = _mapper.Map<DTOs.Ticket.TicketPagination>(page);
+
+            return paginationResult;
         }
 
-        public async Task<Ticket?> CreateTicketAsync(DTOs.Ticket.Create data)
+        public async Task<DTOs.Ticket.Infoticket?> GetTicketByIdAsync(DTOs.Ticket.InfoticketQuery infoticketQuery)
+        {
+            var user = await _auth.GetUserByToken(infoticketQuery.Token);
+            if (user == null)
+            {
+                return null;
+            }
+            var ticket = new Ticket();
+            if (user.Role == "Admin" || user.Role == "Staff")
+            {
+                ticket = await _db.Ticket.Include(x => x.Images).Include(x => x.User).FirstOrDefaultAsync(x => x.Id == infoticketQuery.Id && (x.Type == 1 || x.Type == 3 || x.Receiver == user.Id.ToString()));
+            }
+            if (user.Role == "Owner")
+            {
+                var motelId = await _db.Motel.Where(x => x.UserId == user.Id).Select(x => x.Id).ToListAsync();
+                ticket = await _db.Ticket.Include(x => x.Images).Include(x => x.User).FirstOrDefaultAsync(x => x.Id == infoticketQuery.Id && x.MotelId.HasValue && motelId.Contains(x.MotelId.Value) && x.Type != 1 && x.Type != 3);
+            }
+            if (ticket != null)
+            {
+                var map = _mapper.Map<DTOs.Ticket.Infoticket>(ticket);
+                return map;
+            }
+            return null;
+        }
+
+        public async Task<IEnumerable<DTOs.Ticket.Receiver>?> GetReceiverAsync(string? roleName)
+        {
+            var emails = await _auth.GetEmailsByRoleAsync(roleName);
+            if (emails != null)
+            {
+                var users = await _db.User.Where(x => emails.Contains(x.Email)).ToListAsync();
+                var map = _mapper.Map<List<DTOs.Ticket.Receiver>>(users);
+                return map;
+            }
+            return null;
+        }
+
+        public async Task<DTOs.Ticket.Tickets?> CreateTicketAsync(DTOs.Ticket.Create data)
         {
             var ticket = new Ticket()
             {
@@ -34,12 +104,33 @@ namespace BACK_END.Services.Repositories
                 Title = data.Title,
                 Content = data.Content,
                 Receiver = data.Receiver,
+                CreateDate = DateTime.Now,
+                Status = 1,
                 UserId = data.UserId,
                 MotelId = data.MotelId
             };
             var result = await _db.Ticket.AddAsync(ticket);
             await _db.SaveChangesAsync();
-            return result.Entity;
+            if (data.imgs != null && data.imgs.Count() > 0 && data.imgs.Count() <= 4)
+            {
+                foreach (var item in data.imgs)
+                {
+                    var url = await _firebase.UploadFileAsync(item);
+                    if (!string.IsNullOrEmpty(url))
+                    {
+                        var img = new Image()
+                        {
+                            Link = url,
+                            Type = item.ContentType,
+                            TicketId = result.Entity.Id
+                        };
+                        await _db.Image.AddAsync(img);
+                        await _db.SaveChangesAsync();
+                    }
+                }
+            }
+            var map = _mapper.Map<DTOs.Ticket.Tickets>(result.Entity);
+            return map;
         }
 
         public async Task<Ticket?> UpdateTicketAsync(DTOs.Ticket.Update data)
@@ -51,12 +142,9 @@ namespace BACK_END.Services.Repositories
                 {
                     exist.Status = data.Status;
                 }
-                else
+                if (data.Receiver != null)
                 {
-                    if (data.Receiver != null)
-                    {
-                        exist.Receiver = data.Receiver;
-                    }
+                    exist.Receiver = data.Receiver;
                 }
                 await _db.SaveChangesAsync();
             }

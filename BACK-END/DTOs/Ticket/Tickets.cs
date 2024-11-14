@@ -7,11 +7,14 @@
         public string Title { get; set; }
         public string Content { get; set; }
         public int Status { get; set; }
-        public string? Receiver { get; set; }
-        public int UserId { get; set; }
-        public string UserName { get; set; }
-        public int MotelId { get; set; }
+    }
 
-        public List<string>? Imgs { get; set; }
+    public class TicketPagination
+    {
+        public int TotalCount { get; set; }
+        public int TotalPages { get; set; }
+        public int PageNumber { get; set; }
+        public int PageSize { get; set; }
+        public List<DTOs.Ticket.Tickets>? Items { get; set; }
     }
 }

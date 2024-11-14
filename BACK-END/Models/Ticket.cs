@@ -13,6 +13,7 @@ namespace BACK_END.Models
         public string? Content { get; set; }
         [Column(TypeName = "tinyint")]
         public int Status { get; set; }
+        public DateTime CreateDate { get; set; }
         public string? Receiver { get; set; }
         public int? UserId { get; set; }
         public User? User { get; set; }

@@ -18,11 +18,11 @@ namespace BACK_END.Controllers
             _ticketRepository = ticketRepository;
         }
         [HttpGet]
-        public async Task<IActionResult> Tickets()
+        public async Task<IActionResult> Tickets([FromQuery] DTOs.Ticket.TicketQuery ticketQuery)
         {
             try
             {
-                var tickets = await _ticketRepository.GetAllTicketAsync();
+                var tickets = await _ticketRepository.GetAllTicketByRoleAsync(ticketQuery);
                 return Ok(new ApiResponse<object>
                 {
                     Code = 200,
@@ -42,8 +42,81 @@ namespace BACK_END.Controllers
                 });
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetTicketById([FromQuery] DTOs.Ticket.InfoticketQuery infoticketQuery)
+        {
+            try
+            {
+                var tickets = await _ticketRepository.GetTicketByIdAsync(infoticketQuery);
+                if (tickets == null)
+                {
+                    return BadRequest(new ApiResponse<object>
+                    {
+                        Code = 400,
+                        Status = "error",
+                        Message = $"Id không tồn tại",
+                        Data = null
+                    });
+                }
+                return Ok(new ApiResponse<object>
+                {
+                    Code = 200,
+                    Status = "success",
+                    Message = "Lấy danh sách ticket thành công",
+                    Data = tickets
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ApiResponse<object>
+                {
+                    Code = 400,
+                    Status = "error",
+                    Message = $"Lỗi api :{ex.Message}",
+                    Data = null
+                });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetReceivers([FromQuery] string? roleName)
+        {
+            try
+            {
+                var Receivers = await _ticketRepository.GetReceiverAsync(roleName);
+                if (Receivers == null)
+                {
+                    return BadRequest(new ApiResponse<object>
+                    {
+                        Code = 400,
+                        Status = "error",
+                        Message = $"Không có user nào",
+                        Data = null
+                    });
+                }
+                return Ok(new ApiResponse<object>
+                {
+                    Code = 200,
+                    Status = "success",
+                    Message = "Lấy danh sách receiver thành công",
+                    Data = Receivers
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ApiResponse<object>
+                {
+                    Code = 400,
+                    Status = "error",
+                    Message = $"Lỗi api :{ex.Message}",
+                    Data = null
+                });
+            }
+        }
+
         [HttpPost]
-        public async Task<IActionResult> Tickets([FromBody] DTOs.Ticket.Create data)
+        public async Task<IActionResult> Tickets([FromForm] DTOs.Ticket.Create data)
         {
             try
             {

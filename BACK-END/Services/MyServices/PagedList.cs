@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
 namespace BACK_END.Services.MyServices
@@ -22,7 +18,6 @@ namespace BACK_END.Services.MyServices
             PageSize = pageSize;
             CurrentPage = pageNumber;
             TotalPages = (int)Math.Ceiling(count / (double)pageSize);
-
             AddRange(items);
         }
 
@@ -33,4 +28,6 @@ namespace BACK_END.Services.MyServices
             return new PagedList<T>(items, count, pageNumber, pageSize);
         }
     }
+
+   
 }
