@@ -68,6 +68,43 @@ namespace BACK_END.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Package",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(50)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Price = table.Column<int>(type: "int", nullable: false),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LimitMotel = table.Column<byte>(type: "tinyint", nullable: false),
+                    LimitRoom = table.Column<byte>(type: "tinyint", nullable: false),
+                    Status = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Package", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "User",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FullName = table.Column<string>(type: "nvarchar(50)", nullable: true),
+                    Phone = table.Column<string>(type: "varchar(10)", nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Avatar = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Status = table.Column<byte>(type: "tinyint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_User", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -174,192 +211,128 @@ namespace BACK_END.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Consumption",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Water = table.Column<int>(type: "int", nullable: false),
-                    Electricity = table.Column<int>(type: "int", nullable: false),
-                    Time = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    RoomId = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Consumption", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Image",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Link = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Type = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    MotelId = table.Column<int>(type: "int", nullable: true),
-                    TicketId = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Image", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Invoice",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Water = table.Column<int>(type: "int", nullable: false),
-                    Electric = table.Column<int>(type: "int", nullable: false),
-                    Price = table.Column<int>(type: "int", nullable: false),
-                    Other = table.Column<int>(type: "int", nullable: false),
-                    Status = table.Column<bool>(type: "bit", nullable: false),
-                    RoomId = table.Column<int>(type: "int", nullable: true),
-                    TimeCreated = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Invoice", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Motel",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(50)", nullable: true),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(50)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Location = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Status = table.Column<byte>(type: "tinyint", nullable: false),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ExpriryDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    RegisterDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UserId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Motel", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Price",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Water = table.Column<int>(type: "int", nullable: false),
-                    Electric = table.Column<int>(type: "int", nullable: false),
-                    Other = table.Column<int>(type: "int", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    MotelId = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Price", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Price_Motel_MotelId",
-                        column: x => x.MotelId,
-                        principalTable: "Motel",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Room",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    RoomNumber = table.Column<int>(type: "int", nullable: false),
-                    Area = table.Column<byte>(type: "tinyint", nullable: false),
-                    Price = table.Column<int>(type: "int", nullable: false),
-                    PriceLatest = table.Column<int>(type: "int", nullable: true),
-                    Status = table.Column<byte>(type: "tinyint", nullable: false),
-                    MotelId = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Room", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Room_Motel_MotelId",
-                        column: x => x.MotelId,
-                        principalTable: "Motel",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Term",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Link = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    MotelId = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Term", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Term_Motel_MotelId",
-                        column: x => x.MotelId,
-                        principalTable: "Motel",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "User",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    FullName = table.Column<string>(type: "nvarchar(50)", nullable: true),
-                    Phone = table.Column<string>(type: "varchar(10)", nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Avatar = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Status = table.Column<byte>(type: "tinyint", nullable: false),
-                    RoomId = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_User", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_User_Room_RoomId",
-                        column: x => x.RoomId,
-                        principalTable: "Room",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Review",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Rating = table.Column<float>(type: "real", nullable: false),
-                    Content = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    MotelId = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Review", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Review_Motel_MotelId",
-                        column: x => x.MotelId,
-                        principalTable: "Motel",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Review_User_UserId",
+                        name: "FK_Motel_User_UserId",
                         column: x => x.UserId,
                         principalTable: "User",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Package_User",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UserId = table.Column<int>(type: "int", nullable: true),
+                    PackageId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Package_User", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Package_User_Package_PackageId",
+                        column: x => x.PackageId,
+                        principalTable: "Package",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Package_User_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "User_Notification",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: true),
+                    NotificationId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_User_Notification", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_User_Notification_Notification_NotificationId",
+                        column: x => x.NotificationId,
+                        principalTable: "Notification",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_User_Notification_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Room_Type",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Area = table.Column<int>(type: "int", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Price = table.Column<int>(type: "int", nullable: false),
+                    NewPrice = table.Column<int>(type: "int", nullable: false),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Status = table.Column<byte>(type: "tinyint", nullable: true),
+                    MotelId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Room_Type", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Room_Type_Motel_MotelId",
+                        column: x => x.MotelId,
+                        principalTable: "Motel",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Service",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(100)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Price = table.Column<int>(type: "int", nullable: false),
+                    New_Price = table.Column<int>(type: "int", nullable: false),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    status = table.Column<byte>(type: "tinyint", nullable: false),
+                    MotelId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Service", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Service_Motel_MotelId",
+                        column: x => x.MotelId,
+                        principalTable: "Motel",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -393,26 +366,74 @@ namespace BACK_END.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "User_Notification",
+                name: "Review",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<int>(type: "int", nullable: true),
-                    NotificationId = table.Column<int>(type: "int", nullable: true)
+                    Rating = table.Column<int>(type: "int", nullable: false),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Room_TypeId = table.Column<int>(type: "int", nullable: true),
+                    UserId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_User_Notification", x => x.Id);
+                    table.PrimaryKey("PK_Review", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_User_Notification_Notification_NotificationId",
-                        column: x => x.NotificationId,
-                        principalTable: "Notification",
+                        name: "FK_Review_Room_Type_Room_TypeId",
+                        column: x => x.Room_TypeId,
+                        principalTable: "Room_Type",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_User_Notification_User_UserId",
+                        name: "FK_Review_User_UserId",
                         column: x => x.UserId,
                         principalTable: "User",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Room",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    RoomNumber = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<byte>(type: "tinyint", nullable: false),
+                    Room_TypeId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Room", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Room_Room_Type_Room_TypeId",
+                        column: x => x.Room_TypeId,
+                        principalTable: "Room_Type",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Image",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Link = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Room_TypeId = table.Column<int>(type: "int", nullable: true),
+                    TicketId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Image", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Image_Room_Type_Room_TypeId",
+                        column: x => x.Room_TypeId,
+                        principalTable: "Room_Type",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Image_Ticket_TicketId",
+                        column: x => x.TicketId,
+                        principalTable: "Ticket",
                         principalColumn: "Id");
                 });
 
@@ -431,6 +452,122 @@ namespace BACK_END.Migrations
                         name: "FK_Ticket_Log_Ticket_TicketId",
                         column: x => x.TicketId,
                         principalTable: "Ticket",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Bill",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Water = table.Column<int>(type: "int", nullable: false),
+                    Electric = table.Column<int>(type: "int", nullable: false),
+                    Price = table.Column<int>(type: "int", nullable: false),
+                    Other = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<bool>(type: "bit", nullable: false),
+                    RoomId = table.Column<int>(type: "int", nullable: true),
+                    TimeCreated = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Bill", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Bill_Room_RoomId",
+                        column: x => x.RoomId,
+                        principalTable: "Room",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Consumption",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Water = table.Column<int>(type: "int", nullable: false),
+                    Electricity = table.Column<int>(type: "int", nullable: false),
+                    Time = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    RoomId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Consumption", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Consumption_Room_RoomId",
+                        column: x => x.RoomId,
+                        principalTable: "Room",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Room_History",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    status = table.Column<byte>(type: "tinyint", nullable: true),
+                    RoomId = table.Column<int>(type: "int", nullable: true),
+                    UserId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Room_History", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Room_History_Room_RoomId",
+                        column: x => x.RoomId,
+                        principalTable: "Room",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Room_History_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Service_Room",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ServiceId = table.Column<int>(type: "int", nullable: true),
+                    RoomId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Service_Room", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Service_Room_Room_RoomId",
+                        column: x => x.RoomId,
+                        principalTable: "Room",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Service_Room_Service_ServiceId",
+                        column: x => x.ServiceId,
+                        principalTable: "Service",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Service_Bill",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(100)", nullable: true),
+                    Price_Service = table.Column<int>(type: "int", nullable: false),
+                    BillId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Service_Bill", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Service_Bill_Bill_BillId",
+                        column: x => x.BillId,
+                        principalTable: "Bill",
                         principalColumn: "Id");
                 });
 
@@ -474,14 +611,19 @@ namespace BACK_END.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Bill_RoomId",
+                table: "Bill",
+                column: "RoomId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Consumption_RoomId",
                 table: "Consumption",
                 column: "RoomId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Image_MotelId",
+                name: "IX_Image_Room_TypeId",
                 table: "Image",
-                column: "MotelId");
+                column: "Room_TypeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Image_TicketId",
@@ -489,24 +631,24 @@ namespace BACK_END.Migrations
                 column: "TicketId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Invoice_RoomId",
-                table: "Invoice",
-                column: "RoomId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Motel_UserId",
                 table: "Motel",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Price_MotelId",
-                table: "Price",
-                column: "MotelId");
+                name: "IX_Package_User_PackageId",
+                table: "Package_User",
+                column: "PackageId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Review_MotelId",
+                name: "IX_Package_User_UserId",
+                table: "Package_User",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Review_Room_TypeId",
                 table: "Review",
-                column: "MotelId");
+                column: "Room_TypeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Review_UserId",
@@ -514,14 +656,44 @@ namespace BACK_END.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Room_MotelId",
+                name: "IX_Room_Room_TypeId",
                 table: "Room",
+                column: "Room_TypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Room_History_RoomId",
+                table: "Room_History",
+                column: "RoomId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Room_History_UserId",
+                table: "Room_History",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Room_Type_MotelId",
+                table: "Room_Type",
                 column: "MotelId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Term_MotelId",
-                table: "Term",
+                name: "IX_Service_MotelId",
+                table: "Service",
                 column: "MotelId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Service_Bill_BillId",
+                table: "Service_Bill",
+                column: "BillId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Service_Room_RoomId",
+                table: "Service_Room",
+                column: "RoomId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Service_Room_ServiceId",
+                table: "Service_Room",
+                column: "ServiceId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Ticket_MotelId",
@@ -539,11 +711,6 @@ namespace BACK_END.Migrations
                 column: "TicketId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_User_RoomId",
-                table: "User",
-                column: "RoomId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_User_Notification_NotificationId",
                 table: "User_Notification",
                 column: "NotificationId");
@@ -552,51 +719,11 @@ namespace BACK_END.Migrations
                 name: "IX_User_Notification_UserId",
                 table: "User_Notification",
                 column: "UserId");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Consumption_Room_RoomId",
-                table: "Consumption",
-                column: "RoomId",
-                principalTable: "Room",
-                principalColumn: "Id");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Image_Motel_MotelId",
-                table: "Image",
-                column: "MotelId",
-                principalTable: "Motel",
-                principalColumn: "Id");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Image_Ticket_TicketId",
-                table: "Image",
-                column: "TicketId",
-                principalTable: "Ticket",
-                principalColumn: "Id");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Invoice_Room_RoomId",
-                table: "Invoice",
-                column: "RoomId",
-                principalTable: "Room",
-                principalColumn: "Id");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Motel_User_UserId",
-                table: "Motel",
-                column: "UserId",
-                principalTable: "User",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_User_Room_RoomId",
-                table: "User");
-
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
@@ -619,16 +746,19 @@ namespace BACK_END.Migrations
                 name: "Image");
 
             migrationBuilder.DropTable(
-                name: "Invoice");
-
-            migrationBuilder.DropTable(
-                name: "Price");
+                name: "Package_User");
 
             migrationBuilder.DropTable(
                 name: "Review");
 
             migrationBuilder.DropTable(
-                name: "Term");
+                name: "Room_History");
+
+            migrationBuilder.DropTable(
+                name: "Service_Bill");
+
+            migrationBuilder.DropTable(
+                name: "Service_Room");
 
             migrationBuilder.DropTable(
                 name: "Ticket_Log");
@@ -643,6 +773,15 @@ namespace BACK_END.Migrations
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
+                name: "Package");
+
+            migrationBuilder.DropTable(
+                name: "Bill");
+
+            migrationBuilder.DropTable(
+                name: "Service");
+
+            migrationBuilder.DropTable(
                 name: "Ticket");
 
             migrationBuilder.DropTable(
@@ -650,6 +789,9 @@ namespace BACK_END.Migrations
 
             migrationBuilder.DropTable(
                 name: "Room");
+
+            migrationBuilder.DropTable(
+                name: "Room_Type");
 
             migrationBuilder.DropTable(
                 name: "Motel");
