@@ -30,13 +30,10 @@ namespace BACK_END.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("Electric")
-                        .HasColumnType("int");
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2");
 
-                    b.Property<int>("Other")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Price")
+                    b.Property<int>("Price_Room")
                         .HasColumnType("int");
 
                     b.Property<int?>("RoomId")
@@ -45,10 +42,7 @@ namespace BACK_END.Migrations
                     b.Property<bool>("Status")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime>("TimeCreated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Water")
+                    b.Property<int>("Total")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -161,7 +155,7 @@ namespace BACK_END.Migrations
                     b.Property<string>("Content")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedDate")
+                    b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Sender")
@@ -558,14 +552,14 @@ namespace BACK_END.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<bool?>("Is_Read")
+                        .HasColumnType("bit");
+
                     b.Property<int?>("NotificationId")
                         .HasColumnType("int");
 
                     b.Property<int?>("UserId")
                         .HasColumnType("int");
-
-                    b.Property<bool?>("isReaded")
-                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -810,7 +804,7 @@ namespace BACK_END.Migrations
             modelBuilder.Entity("BACK_END.Models.Motel", b =>
                 {
                     b.HasOne("BACK_END.Models.User", "User")
-                        .WithMany("Motels")
+                        .WithMany()
                         .HasForeignKey("UserId");
 
                     b.Navigation("User");
@@ -822,13 +816,13 @@ namespace BACK_END.Migrations
                         .WithMany()
                         .HasForeignKey("PackageId");
 
-                    b.HasOne("BACK_END.Models.User", "Motel")
+                    b.HasOne("BACK_END.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId");
 
-                    b.Navigation("Motel");
-
                     b.Navigation("Package");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("BACK_END.Models.Review", b =>
@@ -1005,11 +999,6 @@ namespace BACK_END.Migrations
             modelBuilder.Entity("BACK_END.Models.Ticket", b =>
                 {
                     b.Navigation("Images");
-                });
-
-            modelBuilder.Entity("BACK_END.Models.User", b =>
-                {
-                    b.Navigation("Motels");
                 });
 #pragma warning restore 612, 618
         }

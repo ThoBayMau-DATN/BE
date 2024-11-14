@@ -14,8 +14,5 @@ namespace BACK_END.Models
         public DateTime CreateDate { get; set; } = DateTime.Now;
         [Column(TypeName = "tinyint")]
         public bool Status { get; set; } = true;
-
-        public virtual ICollection<Motel>? Motels { get; set; }
     }
-
 }
