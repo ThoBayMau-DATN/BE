@@ -2,21 +2,21 @@
 
 namespace BACK_END.Models
 {
-    public class Motel
+    public class Room_Type
     {
         public int Id { get; set; }
         [Column(TypeName = "nvarchar(max)")]
-        public string? Address { get; set; }
-        [Column(TypeName = "nvarchar(50)")]
         public string? Name { get; set; }
+        public int Area { get; set; }
         [Column(TypeName = "nvarchar(max)")]
         public string? Description { get; set; }
-        [Column(TypeName = "nvarchar(max)")]
-        public string? Location { get; set; }
-        [Column(TypeName = "tinyint")]
-        public int Status { get; set; }
+        public int Price { get; set; }
+        public int NewPrice { get; set; }
         public DateTime CreateDate { get; set; } = DateTime.Now;
-        public int? UserId { get; set; }
-        public User? User { get; set; }
+        public DateTime? UpdateDate { get; set; } = DateTime.Now;
+        [Column(TypeName = "tinyint")]
+        public int? Status { get; set; }
+        public int? MotelId { get; set; }
+        public Motel? Motel { get; set; }
     }
 }
