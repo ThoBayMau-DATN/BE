@@ -1,6 +1,6 @@
 ﻿namespace BACK_END.Models
 {
-    public class Invoice
+    public class Bill
     {
         public int Id { get; set; }
 
