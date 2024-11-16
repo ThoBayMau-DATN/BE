@@ -6,7 +6,7 @@ namespace BACK_END.Services.Interfaces
     {
         Task<List<MotelWithEmptyRoomsDto>> GetMotelsWithEmptyRoomsAsync();
 
-        //Task<List<MonthlyRevenueDto>> GetMonthlyRevenueLastSixMonthsAsync();
+        Task<List<MonthlyRevenueDto>> GetLastSixMonthsRevenueAsync();
 
         //Task<List<Bill>> GetAllAsync();
     }

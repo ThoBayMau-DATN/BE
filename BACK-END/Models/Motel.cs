@@ -18,5 +18,6 @@ namespace BACK_END.Models
         public DateTime CreateDate { get; set; } = DateTime.Now;
         public int? UserId { get; set; }
         public User? User { get; set; }
+        public ICollection<Room_Type>? Room_Types { get; set; }
     }
 }
