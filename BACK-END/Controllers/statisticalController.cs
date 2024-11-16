@@ -31,37 +31,13 @@ namespace BACK_END.Controllers
             }));
         }
 
-        //    [HttpGet("available-motels")]
-        //    public async Task<ActionResult<List<MotelAvailabilityDTO>>> GetAvailableMotels()
-        //    {
-        //        var availableMotels = await _statictical.GetAvailableMotelsAsync();
-        //        if(availableMotels == null)
-        //        {
-        //            return NotFound(
-        //               new ApiResponse<object>
-        //               {
-        //                   Code = 404,
-        //                   Status = "error",
-        //                   Message = "Không có dữ liệu để trả về!!.",
-        //                   Data = null,
-        //               });
-        //        }
-        //        return Ok((new ApiResponse<object>
-        //        {
-        //            Code = 200,
-        //            Status = "success",
-        //            Message = "trả về dữ liệu trọ trống thành công",
-        //            Data = availableMotels
-        //        }));
-        //    }
 
-        //    [HttpGet("last-six-months")]
-        //    public async Task<IActionResult> GetTotalRevenueLastSixMonths()
-        //    {
-        //        var monthlyRevenue = await _statictical.GetMonthlyRevenueLastSixMonthsAsync();
-
-        //        return Ok(monthlyRevenue);
-        //    }
+        [HttpGet("api/revenue/last-six-months")]
+        public async Task<IActionResult> GetLastSixMonthsRevenue()
+        {
+            var revenueData = await _statictical.GetLastSixMonthsRevenueAsync();
+            return Ok(revenueData);
+        }
 
         //    [HttpGet("expense-percentage")]
         //    public async Task<IActionResult> GetExpensePercentage()

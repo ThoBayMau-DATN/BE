@@ -15,42 +15,35 @@ namespace BACK_END.Services.Repositories
             _db = db;
         }
 
-
-
         //public async Task<List<Invoice>> GetAllAsync()
         //{
         //    return await _db.Invoice.ToListAsync(); // Lấy tất cả các hóa đơn
         //}
 
+        public async Task<List<MonthlyRevenueDto>> GetLastSixMonthsRevenueAsync()
+        {
+            var sixMonthsAgo = DateTime.Now.AddMonths(-5);
 
-
-        //public async Task<List<MonthlyRevenueDto>> GetMonthlyRevenueLastSixMonthsAsync()
-        //{
-        //    var currentDate = DateTime.Now;
-        //    var sixMonthsAgo = currentDate.AddMonths(-5); // Bắt đầu từ 5 tháng trước, vì tính cả tháng hiện tại
-
-        //    var invoices = await _db.Invoice
-        //        .Where(i => i.TimeCreated >= sixMonthsAgo && i.TimeCreated <= currentDate)
-        //        .ToListAsync();
-
-        //     Khởi tạo danh sách để lưu doanh thu theo tháng
-        //    var monthlyRevenue = new List<MonthlyRevenueDto>();
-
-        //     Tính doanh thu cho từng tháng
-        //    for (int i = 0; i < 6; i++)
-        //    {
-        //        var month = sixMonthsAgo.AddMonths(i);
-        //        var monthName = month.ToString("MMMM"); // Chỉ lấy tên tháng
-
-        //        var revenue = invoices
-        //            .Where(i => i.TimeCreated.Year == month.Year && i.TimeCreated.Month == month.Month)
-        //            .Sum(i => i.Water + i.Electric + i.Price + i.Other);
-
-        //        monthlyRevenue.Add(new MonthlyRevenueDto { Month = monthName, Revenue = revenue });
-        //    }
-
-        //    return monthlyRevenue;
-        //}
+            var monthlyRevenue = await _db.Bill
+                .Where(bill => bill.CreateDate >= sixMonthsAgo)
+                .GroupBy(bill => new { bill.CreateDate.Year, bill.CreateDate.Month })
+                .Select(g => new MonthlyRevenueDto
+                {
+                    Month = g.Key.Month.ToString(),
+                    Year = g.Key.Year,
+                    Revenue = g.Sum(bill => bill.Total)
+                })
+                .ToListAsync();
+            var sortedMonthlyRevenue = monthlyRevenue
+                .OrderBy(dto => dto.Year)
+                .ThenBy(dto => int.Parse(dto.Month))
+                .ToList();
+            foreach (var item in sortedMonthlyRevenue)
+            {
+                item.Month = $"Tháng {item.Month}/{item.Year}";
+            }
+            return sortedMonthlyRevenue;
+        }
 
         public async Task<List<MotelWithEmptyRoomsDto>> GetMotelsWithEmptyRoomsAsync()
         {

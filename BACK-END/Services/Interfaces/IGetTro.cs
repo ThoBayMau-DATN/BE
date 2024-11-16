@@ -1,11 +1,11 @@
-﻿using BACK_END.DTOs.RoomDto;
+﻿using BACK_END.DTOs.MainDto;
 
 namespace BACK_END.Services.Interfaces
 {
     public interface IGetTro
     {
-        Task<List<GetMotelByAdminDto>> GetNhaTroNoiBat();
+        Task<IEnumerable<MotelDTO>> GetHighlightedMotelsAsync();
 
-        Task<List<GetMotelByAdminDto>> GetNewMotels();
+        Task<IEnumerable<MotelDTO>> GetNewMotelsAsync();
     }
 }
