@@ -9,7 +9,6 @@
         public Room_Type? Room_Type { get; set; }
         public int? TicketId { get; set; }
         public Ticket? Ticket { get; set; }
-        public ICollection<Image>? Images { get; set; }
     }
 
 }
