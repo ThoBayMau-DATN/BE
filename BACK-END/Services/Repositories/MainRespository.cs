@@ -18,60 +18,54 @@ namespace BACK_END.Services.Repositories
 			_mapper = mapper;
 		}
 
-        public async Task<IEnumerable<MotelDTO>> GetHighlightedMotelsAsync()
+        public async Task<IEnumerable<RoomTypeWithPackageDTO>> GetRoomTypesWithFeature()
         {
-            return await _db.Motel
-                .Include(m => m.User)
-                .Include(m => m.Room_Types)
-                    .ThenInclude(rt => rt.Images)
-                .Where(m => _db.Package_User.Any(pu => pu.UserId == m.UserId)) // Điều kiện trọ nổi bật
-                .Select(m => new MotelDTO
-                {
-                    Id = m.Id,
-                    Name = m.Name,
-                    Address = m.Address,
-                    RoomTypes = m.Room_Types.Select(rt => new RoomTypeDTO
-                    {
-                        Id = rt.Id,
-                        Price = rt.Price,
-                        Images = rt.Images.Select(img => new ImageDTO
-                        {
-                            Id = img.Id,
-                            Link = img.Link,
-                            Type = img.Type
-                        }).ToList()
-                    }).ToList()
-                })
+            var roomTypes = await _db.Room_Type
+                .Include(r => r.Motel) 
+                .Include(r => r.Images)
                 .ToListAsync();
+
+            var result = roomTypes.Select(roomType => new RoomTypeWithPackageDTO
+            {
+                Id = roomType.Id,
+                Price = roomType.Price,
+                Name = roomType.Name,
+                Address = roomType.Motel?.Address,
+                Images = roomType.Images?.Select(i => new ImageDTO
+                {
+                    Id = i.Id,
+                    Link = i.Link,
+                    Type = i.Type
+                }).ToList(),
+                IsFeatured = _db.Package_User.Any(pu => pu.UserId == roomType.Motel.UserId)
+            }).Where(r => r.IsFeatured)
+              .ToList();
+
+            return result;
         }
-
-        public async Task<IEnumerable<MotelDTO>> GetNewMotelsAsync()
+        public async Task<List<RoomTypeWithPackageDTO>> GetNewRoomTypesAsync()
         {
-            var threeMonthsAgo = DateTime.Now.AddMonths(-3);
-
-            return await _db.Motel
-                .Include(m => m.Room_Types)
-                    .ThenInclude(rt => rt.Images)
-                .Where(m => m.CreateDate >= threeMonthsAgo)
-                .OrderByDescending(m => m.CreateDate)
-                .Select(m => new MotelDTO
+            var recentDate = DateTime.Now.AddMonths(-3);
+            var roomTypes = await _db.Room_Type
+                .Include(rt => rt.Motel)
+                .Include(rt => rt.Images)
+                .Where(rt => rt.Motel.CreateDate >= recentDate)
+                .Select(rt => new RoomTypeWithPackageDTO
                 {
-                    Id = m.Id,
-                    Name = m.Name,
-                    Address = m.Address,
-                    RoomTypes = m.Room_Types.Select(rt => new RoomTypeDTO
+                    Id = rt.Id,
+                    Name = rt.Name,
+                    Price = rt.Price,
+                    Address = rt.Motel.Address,
+                    Images = rt.Images.Select(i => new ImageDTO
                     {
-                        Id = rt.Id,
-                        Price = rt.Price,
-                        Images = rt.Images.Select(img => new ImageDTO
-                        {
-                            Id = img.Id,
-                            Link = img.Link,
-                            Type = img.Type
-                        }).ToList()
-                    }).ToList()
+                        Id = i.Id,
+                        Link = i.Link,
+                        Type = i.Type
+                    }).ToList(),
                 })
                 .ToListAsync();
+
+            return roomTypes;
         }
     }
 }
