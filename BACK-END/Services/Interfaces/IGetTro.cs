@@ -4,8 +4,8 @@ namespace BACK_END.Services.Interfaces
 {
     public interface IGetTro
     {
-        Task<IEnumerable<MotelDTO>> GetHighlightedMotelsAsync();
+        Task<IEnumerable<RoomTypeWithPackageDTO>> GetRoomTypesWithFeature();
 
-        Task<IEnumerable<MotelDTO>> GetNewMotelsAsync();
+        Task<List<RoomTypeWithPackageDTO>> GetNewRoomTypesAsync();
     }
 }
