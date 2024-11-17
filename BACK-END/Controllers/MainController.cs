@@ -17,15 +17,15 @@ namespace BACK_END.Controllers
         [HttpGet("outstanding-motels")]
         public async Task<IActionResult> GetFeaturedMotels()
         {
-            var motels = await _repo.GetHighlightedMotelsAsync();
+            var motels = await _repo.GetRoomTypesWithFeature();
             return Ok(motels);
         }
 
-        [HttpGet("new-motels")]
-        public async Task<IActionResult> GetNewMotels()
+        [HttpGet("new")]
+        public async Task<ActionResult> GetNewRoomTypes()
         {
-            var motels = await _repo.GetNewMotelsAsync();
-            return Ok(motels);
+            var roomTypes = await _repo.GetNewRoomTypesAsync();
+            return Ok(roomTypes);
         }
 
 
