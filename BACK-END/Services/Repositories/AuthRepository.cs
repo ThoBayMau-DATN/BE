@@ -1,7 +1,6 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using BACK_END.Data;
+﻿using BACK_END.Data;
 using BACK_END.DTOs.Auth;
+using BACK_END.DTOs.MainDto;
 using BACK_END.Mappers;
 using BACK_END.Models;
 using BACK_END.Services.Interfaces;
@@ -9,6 +8,7 @@ using BACK_END.Services.MyServices;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace BACK_END.Services.Repositories
 {
@@ -21,9 +21,10 @@ namespace BACK_END.Services.Repositories
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IMemoryCache _cache;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly FirebaseStorageService _firebase;
 
         public AuthRepository(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, TokenService tokenService, BACK_ENDContext db, IWebHostEnvironment webHostEnvironment,
-            IMemoryCache cache, RoleManager<IdentityRole> roleManager)
+            IMemoryCache cache, RoleManager<IdentityRole> roleManager, FirebaseStorageService firebase)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -32,6 +33,7 @@ namespace BACK_END.Services.Repositories
             _webHostEnvironment = webHostEnvironment;
             _cache = cache;
             _roleManager = roleManager;
+            _firebase = firebase;
         }
 
         public async Task<List<string>> GetEmailsByRoleAsync(string? roleName)
@@ -504,5 +506,45 @@ namespace BACK_END.Services.Repositories
 
             return "Thay đổi quyền thành công";
         }
+
+        public async Task<bool> UpdateUserFromToken(string token, userDetailDto dto)
+        {
+            var userNameIdentity = HandlerToken(token);
+            if (string.IsNullOrEmpty(userNameIdentity)) return false;
+
+            var identityUser = await _userManager.FindByNameAsync(userNameIdentity);
+            if (identityUser == null) return false;
+
+            var myUser = await _db.User.FirstOrDefaultAsync(x => x.Email == identityUser.Email);
+            if (myUser == null) return false;
+
+            // Cập nhật thông tin từ dto vào bảng IdentityUser
+            identityUser.Email = dto.Email ?? identityUser.Email;
+            identityUser.PhoneNumber = dto.Phone ?? identityUser.PhoneNumber;
+            var identityResult = await _userManager.UpdateAsync(identityUser);
+            if (!identityResult.Succeeded) return false;
+
+            // Cập nhật thông tin vào bảng User
+            myUser.FullName = dto.FullName ?? myUser.FullName;
+            myUser.Phone = dto.Phone ?? myUser.Phone;
+            myUser.Email = dto.Email ?? myUser.Email;
+
+            // Nếu có ảnh, upload lên Firebase và cập nhật link vào bảng User
+            if (dto.Avatar != null)
+            {
+                var avatarUrl = await _firebase.UploadFileAsync(dto.Avatar);
+                if (!string.IsNullOrEmpty(avatarUrl))
+                {
+                    myUser.Avatar = avatarUrl;
+                }
+            }
+
+            // Lưu thay đổi vào database
+            _db.User.Update(myUser);
+            await _db.SaveChangesAsync();
+
+            return true;
+        }
+
     }
 }
