@@ -28,6 +28,12 @@ namespace BACK_END.Controllers
             return Ok(roomTypes);
         }
 
+        [HttpGet("room-types-under-one-million")]
+        public async Task<IActionResult> GetRoomTypesUnderOneMillion()
+        {
 
+            var roomTypes = await _repo.GetRoomTypesUnderOneMillionAsync();
+            return Ok(roomTypes);
+        }
     }
 }

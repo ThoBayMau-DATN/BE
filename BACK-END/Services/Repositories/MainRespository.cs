@@ -49,7 +49,7 @@ namespace BACK_END.Services.Repositories
             var roomTypes = await _db.Room_Type
                 .Include(rt => rt.Motel)
                 .Include(rt => rt.Images)
-                .Where(rt => rt.Motel.CreateDate >= recentDate)
+                .Where(rt => rt.Motel.CreateDate >= recentDate).OrderByDescending(rt => rt.Motel.CreateDate)
                 .Select(rt => new RoomTypeWithPackageDTO
                 {
                     Id = rt.Id,
@@ -64,6 +64,31 @@ namespace BACK_END.Services.Repositories
                     }).ToList(),
                 })
                 .ToListAsync();
+
+            return roomTypes;
+        }
+
+        public async Task<List<RoomTypeWithPackageDTO>> GetRoomTypesUnderOneMillionAsync()
+        {
+            var roomTypes = await _db.Room_Type
+        .Include(rt => rt.Motel)
+        .Include(rt => rt.Images)
+        .Where(rt => rt.Price < 1000000)
+        .OrderByDescending(rt => rt.Motel.CreateDate)
+        .Select(rt => new RoomTypeWithPackageDTO
+        {
+            Id = rt.Id,
+            Name = rt.Name,
+            Price = rt.Price,
+            Address = rt.Motel.Address,
+            Images = rt.Images.Select(i => new ImageDTO
+            {
+                Id = i.Id,
+                Link = i.Link,
+                Type = i.Type
+            }).ToList(),
+        })
+        .ToListAsync();
 
             return roomTypes;
         }
