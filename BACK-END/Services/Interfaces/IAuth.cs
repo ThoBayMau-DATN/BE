@@ -1,4 +1,5 @@
 ﻿using BACK_END.DTOs.Auth;
+using BACK_END.DTOs.MainDto;
 
 namespace BACK_END.Services.Interfaces
 {
@@ -21,5 +22,7 @@ namespace BACK_END.Services.Interfaces
         bool CheckOtp(string model);
         Task<GetUserDto> GetUserByToken(string token);
         Task<string> EditRoleCustomerToOwner(string token);
+
+        Task<bool> UpdateUserFromToken(string token, userDetailDto dto);
     }
 }
