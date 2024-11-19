@@ -7,5 +7,7 @@ namespace BACK_END.Services.Interfaces
         Task<IEnumerable<RoomTypeWithPackageDTO>> GetRoomTypesWithFeature();
 
         Task<List<RoomTypeWithPackageDTO>> GetNewRoomTypesAsync();
+
+        Task<List<RoomTypeWithPackageDTO>> GetRoomTypesUnderOneMillionAsync();
     }
 }
