@@ -4,8 +4,8 @@ namespace BACK_END.Services.Interfaces
 {
     public interface IGetTro
     {
-        Task<List<GetMotelByAdminDto>> GetNhaTroNoiBat();
+        /*Task<List<GetMotelByAdminDto>> GetNhaTroNoiBat();
 
-        Task<List<GetMotelByAdminDto>> GetNewMotels();
+        Task<List<GetMotelByAdminDto>> GetNewMotels();*/
     }
 }

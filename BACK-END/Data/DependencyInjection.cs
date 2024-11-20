@@ -10,7 +10,7 @@ namespace BACK_END.Data
         {
             services.AddScoped<IAuth, AuthRepository>();
             services.AddScoped<TokenService>();
-            //services.AddScoped<IRoom, RoomRepository>();
+            services.AddScoped<IRoom, RoomRepository>();
             //services.AddScoped<INoti, NofRespository>();
             //services.AddScoped<IStatictical, StaticticalRepository>();
             services.AddScoped<IUser, UserRepository>();
@@ -19,6 +19,7 @@ namespace BACK_END.Data
             services.AddScoped<IHome, HomeRespository>();
             services.AddScoped<IRole, RoleRepository>();
             //services.AddScoped<IGetTro, MainRespository>();
+            services.AddScoped<IService, ServiceRepository>();
         }
     }
 }

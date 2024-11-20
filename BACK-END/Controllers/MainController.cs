@@ -15,7 +15,7 @@ namespace BACK_END.Controllers
 			_repo = repo;
 		}
 
-		[HttpGet("popular-Motel")]
+		/*[HttpGet("popular-Motel")]
 		public async Task<IActionResult> GetNhaTroNoiBat()
 		{
 			try
@@ -53,6 +53,6 @@ namespace BACK_END.Controllers
 			{
 				return BadRequest(ex.Message);
 			}
-		}
+		}*/
 	}
 }
