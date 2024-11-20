@@ -92,5 +92,47 @@ namespace BACK_END.Services.Repositories
 
             return roomTypes;
         }
+        public Task<RoomTypeDTO> GetRoomTypeByRoomID(int id)
+        {
+            //find roomtype by id
+            var roomType = _db.Room_Type
+                .Include(rt => rt.Motel).ThenInclude(m => m.User)
+                .Include(rt => rt.Images)
+                .FirstOrDefault(rt => rt.Id == id);
+
+            if (roomType == null)
+            {
+                return Task.FromResult<RoomTypeDTO>(null);
+            }
+            //gộp mô tả motel + roomtype
+            var Description = roomType.Motel.Description + ". " + roomType.Description;
+
+            var roomTypeDTO = new RoomTypeDTO
+            {
+                Id = roomType.Id,
+                Name = roomType.Name,
+                Area = roomType.Area,
+                Price = roomType.Price,
+                Address = roomType.Motel.Address,
+                Images = roomType.Images.Select(i => new ImageDTO
+                {
+                    Id = i.Id,
+                    Link = i.Link,
+                    Type = i.Type
+                }).ToList(),
+                Description = Description,
+                Location = roomType.Motel.Location,
+                Status = roomType.Motel.Status,
+                CreateDate = roomType.CreateDate,
+                UpdateDate = roomType.UpdateDate,
+                FullName = roomType.Motel.User.FullName,
+                PhoneNumber = roomType.Motel.User.Phone,
+                Email = roomType.Motel.User.Email,
+                //đếm theo số lượng roomtype của motel
+                RoomTypeCount = _db.Room_Type.Count(rt => rt.MotelId == roomType.MotelId)
+            };
+
+            return Task.FromResult(roomTypeDTO);
+        }
     }
 }
