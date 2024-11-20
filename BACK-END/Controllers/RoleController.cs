@@ -25,7 +25,7 @@ namespace BACK_END.Controllers
                     {
                         Code = 404,
                         Status = "error",
-                        Message = "Không tìm thấy vai trò",
+                        Message = "Không tìm thấy phòng trọ",
                         Data = null
                     });
                 }
