@@ -18,5 +18,7 @@ namespace BACK_END.Models
         public DateTime CreateDate { get; set; } = DateTime.Now;
         public int? UserId { get; set; }
         public User? User { get; set; }
+        public virtual List<Room_Type>? Room_Types { get; set; }
+        public virtual List<Service>? Services { get; set; }
     }
 }
