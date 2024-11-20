@@ -1,4 +1,5 @@
-﻿using BACK_END.Services.Interfaces;
+﻿using BACK_END.DTOs.Repository;
+using BACK_END.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BACK_END.Controllers
@@ -35,5 +36,31 @@ namespace BACK_END.Controllers
             var roomTypes = await _repo.GetRoomTypesUnderOneMillionAsync();
             return Ok(roomTypes);
         }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult> GetRoomTypeByRoomID(int id)
+        {
+            var room = await _repo.GetRoomTypeByRoomID(id);
+            if (room == null)
+            {
+                return NotFound(new ApiResponse<object>
+                {
+                    Code = 404,
+                    Status = "error",
+                    Message = "Không tìm thấy vai trò",
+                    Data = null
+                });
+            }
+            return Ok(new ApiResponse<object>
+            {
+                Code = 200,
+                Status = "Success",
+                Message = "Lấy thông tin thành công",
+                Data = room
+            });
+        }
+
+
+
     }
 }
