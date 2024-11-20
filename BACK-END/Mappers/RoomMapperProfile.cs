@@ -63,7 +63,7 @@ namespace BACK_END.Mappers
                 .SelectMany(rt => rt.Reviews ?? Enumerable.Empty<Review>())
                 .Where(r => r != null);
 
-            return validReviews.Any() ? validReviews.Average(r => r.Rating) : 0;
+            return validReviews.Any() ? (float)Math.Round(validReviews.Average(r => r.Rating), 1) : 0;
         }
 
         private static float CalculateAverageRating(Room_Type roomType)
@@ -73,7 +73,7 @@ namespace BACK_END.Mappers
             var validReviews = roomType.Reviews
                 .Where(r => r != null);
 
-            return validReviews.Any() ? validReviews.Average(r => r.Rating) : 0;
+            return validReviews.Any() ? (float)Math.Round(validReviews.Average(r => r.Rating), 1) : 0;
         }
 
         private static int CalculateTotalRooms(Motel motel)

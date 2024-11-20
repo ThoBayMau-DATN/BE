@@ -17,11 +17,11 @@ namespace BACK_END.Services.Interfaces
         Task<List<RoomTypeDto>?> GetRoomTypeByMotelId(int motelId);
         // Task<GetMotelByIdDto?> EditMotel(int motelId, UpdateMotelDto dto);
         // Task<GetMotelByIdDto?> GetMotelById(int id);
-        // Task<bool> RejectMotel(int motelId);
-        // Task<bool> ApproveMotel(int motelId);
-        // Task<bool> DeactivateMotel(int motelId);
-        // Task<bool> ActiveMotel(int motelId);
-        // Task<bool> RemoveMotel(int motelId);
+        Task<bool> RejectMotel(int motelId);
+        Task<bool> ApproveMotel(int motelId);
+        Task<bool> LockMotel(int motelId);
+        Task<bool> UnlockMotel(int motelId);
+        Task<bool> DeleteMotel(int motelId);
         // Task<List<GetRoomByMotelIdDto>?> GetRoomByMotelId(int motelId);
         // Task<bool> AddRoom(AddRoomDto dto);
         // Task<bool> AddMultiRoom(AddMultiRoomDto dto);

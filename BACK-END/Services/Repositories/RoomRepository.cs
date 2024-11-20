@@ -38,8 +38,7 @@ namespace BACK_END.Services.Repositories
                 .Include(x => x.Room_Types!)
                 .ThenInclude(x => x.Images)
                 .Include(x => x.Room_Types!)
-                .ThenInclude(x => x.Reviews)
-                .AsQueryable();
+                .ThenInclude(x => x.Reviews).AsQueryable();
 
             //Lọc theo trạng thái
             if (queryDto.Status != null && queryDto.Status != 0)
@@ -50,7 +49,7 @@ namespace BACK_END.Services.Repositories
             //Tìm kiếm
             if (!string.IsNullOrEmpty(queryDto.Search))
             {
-                SearchMotel(queryDto.Search, motel);
+                motel = SearchMotel(queryDto.Search, motel);
             }
 
             // Sắp xếp
@@ -76,18 +75,19 @@ namespace BACK_END.Services.Repositories
             };
         }
 
-        private IQueryable<Motel> SearchMotel(string search, IQueryable<Motel> motel)
+        private IQueryable<Motel> SearchMotel(string? search, IQueryable<Motel> motel)
         {
-            if (!string.IsNullOrEmpty(search))
-            {
-                var searchTerms = search.ToLower().Trim().Split(' ');
-                motel = motel.Where(x => searchTerms.All(term =>
-                    (x.Address != null && x.Address.ToLower().Contains(term)) ||
-                    (x.Name != null && x.Name.ToLower().Contains(term)) ||
-                    (x.Description != null && x.Description.ToLower().Contains(term))
-                ));
-            }
-            return motel;
+            if (string.IsNullOrEmpty(search))
+                return motel;
+
+            var searchTerms = search.ToLower().Trim().Split(' ');
+
+            return motel.Where(x => searchTerms.All(term =>
+                x.Address != null && x.Address.ToLower().Contains(term) ||
+                x.Name != null && x.Name.ToLower().Contains(term) ||
+                x.Description != null && x.Description.ToLower().Contains(term) ||
+                x.User != null && x.User.FullName != null && x.User.FullName.ToLower().Contains(term)
+            ));
         }
 
         private bool IsValidDate(string term)
@@ -120,16 +120,14 @@ namespace BACK_END.Services.Repositories
         public async Task<PagedResultDto<RoomMotelDto>?> GetMotelByOwner(int userId, MotelQueryDto queryDto)
         {
             var motel = _db.Motel
-             .Include(x => x.User)
-             .Include(x => x.Room_Types!)
-             .ThenInclude(x => x.Rooms!)
-              .ThenInclude(x => x.History)
-             .Include(x => x.Room_Types!)
-             .ThenInclude(x => x.Images)
-             .Include(x => x.Room_Types!)
-             .ThenInclude(x => x.Reviews)
-             .Where(x => x.UserId == userId)
-             .AsQueryable();
+                .Include(x => x.User)
+                .Include(x => x.Room_Types!)
+                .ThenInclude(x => x.Rooms!)
+                 .ThenInclude(x => x.History)
+                .Include(x => x.Room_Types!)
+                .ThenInclude(x => x.Images)
+                .Include(x => x.Room_Types!)
+                .ThenInclude(x => x.Reviews).AsQueryable();
 
             //Lọc theo trạng thái
             if (queryDto.Status != null && queryDto.Status != 0)
@@ -140,7 +138,7 @@ namespace BACK_END.Services.Repositories
             //Tìm kiếm
             if (!string.IsNullOrEmpty(queryDto.Search))
             {
-                SearchMotel(queryDto.Search, motel);
+                motel = SearchMotel(queryDto.Search, motel);
             }
 
             // Sắp xếp
@@ -216,7 +214,7 @@ namespace BACK_END.Services.Repositories
                 await _db.SaveChangesAsync();
                 await transaction.CommitAsync();
                 return _mapper.Map<RoomMotelDto>(motel);
-            }       
+            }
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
@@ -305,6 +303,66 @@ namespace BACK_END.Services.Repositories
                 .Where(x => x.MotelId == motelId)
                 .ToListAsync();
             return _mapper.Map<List<RoomTypeDto>>(roomType);
+        }
+
+        //Lock trọ đổi trạng thái từ 2 sang 3
+        public async Task<bool> LockMotel(int motelId)
+        {
+            var motel = await _db.Motel.FindAsync(motelId);
+            if (motel == null || motel.Status != 2) return false;
+
+            motel.Status = (int)MotelStatus.Inactive; // 3
+            _db.Update(motel);
+
+            return await _db.SaveChangesAsync() > 0;
+        }
+
+        //Unlock trọ đổi trạng thái từ 3 sang 2
+        public async Task<bool> UnlockMotel(int motelId)
+        {
+            var motel = await _db.Motel.FindAsync(motelId);
+            if (motel == null || motel.Status != 3) return false;
+
+            motel.Status = (int)MotelStatus.Active; // 2
+            _db.Update(motel);
+
+            return await _db.SaveChangesAsync() > 0;
+        }
+
+        //delete motel
+        public async Task<bool> DeleteMotel(int motelId)
+        {
+            var motel = await _db.Motel.FindAsync(motelId);
+            if (motel == null || (motel.Status != 3 && motel.Status != 1)) return false;
+
+            motel.Status = (int)MotelStatus.Remove; // 5
+            _db.Update(motel);
+
+            return await _db.SaveChangesAsync() > 0;
+        }
+
+        //duyệt motel
+        public async Task<bool> ApproveMotel(int motelId)
+        {
+            var motel = await _db.Motel.FindAsync(motelId);
+            if (motel == null || motel.Status != 1) return false;
+
+            motel.Status = (int)MotelStatus.Active; // 2
+            _db.Update(motel);
+
+            return await _db.SaveChangesAsync() > 0;
+        }
+
+        //từ chối motel
+        public async Task<bool> RejectMotel(int motelId)
+        {
+            var motel = await _db.Motel.FindAsync(motelId);
+            if (motel == null || motel.Status != 1) return false;
+
+            motel.Status = (int)MotelStatus.Rejected; // 4
+            _db.Update(motel);
+
+            return await _db.SaveChangesAsync() > 0;
         }
 
         public Task<GetMotelByIdDto?> GetMotelById(int motelId)

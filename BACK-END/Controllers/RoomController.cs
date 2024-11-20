@@ -167,89 +167,89 @@ namespace BACK_END.Controllers
 
 
 
-        // [HttpPut("reject/{motelId}")]
-        // public async Task<IActionResult> RejectMotel(int motelId)
-        // {
-        //     var result = await _room.RejectMotel(motelId);
-        //     if (!result || result == false)
-        //     {
-        //         return BadRequest(new MotelRepository<object>
-        //         {
-        //             Code = 400,
-        //             Status = "error",
-        //             Message = "Từ chối phòng trọ thất bại",
-        //         });
-        //     }
-        //     return Ok(new MotelRepository<object> { Code = 200, Status = "success", Message = "Từ chối phòng trọ thành công" });
-        // }
+        [HttpPut("reject-motel/{motelId}")]
+        public async Task<IActionResult> RejectMotel(int motelId)
+        {
+            var result = await _room.RejectMotel(motelId);
+            if (!result || result == false)
+            {
+                return BadRequest(new MotelRepository<object>
+                {
+                    Code = 400,
+                    Success = false,
+                    Message = "Từ chối phòng trọ thất bại",
+                });
+            }
+            return Ok(new MotelRepository<object> { Code = 200, Success = true, Message = "Từ chối phòng trọ thành công" });
+        }
 
-        // [HttpPut("approve/{motelId}")]
-        // public async Task<IActionResult> ApproveMotel(int motelId)
-        // {
-        //     var result = await _room.ApproveMotel(motelId);
-        //     if (!result || result == false)
-        //     {
-        //         return BadRequest(new MotelRepository<object>
-        //         {
-        //             Code = 400,
-        //             Status = "error",
-        //             Message = "Phê duyệt phòng trọ thất bại",
-        //         });
-        //     }
-        //     return Ok(new MotelRepository<object> { Code = 200, Status = "success", Message = "Phê duyệt phòng trọ thành công" });
-        // }
+        [HttpPut("approve-motel/{motelId}")]
+        public async Task<IActionResult> ApproveMotel(int motelId)
+        {
+            var result = await _room.ApproveMotel(motelId);
+            if (!result || result == false)
+            {
+                return BadRequest(new MotelRepository<object>
+                {
+                    Code = 400,
+                    Success = false,
+                    Message = "Phê duyệt phòng trọ thất bại",
+                });
+            }
+            return Ok(new MotelRepository<object> { Code = 200, Success = true, Message = "Phê duyệt phòng trọ thành công" });
+        }
 
-        // [HttpPut("lock/{motelId}")]
-        // public async Task<IActionResult> DeactivateMotel(int motelId)
-        // {
-        //     var result = await _room.DeactivateMotel(motelId);
-        //     if (!result || result == false)
-        //     {
-        //         return BadRequest(new MotelRepository<object>
-        //         {
-        //             Code = 400,
-        //             Status = "error",
-        //             Message = "Vô hiệu hóa phòng trọ thất bại",
-        //         });
-        //     }
-        //     return Ok(new MotelRepository<object> { Code = 200, Status = "success", Message = "Vô hiệu hóa phòng trọ thành công" });
-        // }
+        [HttpPut("lock-motel/{motelId}")]
+        public async Task<IActionResult> DeactivateMotel(int motelId)
+        {
+            var result = await _room.LockMotel(motelId);
+            if (!result || result == false)
+            {
+                return BadRequest(new MotelRepository<object>
+                {
+                    Code = 400,
+                    Success = false,
+                    Message = "Vô hiệu hóa phòng trọ thất bại",
+                });
+            }
+            return Ok(new MotelRepository<object> { Code = 200, Success = true, Message = "Vô hiệu hóa phòng trọ thành công" });
+        }
 
-        // [HttpPut("active/{motelId}")]
-        // public async Task<IActionResult> ActiveMotel(int motelId)
-        // {
-        //     try
-        //     {
-        //         var result = await _room.ActiveMotel(motelId);
-        //         if (!result || result == false)
-        //         {
-        //             return BadRequest(new MotelRepository<object> { Code = 400, Status = "error", Message = "Kích hoạt phòng trọ thất bại" });
-        //         }
-        //         return Ok(new MotelRepository<object> { Code = 200, Status = "success", Message = "Kích hoạt phòng trọ thành công" });
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         return BadRequest(ex.Message);
-        //     }
-        // }
+        [HttpPut("unlock-motel/{motelId}")]
+        public async Task<IActionResult> UnlockMotel(int motelId)
+        {
+            try
+            {
+                var result = await _room.UnlockMotel(motelId);
+                if (!result || result == false)
+                {
+                    return BadRequest(new MotelRepository<object> { Code = 400, Success = false, Message = "Kích hoạt phòng trọ thất bại" });
+                }
+                return Ok(new MotelRepository<object> { Code = 200, Success = true, Message = "Kích hoạt phòng trọ thành công" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
-        // [HttpDelete("remove/{motelId}")]
-        // public async Task<IActionResult> RemoveMotel(int motelId)
-        // {
-        //     try
-        //     {
-        //         var result = await _room.RemoveMotel(motelId);
-        //         if (!result || result == false)
-        //         {
-        //             return BadRequest(new MotelRepository<object> { Code = 400, Status = "error", Message = "Xóa phòng trọ thất bại" });
-        //         }
-        //         return Ok(new MotelRepository<object> { Code = 200, Status = "success", Message = "Xóa phòng trọ thành công" });
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         return BadRequest(ex.Message);
-        //     }
-        // }
+        [HttpDelete("delete-motel/{motelId}")]
+        public async Task<IActionResult> DeleteMotel(int motelId)
+        {
+            try
+            {
+                var result = await _room.DeleteMotel(motelId);
+                if (!result || result == false)
+                {
+                    return BadRequest(new MotelRepository<object> { Code = 400, Success = false, Message = "Xóa phòng trọ thất bại" });
+                }
+                return Ok(new MotelRepository<object> { Code = 200, Success = true, Message = "Xóa phòng trọ thành công" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
         // [HttpGet("get-room-by-motel-id/{motelId}")]
         // public async Task<IActionResult> GetRoomByMotelId(int motelId)
