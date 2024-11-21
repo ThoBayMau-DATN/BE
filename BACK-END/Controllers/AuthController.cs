@@ -565,5 +565,21 @@ namespace BACK_END.Controllers
             return BadRequest("Cập nhật thông tin thất bại.");
         }
 
+        [HttpPost("ChangePasswordFromToken")]
+        public async Task<IActionResult> ChangePasswordFromToken([FromQuery] string token, [FromBody] ChangePasswordDto dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var result = await _auth.ChangePasswordFromTokenAsync(token, dto);
+            if (result)
+            {
+                return Ok(new { Message = "Password changed successfully." });
+            }
+            return BadRequest(new { Message = "Failed to change password. Please check the current password." });
+        }
+
     }
 }

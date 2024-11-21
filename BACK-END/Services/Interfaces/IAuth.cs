@@ -24,5 +24,7 @@ namespace BACK_END.Services.Interfaces
         Task<string> EditRoleCustomerToOwner(string token);
 
         Task<bool> UpdateUserFromToken(string token, userDetailDto dto);
+
+        Task<bool> ChangePasswordFromTokenAsync(string token, ChangePasswordDto dto);
     }
 }
