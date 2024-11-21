@@ -546,5 +546,20 @@ namespace BACK_END.Services.Repositories
             return true;
         }
 
+        public async Task<bool> ChangePasswordFromTokenAsync(string token, ChangePasswordDto dto)
+        {
+            // Giải mã token để lấy tên người dùng
+            var userNameIdentity = HandlerToken(token);
+            if (string.IsNullOrEmpty(userNameIdentity)) return false;
+
+            // Tìm người dùng trong bảng Identity
+            var identityUser = await _userManager.FindByNameAsync(userNameIdentity);
+            if (identityUser == null) return false;
+
+            // Kiểm tra mật khẩu cũ và thay đổi mật khẩu
+            var result = await _userManager.ChangePasswordAsync(identityUser, dto.CurrentPassword, dto.NewPassword);
+            return result.Succeeded;
+        }
+
     }
 }
