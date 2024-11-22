@@ -557,9 +557,9 @@ namespace BACK_END.Controllers
             }
 
             var isUpdated = await _auth.UpdateUserFromToken(token, dto);
-            if (isUpdated)
+            if (isUpdated != null)
             {
-                return Ok("Cập nhật thông tin thành công.");
+                return Ok(isUpdated);
             }
 
             return BadRequest("Cập nhật thông tin thất bại.");
@@ -579,6 +579,15 @@ namespace BACK_END.Controllers
                 return Ok(new { Message = "Password changed successfully." });
             }
             return BadRequest(new { Message = "Failed to change password. Please check the current password." });
+        }
+
+        [HttpGet("GetUserDetailsFromToken")]
+        public async Task<IActionResult> GetUserDetailsFromToken([FromQuery] string token)
+        {
+            var userDetails = await _auth.GetUserDetailsFromTokenAsync(token);
+            if (userDetails == null)
+                return NotFound("User not found or invalid token");
+            return Ok(userDetails);
         }
 
     }
