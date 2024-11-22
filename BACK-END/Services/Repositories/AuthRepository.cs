@@ -507,46 +507,42 @@ namespace BACK_END.Services.Repositories
             return "Thay đổi quyền thành công";
         }
 
-        public async Task<bool> UpdateUserFromToken(string token, userDetailDto dto)
+        public async Task<userDetailDto?> UpdateUserFromToken(string token, userDetailDto userDetailDto)
         {
             var userNameIdentity = HandlerToken(token);
-            if (string.IsNullOrEmpty(userNameIdentity)) return false;
-
+            if (string.IsNullOrEmpty(userNameIdentity)) 
+                return null;
             var identityUser = await _userManager.FindByNameAsync(userNameIdentity);
-            if (identityUser == null) return false;
-
+            if (identityUser == null) 
+                return null;
             var myUser = await _db.User.FirstOrDefaultAsync(x => x.Email == identityUser.Email);
-            if (myUser == null) return false;
-
-            // Cập nhật thông tin từ dto vào bảng IdentityUser
-            identityUser.Email = dto.Email ?? identityUser.Email;
-            identityUser.PhoneNumber = dto.Phone ?? identityUser.PhoneNumber;
+            if (myUser == null) 
+                return null;
+            identityUser.Email = userDetailDto.Email ?? identityUser.Email;
+            identityUser.PhoneNumber = userDetailDto.Phone ?? identityUser.PhoneNumber;
             var identityResult = await _userManager.UpdateAsync(identityUser);
-            if (!identityResult.Succeeded) return false;
-
-            // Cập nhật thông tin vào bảng User
-            myUser.FullName = dto.FullName ?? myUser.FullName;
-            myUser.Phone = dto.Phone ?? myUser.Phone;
-            myUser.Email = dto.Email ?? myUser.Email;
-
-            // Nếu có ảnh, upload lên Firebase và cập nhật link vào bảng User
-            if (dto.Avatar != null)
+            if (!identityResult.Succeeded) 
+                return null;
+            myUser.FullName = userDetailDto.FullName ?? myUser.FullName;
+            myUser.Phone = userDetailDto.Phone ?? myUser.Phone;
+            myUser.Email = userDetailDto.Email ?? myUser.Email;
+            if (userDetailDto.Avatar != null)
             {
-                var avatarUrl = await _firebase.UploadFileAsync(dto.Avatar);
+                var avatarUrl = await _firebase.UploadFileAsync(userDetailDto.Avatar);
                 if (!string.IsNullOrEmpty(avatarUrl))
                 {
                     myUser.Avatar = avatarUrl;
                 }
             }
-
-            // Lưu thay đổi vào database
+            userDetailDto.AvatarLink = myUser.Avatar;
             _db.User.Update(myUser);
             await _db.SaveChangesAsync();
 
-            return true;
+            return userDetailDto;
+
         }
 
-        public async Task<bool> ChangePasswordFromTokenAsync(string token, ChangePasswordDto dto)
+        public async Task<bool> ChangePasswordFromTokenAsync(string token, ChangePasswordDto changePasswordDto)
         {
             // Giải mã token để lấy tên người dùng
             var userNameIdentity = HandlerToken(token);
@@ -557,8 +553,29 @@ namespace BACK_END.Services.Repositories
             if (identityUser == null) return false;
 
             // Kiểm tra mật khẩu cũ và thay đổi mật khẩu
-            var result = await _userManager.ChangePasswordAsync(identityUser, dto.CurrentPassword, dto.NewPassword);
+            var result = await _userManager.ChangePasswordAsync(identityUser, changePasswordDto.CurrentPassword, changePasswordDto.NewPassword);
             return result.Succeeded;
+        }
+
+        public async Task<UserDetailDto?> GetUserDetailsFromTokenAsync(string token)
+        {
+            var userNameIdentity = HandlerToken(token);
+            if (string.IsNullOrEmpty(userNameIdentity))
+                return null;
+            var identityUser = await _userManager.FindByNameAsync(userNameIdentity);
+            if (identityUser == null) 
+                return null;
+            var user = await _db.User.FirstOrDefaultAsync(u => u.Email == identityUser.Email);
+            if (user == null) 
+                return null;
+            return new UserDetailDto
+            {
+                FullName = user.FullName,
+                Phone = user.Phone,
+                Avatar = user.Avatar,
+                Email = user.Email,
+               
+            };
         }
 
     }
