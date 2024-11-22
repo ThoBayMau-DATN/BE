@@ -10,7 +10,7 @@ namespace BACK_END.DTOs.Ticket
         [Required(ErrorMessage = "Nội dung không được để trống")]
         public string Content { get; set; }
         public string? Receiver { get; set; }
-        public int? UserId { get; set; }
+        public string Token { get; set; }
         public int? MotelId { get; set; }
         public List<IFormFile>? imgs { get; set; }
     }
