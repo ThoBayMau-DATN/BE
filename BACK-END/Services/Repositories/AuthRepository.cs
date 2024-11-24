@@ -1,6 +1,7 @@
 ﻿using BACK_END.Data;
 using BACK_END.DTOs.Auth;
 using BACK_END.DTOs.MainDto;
+using BACK_END.DTOs.MotelDto;
 using BACK_END.Mappers;
 using BACK_END.Models;
 using BACK_END.Services.Interfaces;
@@ -510,18 +511,18 @@ namespace BACK_END.Services.Repositories
         public async Task<userDetailDto?> UpdateUserFromToken(string token, userDetailDto userDetailDto)
         {
             var userNameIdentity = HandlerToken(token);
-            if (string.IsNullOrEmpty(userNameIdentity)) 
+            if (string.IsNullOrEmpty(userNameIdentity))
                 return null;
             var identityUser = await _userManager.FindByNameAsync(userNameIdentity);
-            if (identityUser == null) 
+            if (identityUser == null)
                 return null;
             var myUser = await _db.User.FirstOrDefaultAsync(x => x.Email == identityUser.Email);
-            if (myUser == null) 
+            if (myUser == null)
                 return null;
             identityUser.Email = userDetailDto.Email ?? identityUser.Email;
             identityUser.PhoneNumber = userDetailDto.Phone ?? identityUser.PhoneNumber;
             var identityResult = await _userManager.UpdateAsync(identityUser);
-            if (!identityResult.Succeeded) 
+            if (!identityResult.Succeeded)
                 return null;
             myUser.FullName = userDetailDto.FullName ?? myUser.FullName;
             myUser.Phone = userDetailDto.Phone ?? myUser.Phone;
@@ -544,15 +545,10 @@ namespace BACK_END.Services.Repositories
 
         public async Task<bool> ChangePasswordFromTokenAsync(string token, ChangePasswordDto changePasswordDto)
         {
-            // Giải mã token để lấy tên người dùng
             var userNameIdentity = HandlerToken(token);
             if (string.IsNullOrEmpty(userNameIdentity)) return false;
-
-            // Tìm người dùng trong bảng Identity
             var identityUser = await _userManager.FindByNameAsync(userNameIdentity);
             if (identityUser == null) return false;
-
-            // Kiểm tra mật khẩu cũ và thay đổi mật khẩu
             var result = await _userManager.ChangePasswordAsync(identityUser, changePasswordDto.CurrentPassword, changePasswordDto.NewPassword);
             return result.Succeeded;
         }
@@ -563,10 +559,10 @@ namespace BACK_END.Services.Repositories
             if (string.IsNullOrEmpty(userNameIdentity))
                 return null;
             var identityUser = await _userManager.FindByNameAsync(userNameIdentity);
-            if (identityUser == null) 
+            if (identityUser == null)
                 return null;
             var user = await _db.User.FirstOrDefaultAsync(u => u.Email == identityUser.Email);
-            if (user == null) 
+            if (user == null)
                 return null;
             return new UserDetailDto
             {
@@ -574,7 +570,130 @@ namespace BACK_END.Services.Repositories
                 Phone = user.Phone,
                 Avatar = user.Avatar,
                 Email = user.Email,
-               
+
+            };
+        }
+
+        public async Task<RentalRoomDetailDTO?> GetRentalRoomDetailsAsync(string token)
+        {
+            var email = HandlerToken(token);
+            if (string.IsNullOrEmpty(email)) return null;
+            var user = await _db.User.FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null)
+                return null;
+
+            // Lấy lịch sử thuê phòng
+            var roomHistory = await _db.Room_History
+                .Include(rh => rh.Room)
+                .ThenInclude(r => r.Room_Type)
+                .ThenInclude(rt => rt.Motel)
+                .FirstOrDefaultAsync(rh => rh.UserId == user.Id && rh.EndDate == null);
+
+            if (roomHistory == null)
+                return null;
+            var room = roomHistory.Room;
+            if (room == null)
+                return null;
+
+            // Lấy thông tin sử dụng nước và điện
+            var consumption = await _db.Consumption.FirstOrDefaultAsync(c => c.RoomId == room.Id);
+            int waterUsage = consumption?.Water ?? 0;
+            int electricUsage = consumption?.Electricity ?? 0;
+
+            int waterPrice = 0, electricPrice = 0, otherServicePrice = 0;
+            List<OtherServiceDTO> otherServices = new List<OtherServiceDTO>();
+
+            // Lấy các dịch vụ ngoài nước và điện
+            var serviceRooms = await _db.Service_Room
+                .Include(sr => sr.Service)
+                .Where(sr => sr.RoomId == room.Id)
+                .ToListAsync();
+
+            foreach (var serviceRoom in serviceRooms)
+            {
+                var service = serviceRoom.Service;
+                if (service == null) continue;
+
+                if (service.Name?.ToLower() == "water")
+                {
+                    waterPrice = service.Price * waterUsage;
+                }
+                else if (service.Name?.ToLower() == "electric")
+                {
+                    electricPrice = service.Price * electricUsage;
+                }
+                else
+                {
+                    // Thêm các dịch vụ khác vào danh sách OtherServiceDTO
+                    otherServices.Add(new OtherServiceDTO
+                    {
+                        Name = service.Name,
+                        price = service.Price
+                    });
+                }
+            }
+
+            // Lấy hình ảnh của RoomType
+            var roomImages = await _db.Image
+                .Where(i => i.Room_TypeId == room.Room_TypeId)
+                .Select(i => new RoomImageDTO
+                {
+                    Id = i.Id,
+                    Link = i.Link,
+                    Type = i.Type
+                })
+                .ToListAsync();
+
+            // Lấy thông tin dãy trọ và chủ nhà
+            var motel = room.Room_Type?.Motel;
+            string ownerName = "Unknown";
+            string ownerPhone = "Unknown";
+            string motelName = "Unknown";
+            string motelAddress = "Unknown";
+
+            if (motel != null)
+            {
+                var relatedRooms = await _db.Room
+                    .Include(r => r.Room_Type)
+                    .Where(r => r.Room_Type != null && r.Room_Type.MotelId == motel.Id)
+                    .ToListAsync();
+
+                bool isRoomInMotel = relatedRooms.Any(r => r.Id == room.Id);
+
+                if (isRoomInMotel)
+                {
+                    var motelOwner = await _db.User.FirstOrDefaultAsync(u => u.Id == motel.UserId);
+                    if (motelOwner != null)
+                    {
+                        ownerName = motelOwner.FullName ?? "Unknown";
+                        ownerPhone = motelOwner.Phone ?? "Unknown";
+                    }
+
+                    motelName = motel.Name ?? "Unknown";
+                    motelAddress = motel.Address ?? "Unknown";
+                }
+            }
+
+            // Kiểm tra tình trạng thanh toán
+            bool hasPaid = await _db.Bill.AnyAsync(b => b.UserId == user.Id);
+
+            // Trả về DTO RentalRoomDetailDTO
+            return new RentalRoomDetailDTO
+            {
+                MotelName = motelName,
+                MotelAdress = motelAddress,
+                fullName = user.FullName,
+                RoomNumber = room.RoomNumber,
+                Price = room.Room_Type?.Price ?? 0,
+                Area = room.Room_Type?.Area ?? 0,
+                CreateDate = roomHistory.CreateDate,
+                Status = hasPaid,
+                WaterPrice = waterPrice,
+                ElectricPrice = electricPrice,
+                OtherService = otherServices, // Các dịch vụ ngoài nước và điện
+                owner = ownerName,
+                phone = ownerPhone,
+                RoomImages = roomImages // Trả về danh sách hình ảnh của RoomType
             };
         }
 
