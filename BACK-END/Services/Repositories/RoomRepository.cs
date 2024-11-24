@@ -7,6 +7,7 @@ using BACK_END.Models;
 
 using BACK_END.Services.Interfaces;
 using BACK_END.Services.MyServices;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Drawing.Printing;
 using System.Globalization;
@@ -300,8 +301,36 @@ namespace BACK_END.Services.Repositories
                 .Include(x => x.Rooms)
                 .Include(x => x.Images)
                 .Include(x => x.Reviews)
+                .Include(x => x.Motel)
+                .Include(x => x.Rooms!)
+                .ThenInclude(x => x.History)
                 .Where(x => x.MotelId == motelId)
                 .ToListAsync();
+
+            if (roomType == null)
+            {
+                return null;
+            }
+
+            //check lại hết số người trong phòng nếu có người thì status = 2 nếu không có người thì status = 1, update database
+            foreach (var item in roomType)
+            {
+                var room = await _db.Room.Where(x => x.Room_TypeId == item.Id).ToListAsync();
+                if (room == null || !room.Any()) continue;
+                foreach (var r in room)
+                {
+                    if (r.History != null && r.History.Count > 0 && r.History.Any(x => x.Status == 1) && r.Status != 2)
+                    {
+                        r.Status = 2;
+                    }
+                    else if (r.History != null && r.History.Count > 0 && r.History.Any(x => x.Status != 1) && r.Status != 1)
+                    {
+                        r.Status = 1;
+                    }
+                }
+                _db.UpdateRange(room);
+            }
+            await _db.SaveChangesAsync();
             return _mapper.Map<List<RoomTypeDto>>(roomType);
         }
 
@@ -370,12 +399,143 @@ namespace BACK_END.Services.Repositories
             throw new NotImplementedException();
         }
 
-        //    private async Task DeleteImages(int motelId, List<int> removeImageId)
-        //    {
-        //        var images = await _db.Image.Where(x => x.motelId == motelId && removeImageId.Contains(x.Id)).ToListAsync();
-        //        _db.Image.RemoveRange(images);
-        //        await _db.SaveChangesAsync();
-        //    }
+        public async Task<bool> AddRoom(AddRoomDto dto)
+        {
+            using var transaction = await _db.Database.BeginTransactionAsync();
+            try
+            {
+                if (dto.RoomTypeId == null || dto.RoomTypeId == 0 || dto.QuantityRoom == null || dto.QuantityRoom <= 0) return false;
+                for (int i = 0; i < dto.QuantityRoom; i++)
+                {
+                    var lastRoom = await _db.Room
+                    .Where(x => x.Room_TypeId == dto.RoomTypeId)
+                    .OrderByDescending(x => x.RoomNumber)
+                    .FirstOrDefaultAsync();
+                    var room = new Room
+                    {
+                        Room_TypeId = dto.RoomTypeId,
+                        RoomNumber = lastRoom?.RoomNumber != null ? lastRoom.RoomNumber + 1 : 1,
+                        Status = 1
+                    };
+                    await _db.Room.AddAsync(room);
+                }
+                await _db.SaveChangesAsync();
+                await transaction.CommitAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                return false;
+            }
+        }
+
+        public async Task<RoomTypeDto?> AddRoomType([FromForm] AddRoomTypeDto dto)
+        {
+            using var transaction = await _db.Database.BeginTransactionAsync();
+            try
+            {
+                var (roomType, rooms) = dto.MapToAddRoomType();
+                roomType.MotelId = dto.MotelId;
+                await _db.Room_Type.AddAsync(roomType);
+                await _db.SaveChangesAsync(); // Lưu motel để có Id
+
+                foreach (var room in rooms)
+                {
+                    room.Room_TypeId = roomType.Id;
+                }
+                await _db.Room.AddRangeAsync(rooms);
+
+                // Tải lên hình ảnh nếu có
+                if (dto.Images != null && dto.Images.Count > 0)
+                {
+                    await AddImages(roomType.Id, dto.Images);
+                }
+
+                await _db.SaveChangesAsync();
+                await transaction.CommitAsync();
+                return _mapper.Map<RoomTypeDto>(roomType);
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                // Log exception
+                Console.WriteLine($"Lỗi khi thêm dãy trọ và phòng trọ: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<RoomDto?> GetRoomById(int roomTypeId)
+        {
+            var roomType = await _db.Room
+            .Include(x => x.Consumption)
+            .Include(x => x.Room_Type!)
+            .ThenInclude(x => x.Images)
+            .Include(x => x.History!)
+            .ThenInclude(x => x.User)
+            .FirstOrDefaultAsync(x => x.Id == roomTypeId);
+            return _mapper.Map<RoomDto>(roomType);
+        }
+
+        public async Task<GetRoomTypeByEditDto?> GetRoomTypeByEdit(int roomTypeId)
+        {
+            var roomType = await _db.Room_Type
+            .Include(x => x.Images)
+            .FirstOrDefaultAsync(x => x.Id == roomTypeId);
+            return _mapper.Map<GetRoomTypeByEditDto>(roomType);
+        }
+
+        public async Task<GetRoomTypeByEditDto?> EditRoomType(EditRoomTypeDto dto)
+        {
+            using var transaction = await _db.Database.BeginTransactionAsync();
+            try
+            {
+                var roomType = await _db.Room_Type.FindAsync(dto.Id);
+                if (roomType == null) return null;
+
+                roomType.Name = !string.IsNullOrWhiteSpace(dto.Name) ? dto.Name : roomType.Name;
+                roomType.Area = dto.Area > 0 ? dto.Area : roomType.Area;
+                roomType.Description = !string.IsNullOrWhiteSpace(dto.Description) ? dto.Description : roomType.Description;
+                if (dto.NewPrice > 0)
+                {
+                    if (dto.NewPrice != roomType.Price)
+                    {
+                        roomType.NewPrice = dto.NewPrice;
+                    }
+                    else
+                    {
+                        roomType.NewPrice = 0;
+                    }
+                }
+
+                if (dto.RemoveImageId != null && dto.RemoveImageId.Count > 0)
+                {
+                    await DeleteImages(roomType.Id, dto.RemoveImageId);
+                }
+
+                if (dto.NewImages != null && dto.NewImages.Count > 0)
+                {
+                    await AddImages(roomType.Id, dto.NewImages);
+                }
+
+
+                await _db.SaveChangesAsync();
+                await transaction.CommitAsync();
+                return _mapper.Map<GetRoomTypeByEditDto>(roomType);
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                return null;
+            }
+        }
+
+        private async Task DeleteImages(int roomTypeId, List<int> removeImageId)
+        {
+            var images = await _db.Image.Where(x => x.Room_TypeId == roomTypeId && removeImageId.Contains(x.Id)).ToListAsync();
+            _db.Image.RemoveRange(images);
+            await _db.SaveChangesAsync();
+        }
 
         //    private async Task UpdateTerm(int motelId, IFormFile fileTerm)
         //    {

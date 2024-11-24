@@ -18,8 +18,31 @@ namespace BACK_END.DTOs.RoomDto
         public DateTime CreateDate { get; set; } = DateTime.Now;
         public DateTime? UpdateDate { get; set; } = DateTime.Now;
         public int? Status { get; set; }
-        public virtual List<RoomDto>? Rooms { get; set; }
+        public virtual List<RoomTypeDto_Room>? Rooms { get; set; }
         public virtual List<RoomImageDto>? Images { get; set; }
-        public virtual List<RoomReviewDto>? Reviews { get; set; }
+        public virtual RoomTypeDto_Motel? Motel { get; set; }
     }
+
+    public class RoomTypeDto_Motel
+    {
+        public int Id { get; set; }
+        public string? Address { get; set; }
+        public string? Name { get; set; }
+        public string? Description { get; set; }
+        public string? Location { get; set; }
+        public float Rating { get; set; }
+        public int TotalRoom { get; set; }
+        public int TotalUser { get; set; }
+        public int Status { get; set; }
+        public DateTime CreateDate { get; set; } = DateTime.Now;
+    }
+
+    public class RoomTypeDto_Room
+    {
+        public int Id { get; set; }
+        public int RoomNumber { get; set; }
+        public int? TotalUser { get; set; }
+        public int Status { get; set; }
+    }
+
 }

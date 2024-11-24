@@ -120,6 +120,29 @@ namespace BACK_END.Mappers
 
             return (motels, rooms, roomType, services);
         }
+
+        public static (Room_Type roomType, List<Room> rooms) MapToAddRoomType(this AddRoomTypeDto dto)
+        {
+            var roomType = new Room_Type
+            {
+                Name = dto.Name,
+                Description = dto.Description,
+                Area = dto.Area,
+                Price = dto.Price,
+            };
+
+            var rooms = new List<Room>();
+            for (int i = 0; i < dto.QuantityRoom; i++)
+            {
+                rooms.Add(new Room
+                {
+                    RoomNumber = i + 1,
+                    Status = 1,
+                });
+            }
+
+            return (roomType, rooms);
+        }
         // public static (Motel motel, Price price) MapToMotelAndPrice(this UpdateMotelDto dto)
         // {
         //     var motel = new Motel

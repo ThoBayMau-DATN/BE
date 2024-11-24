@@ -251,6 +251,92 @@ namespace BACK_END.Controllers
             }
         }
 
+        [HttpPost("add-room")]
+        public async Task<IActionResult> AddRoom([FromBody] AddRoomDto dto)
+        {
+            try
+            {
+                var result = await _room.AddRoom(dto);
+                if (!result || result == false)
+                {
+                    return BadRequest(new MotelRepository<object> { Code = 400, Success = false, Message = "Thêm phòng trọ thất bại" });
+                }
+                return Ok(new MotelRepository<object> { Code = 200, Success = true, Message = "Thêm phòng trọ thành công" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("add-room-type")]
+        public async Task<IActionResult> AddRoomType([FromForm] AddRoomTypeDto dto)
+        {
+            try
+            {
+                var result = await _room.AddRoomType(dto);
+                if (result == null)
+                {
+                    return BadRequest(new MotelRepository<object> { Code = 400, Success = false, Message = "Thêm phòng trọ thất bại" });
+                }
+                return Ok(new MotelRepository<object> { Code = 200, Success = true, Message = "Thêm phòng trọ thành công", Data = result });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("get-room-by-id/{id}")]
+        public async Task<IActionResult> GetRoomById(int id)
+        {
+            try
+            {
+                var result = await _room.GetRoomById(id);
+                return Ok(new MotelRepository<object> { Code = 200, Success = true, Message = "Lấy phòng trọ thành công", Data = result });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("get-room-type-by-edit/{roomTypeId}")]
+        public async Task<IActionResult> GetRoomTypeByEdit(int roomTypeId)
+        {
+            try
+            {
+                var result = await _room.GetRoomTypeByEdit(roomTypeId);
+                if (result == null)
+                {
+                    return BadRequest(new MotelRepository<object> { Code = 400, Success = false, Message = "Không tìm thấy phòng trọ" });
+                }
+                return Ok(new MotelRepository<object> { Code = 200, Success = true, Message = "Lấy phòng trọ thành công", Data = result });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut("edit-room-type")]
+        public async Task<IActionResult> EditRoomType([FromForm] EditRoomTypeDto dto)
+        {
+            try
+            {
+                var result = await _room.EditRoomType(dto);
+                if (result == null)
+                {
+                    return BadRequest(new MotelRepository<object> { Code = 400, Success = false, Message = "Cập nhật phòng trọ thất bại" });
+                }
+                return Ok(new MotelRepository<object> { Code = 200, Success = true, Message = "Cập nhật phòng trọ thành công", Data = result });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         // [HttpGet("get-room-by-motel-id/{motelId}")]
         // public async Task<IActionResult> GetRoomByMotelId(int motelId)
         // {

@@ -18,17 +18,18 @@ namespace BACK_END.Mappers
             .ForMember(dest => dest.Rating, opt => opt.MapFrom((src, _, _, context) => CalculateAverageRating(src)))
             .ForMember(dest => dest.TotalRoom, opt => opt.MapFrom((src, _, _, context) => CalculateTotalRooms(src)))
             .ForMember(dest => dest.TotalUser, opt => opt.MapFrom((src, _, _, context) => CalculateTotalUsers(src)));
-
+            //room type
             CreateMap<Room_Type, RoomTypeDto>()
                 .ForMember(dest => dest.Rooms, opt => opt.MapFrom(src => src.Rooms))
                 .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.Images))
-                .ForMember(dest => dest.Reviews, opt => opt.MapFrom(src => src.Reviews))
                 .ForMember(dest => dest.Rating, opt => opt.MapFrom((src, _, _, context) => CalculateAverageRating(src)))
                 .ForMember(dest => dest.TotalRoom, opt => opt.MapFrom((src, _, _, context) => CalculateTotalRooms(src)))
                 .ForMember(dest => dest.TotalUser, opt => opt.MapFrom((src, _, _, context) => CalculateTotalUsers(src)));
-
-            CreateMap<Room, RoomDto>()
-                .ForMember(dest => dest.History, opt => opt.MapFrom(src => src.History))
+            CreateMap<Motel, RoomTypeDto_Motel>()
+                .ForMember(dest => dest.Rating, opt => opt.MapFrom((src, _, _, context) => CalculateAverageRating(src)))
+                .ForMember(dest => dest.TotalRoom, opt => opt.MapFrom((src, _, _, context) => CalculateTotalRooms(src)))
+                .ForMember(dest => dest.TotalUser, opt => opt.MapFrom((src, _, _, context) => CalculateTotalUsers(src)));
+            CreateMap<Room, RoomTypeDto_Room>()
                 .ForMember(dest => dest.TotalUser, opt => opt.MapFrom((src, _, _, context) => CalculateTotalUsers(src)));
 
             CreateMap<Image, RoomImageDto>().ReverseMap();
@@ -53,6 +54,19 @@ namespace BACK_END.Mappers
                 .ForMember(dest => dest.Rating, opt => opt.MapFrom((src, _, _, context) => CalculateAverageRating(src)))
                 .ForMember(dest => dest.TotalRoom, opt => opt.MapFrom((src, _, _, context) => CalculateTotalRooms(src)))
                 .ForMember(dest => dest.TotalUser, opt => opt.MapFrom((src, _, _, context) => CalculateTotalUsers(src)));
+
+            //room
+            CreateMap<Room, RoomDto>()
+                .ForMember(dest => dest.RoomType, opt => opt.MapFrom(src => src.Room_Type))
+                .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.Room_Type != null ? src.Room_Type.Images : null))
+                .ForMember(dest => dest.Users, opt => opt.MapFrom(src => src.History != null ? src.History.Where(h => h.Status == 1).Select(h => h.User) : null))
+                .ForMember(dest => dest.Consumption, opt => opt.MapFrom(src => src.Consumption != null ? src.Consumption.OrderByDescending(c => c.Time).FirstOrDefault() : null));
+            CreateMap<Room_Type, RoomDto_RoomType>();
+            CreateMap<User, RoomDto_History_User>();
+            CreateMap<Consumption, ConsumptionDto>();
+
+            //edit room type
+            CreateMap<Room_Type, GetRoomTypeByEditDto>();
         }
 
         private static float CalculateAverageRating(Motel motel)
