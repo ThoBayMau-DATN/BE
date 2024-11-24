@@ -590,5 +590,14 @@ namespace BACK_END.Controllers
             return Ok(userDetails);
         }
 
+        [HttpGet("GetRentalRoomDetail")]
+        public async Task<IActionResult> GetRentalRoomDetail([FromQuery] string token)
+        {
+            var roomDetail = await _auth.GetRentalRoomDetailsAsync(token);
+            if (roomDetail == null)
+                return NotFound("User not found or invalid token");
+            return Ok(roomDetail);
+        }
+
     }
 }
