@@ -19,5 +19,6 @@ namespace BACK_END.Models
         public int? MotelId { get; set; }
         public Motel? Motel { get; set; }
         public ICollection<Image>? Images { get; set; }
+        public ICollection<Room>? rooms { get; set; }
     }
 }
