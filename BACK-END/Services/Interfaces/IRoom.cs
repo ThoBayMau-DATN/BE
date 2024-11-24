@@ -14,14 +14,20 @@ namespace BACK_END.Services.Interfaces
         Task<GetMotelByIdDto?> GetMotelById(int motelId);
         Task<GetMotelEditDto?> GetMotelEdit(int motelId);
         Task<GetMotelByIdDto?> EditMotel(EditMotelDto editMotelDto);
-        Task<List<RoomTypeDto>?> GetRoomTypeByMotelId(int motelId);
-        // Task<GetMotelByIdDto?> EditMotel(int motelId, UpdateMotelDto dto);
-        // Task<GetMotelByIdDto?> GetMotelById(int id);
-        Task<bool> RejectMotel(int motelId);
+                Task<bool> RejectMotel(int motelId);
         Task<bool> ApproveMotel(int motelId);
         Task<bool> LockMotel(int motelId);
         Task<bool> UnlockMotel(int motelId);
         Task<bool> DeleteMotel(int motelId);
+
+        Task<List<RoomTypeDto>?> GetRoomTypeByMotelId(int motelId);
+        Task<bool> AddRoom(AddRoomDto dto);
+        Task<RoomTypeDto?> AddRoomType(AddRoomTypeDto dto);
+
+        Task<RoomDto?> GetRoomById(int roomTypeId);
+        Task<GetRoomTypeByEditDto?> GetRoomTypeByEdit(int roomTypeId);
+        Task<GetRoomTypeByEditDto?> EditRoomType(EditRoomTypeDto dto);
+
         // Task<List<GetRoomByMotelIdDto>?> GetRoomByMotelId(int motelId);
         // Task<bool> AddRoom(AddRoomDto dto);
         // Task<bool> AddMultiRoom(AddMultiRoomDto dto);
