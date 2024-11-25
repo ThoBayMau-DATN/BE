@@ -59,8 +59,5 @@ namespace BACK_END.Controllers
                 Data = room
             });
         }
-
-
-
     }
 }
