@@ -9,21 +9,21 @@ using Microsoft.EntityFrameworkCore;
 namespace BACK_END.Services.Repositories
 {
     public class MainRespository : IGetTro
-	{
-		private readonly BACK_ENDContext _db;
-		private readonly FirebaseStorageService _firebaseStorageService;
-		private readonly IMapper _mapper;
-		public MainRespository(BACK_ENDContext db, FirebaseStorageService firebaseStorageService, IMapper mapper)
-		{
-			_db = db;
-			_firebaseStorageService = firebaseStorageService;
-			_mapper = mapper;
-		}
+    {
+        private readonly BACK_ENDContext _db;
+        private readonly FirebaseStorageService _firebaseStorageService;
+        private readonly IMapper _mapper;
+        public MainRespository(BACK_ENDContext db, FirebaseStorageService firebaseStorageService, IMapper mapper)
+        {
+            _db = db;
+            _firebaseStorageService = firebaseStorageService;
+            _mapper = mapper;
+        }
 
         public async Task<IEnumerable<RoomTypeWithPackageDTO>> GetRoomTypesWithFeature()
         {
             var roomTypes = await _db.Room_Type
-                .Include(r => r.Motel) 
+                .Include(r => r.Motel)
                 .Include(r => r.Images)
                 .ToListAsync();
 
@@ -229,11 +229,5 @@ namespace BACK_END.Services.Repositories
             // Trả về kết quả phân trang
             return await PagedList<RoomTypeDTO>.CreateAsync(projectedQuery, pageNumber, pageSize);
         }
-
-
-
-
-
-
     }
 }

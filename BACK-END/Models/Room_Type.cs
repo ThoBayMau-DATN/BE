@@ -15,9 +15,12 @@ namespace BACK_END.Models
         public DateTime CreateDate { get; set; } = DateTime.Now;
         public DateTime UpdateDate { get; set; } = DateTime.Now;
         [Column(TypeName = "tinyint")]
-        public int? Status { get; set; }
+        public int? Status { get; set; } = 1;
         public int? MotelId { get; set; }
-        public Motel? Motel { get; set; }
-        public ICollection<Image>? Images { get; set; }
+
+        public virtual Motel? Motel { get; set; }
+        public virtual List<Image>? Images { get; set; }
+        public virtual List<Room>? Rooms { get; set; }
+        public virtual List<Review>? Reviews { get; set; }
     }
 }

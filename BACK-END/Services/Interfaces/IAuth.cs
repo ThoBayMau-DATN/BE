@@ -1,5 +1,6 @@
 ﻿using BACK_END.DTOs.Auth;
 using BACK_END.DTOs.MainDto;
+using BACK_END.DTOs.MotelDto;
 
 namespace BACK_END.Services.Interfaces
 {
@@ -23,8 +24,11 @@ namespace BACK_END.Services.Interfaces
         Task<GetUserDto> GetUserByToken(string token);
         Task<string> EditRoleCustomerToOwner(string token);
 
-        Task<bool> UpdateUserFromToken(string token, userDetailDto dto);
+        Task<userDetailDto?> UpdateUserFromToken(string token, userDetailDto dto);
 
         Task<bool> ChangePasswordFromTokenAsync(string token, ChangePasswordDto dto);
+        Task<UserDetailDto?> GetUserDetailsFromTokenAsync(string token);
+
+        Task<RentalRoomDetailDTO?> GetRentalRoomDetailsAsync(string token);
     }
 }

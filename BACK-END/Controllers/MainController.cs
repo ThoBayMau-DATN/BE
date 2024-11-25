@@ -125,8 +125,5 @@ namespace BACK_END.Controllers
                 });
             }
         }
-
-
-
     }
 }
