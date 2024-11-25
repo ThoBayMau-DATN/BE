@@ -1,6 +1,5 @@
 ﻿using BACK_END.DTOs.MainDto;
 using BACK_END.DTOs.Repository;
-using BACK_END.DTOs.UserDto;
 using BACK_END.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -82,8 +81,30 @@ namespace BACK_END.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "An error occurred", details = ex.Message });
-             }
-          }
+            }
+        }
+
+        [HttpGet("get-Bill")]
+        public async Task<IActionResult> GetBillAsync(int id, [FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10)
+        {
+            try
+            {
+                var result = await _repo.GetBillAsync(id, pageIndex, pageSize);
+                return Ok(result);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred", details = ex.Message });
+            }
+        }
         class CustomData
         {
             public List<RoomTypeDTO> list { get; set; }
