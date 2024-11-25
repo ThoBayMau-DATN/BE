@@ -61,6 +61,29 @@ namespace BACK_END.Controllers
                 Data = room
             });
         }
+
+
+        [HttpGet("get-rental-history")]
+        public async Task<IActionResult> GetRentalRoomHistory([FromQuery] string token, [FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10)
+        {
+            try
+            {
+                var result = await _repo.GetRentalRoomHistoryAsync(token, pageIndex, pageSize);
+                return Ok(result);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred", details = ex.Message });
+             }
+          }
         class CustomData
         {
             public List<RoomTypeDTO> list { get; set; }
