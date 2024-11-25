@@ -3,6 +3,7 @@ using BACK_END.Data;
 using BACK_END.Models;
 using BACK_END.Services.Interfaces;
 using BACK_END.Services.MyServices;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace BACK_END.Services.Repositories
@@ -13,13 +14,17 @@ namespace BACK_END.Services.Repositories
         private readonly IMapper _mapper;
         private readonly IAuth _auth;
         private readonly FirebaseStorageService _firebase;
+        private readonly UserManager<IdentityUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public TicketRepository(BACK_ENDContext db, IMapper mapper, IAuth auth, FirebaseStorageService firebase)
+        public TicketRepository(BACK_ENDContext db, IMapper mapper, IAuth auth, FirebaseStorageService firebase, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _db = db;
             _mapper = mapper;
             _auth = auth;
             _firebase = firebase;
+            _userManager = userManager;
+            _roleManager = roleManager;
         }
 
         public async Task<DTOs.Ticket.TicketPagination?> GetAllTicketByRoleAsync(DTOs.Ticket.TicketQuery ticketQuery)
@@ -98,39 +103,53 @@ namespace BACK_END.Services.Repositories
 
         public async Task<DTOs.Ticket.Tickets?> CreateTicketAsync(DTOs.Ticket.Create data)
         {
-            var ticket = new Ticket()
+            var user = await _auth.GetUserByToken(data.Token);
+            if (user != null)
             {
-                Type = data.Type,
-                Title = data.Title,
-                Content = data.Content,
-                Receiver = data.Receiver,
-                CreateDate = DateTime.Now,
-                Status = 1,
-                UserId = data.UserId,
-                MotelId = data.MotelId
-            };
-            var result = await _db.Ticket.AddAsync(ticket);
-            await _db.SaveChangesAsync();
-            if (data.imgs != null && data.imgs.Count() > 0 && data.imgs.Count() <= 4)
-            {
-                foreach (var item in data.imgs)
+                var ticket = new Ticket()
                 {
-                    var url = await _firebase.UploadFileAsync(item);
-                    if (!string.IsNullOrEmpty(url))
+                    Type = data.Type,
+                    Title = data.Title,
+                    Content = data.Content,
+                    CreateDate = DateTime.Now,
+                    Status = 1,
+                    UserId = user.Id,
+                    MotelId = data.MotelId
+                };
+                if (await _roleManager.RoleExistsAsync("Admin"))
+                {
+                    var usersInRole = await _userManager.GetUsersInRoleAsync("Admin");
+                    var firstAdminUser = usersInRole.FirstOrDefault();
+                    var admin = await _db.User.FirstOrDefaultAsync(x => x.Email == firstAdminUser.Email);
+                    if (string.IsNullOrEmpty(data.Receiver) && admin != null)
                     {
-                        var img = new Image()
-                        {
-                            Link = url,
-                            Type = item.ContentType,
-                            TicketId = result.Entity.Id
-                        };
-                        await _db.Image.AddAsync(img);
-                        await _db.SaveChangesAsync();
+                        ticket.Receiver = admin.Id.ToString();
                     }
                 }
+                var result = await _db.Ticket.AddAsync(ticket);
+                await _db.SaveChangesAsync();
+                if (data.imgs != null && data.imgs.Count() > 0 && data.imgs.Count() <= 4)
+                {
+                    foreach (var item in data.imgs)
+                    {
+                        var url = await _firebase.UploadFileAsync(item);
+                        if (!string.IsNullOrEmpty(url))
+                        {
+                            var img = new Image()
+                            {
+                                Link = url,
+                                Type = item.ContentType,
+                                TicketId = result.Entity.Id
+                            };
+                            await _db.Image.AddAsync(img);
+                            await _db.SaveChangesAsync();
+                        }
+                    }
+                }
+                var map = _mapper.Map<DTOs.Ticket.Tickets>(result.Entity);
+                return map;
             }
-            var map = _mapper.Map<DTOs.Ticket.Tickets>(result.Entity);
-            return map;
+            return null;
         }
 
         public async Task<Ticket?> UpdateTicketAsync(DTOs.Ticket.Update data)
