@@ -1,10 +1,10 @@
 ﻿using BACK_END.DTOs.Auth;
+using BACK_END.DTOs.MainDto;
 using BACK_END.DTOs.Repository;
 using BACK_END.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Mail;
-using System.Runtime.InteropServices;
 
 namespace BACK_END.Controllers
 {
@@ -77,7 +77,8 @@ namespace BACK_END.Controllers
                     {
 
                         fullErrorMessage = string.Join("; ", "Email đã tồn tại.");
-                    } else
+                    }
+                    else
                     {
                         fullErrorMessage = string.Join("; ", fullErrorMessage, "Email đã tồn tại.");
                     }
@@ -88,7 +89,8 @@ namespace BACK_END.Controllers
                     {
 
                         fullErrorMessage = string.Join("; ", "Phone đã tồn tại.");
-                    } else
+                    }
+                    else
                     {
                         fullErrorMessage = string.Join("; ", fullErrorMessage, "Phone đã tồn tại.");
                     }
@@ -538,5 +540,64 @@ namespace BACK_END.Controllers
                 });
             }
         }
+
+        [HttpPut("update-user-from-token")]
+        public async Task<IActionResult> UpdateUserFromToken(
+    [FromQuery] string token,
+    [FromForm] userDetailDto dto)
+        {
+            if (string.IsNullOrEmpty(token))
+            {
+                return BadRequest("Token không được để trống.");
+            }
+
+            if (dto == null)
+            {
+                return BadRequest("Dữ liệu cập nhật không hợp lệ.");
+            }
+
+            var isUpdated = await _auth.UpdateUserFromToken(token, dto);
+            if (isUpdated != null)
+            {
+                return Ok(isUpdated);
+            }
+
+            return BadRequest("Cập nhật thông tin thất bại.");
+        }
+
+        [HttpPost("ChangePasswordFromToken")]
+        public async Task<IActionResult> ChangePasswordFromToken([FromQuery] string token, [FromBody] ChangePasswordDto dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var result = await _auth.ChangePasswordFromTokenAsync(token, dto);
+            if (result)
+            {
+                return Ok(new { Message = "Password changed successfully." });
+            }
+            return BadRequest(new { Message = "Failed to change password. Please check the current password." });
+        }
+
+        [HttpGet("GetUserDetailsFromToken")]
+        public async Task<IActionResult> GetUserDetailsFromToken([FromQuery] string token)
+        {
+            var userDetails = await _auth.GetUserDetailsFromTokenAsync(token);
+            if (userDetails == null)
+                return NotFound("User not found or invalid token");
+            return Ok(userDetails);
+        }
+
+        [HttpGet("GetRentalRoomDetail")]
+        public async Task<IActionResult> GetRentalRoomDetail([FromQuery] string token)
+        {
+            var roomDetail = await _auth.GetRentalRoomDetailsAsync(token);
+            if (roomDetail == null)
+                return NotFound("User not found or invalid token");
+            return Ok(roomDetail);
+        }
+
     }
 }

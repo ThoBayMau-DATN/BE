@@ -13,10 +13,11 @@ namespace BACK_END.Models
         public int Price { get; set; }
         public int NewPrice { get; set; }
         public DateTime CreateDate { get; set; } = DateTime.Now;
-        public DateTime? UpdateDate { get; set; } = DateTime.Now;
+        public DateTime UpdateDate { get; set; } = DateTime.Now;
         [Column(TypeName = "tinyint")]
         public int? Status { get; set; } = 1;
         public int? MotelId { get; set; }
+
         public virtual Motel? Motel { get; set; }
         public virtual List<Image>? Images { get; set; }
         public virtual List<Room>? Rooms { get; set; }
