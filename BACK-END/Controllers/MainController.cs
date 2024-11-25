@@ -1,4 +1,6 @@
-﻿using BACK_END.DTOs.Repository;
+﻿using BACK_END.DTOs.MainDto;
+using BACK_END.DTOs.Repository;
+using BACK_END.DTOs.UserDto;
 using BACK_END.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -60,6 +62,7 @@ namespace BACK_END.Controllers
             });
         }
 
+
         [HttpGet("get-rental-history")]
         public async Task<IActionResult> GetRentalRoomHistory([FromQuery] string token, [FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10)
         {
@@ -79,6 +82,70 @@ namespace BACK_END.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "An error occurred", details = ex.Message });
+             }
+          }
+        class CustomData
+        {
+            public List<RoomTypeDTO> list { get; set; }
+            public int TotalPage { get; set; }
+        }
+        //search room type by Province or Districtname or Ward
+        
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchRoomTypeByLocationAsync(
+        [FromQuery] string? Province,
+        [FromQuery] string? District,
+        [FromQuery] string? Ward,
+        [FromQuery] string? search,
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 10,
+        [FromQuery] string? sortOption = null,
+        [FromQuery] decimal? minPrice = null,     // New parameter for minimum price
+        [FromQuery] decimal? maxPrice = null,     // New parameter for maximum price
+        [FromQuery] double? minArea = null,       // New parameter for minimum area
+        [FromQuery] double? maxArea = null
+
+
+
+        )// Thêm tham số sortOption
+        {
+            try
+            {
+                var result = await _repo.SearchRoomTypeByLocationAsync(Province, District, Ward, search, pageNumber, pageSize, sortOption, minPrice, maxPrice, minArea, maxArea);
+
+                if (!result.Any())
+                {
+                    return NotFound(new ApiResponse<object>
+                    {
+                        Code = 404,
+                        Status = "error",
+                        Message = "Không tìm thấy kết quả nào",
+                        Data = null
+                    });
+                }
+
+                return Ok(new ApiResponse<object>
+                {
+                    Code = 200,
+                    Status = "success",
+                    Message = "Lấy danh sách thành công",
+                    Data = new CustomData
+                    {
+                        list = result,  // Access the paginated items
+                        TotalPage = result.TotalPages
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                return BadRequest(new ApiResponse<string>
+                {
+                    Code = 400,
+                    Status = "error",
+                    Message = "Đã xảy ra lỗi",
+                    Data = ex.Message
+                });
             }
         }
     }
