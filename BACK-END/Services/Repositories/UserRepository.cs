@@ -1,11 +1,11 @@
 ﻿using BACK_END.Data;
+using BACK_END.DTOs.MainDto;
 using BACK_END.DTOs.UserDto;
 using BACK_END.Models;
 using BACK_END.Services.Interfaces;
 using BACK_END.Services.MyServices;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
 
 namespace BACK_END.Services.Repositories
 {
@@ -290,22 +290,18 @@ namespace BACK_END.Services.Repositories
            return newUser;
         }
 
-        private Expression<Func<User, object>> GetSortProperty(string sortColumn)
-        {
-            throw new NotImplementedException();
-        }
 
         public async Task<User> UpdateUser(int id, UpdateUserRepositoryDto user)
         {
             // Tìm người dùng theo ID
             var existingUser = await _db.User.FindAsync(id);
             if (existingUser == null)
-                {
+            {
                 throw new KeyNotFoundException($"Không tìm thấy người dùng.");
             }
             //tìm người dùng trong identity trước khi cập nhật
             var identityUser = await _userManager.FindByEmailAsync(existingUser.Email);
-          
+
             if (identityUser == null)
             {
                 throw new KeyNotFoundException($"Identity user with ID {existingUser.Id} not found.");
@@ -364,6 +360,11 @@ namespace BACK_END.Services.Repositories
             return existingUser; // Trả về người dùng đã được cập nhật
         }
 
+        public Task<User> UpdateMainUser(int id, userDetailDto user)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<User> DeleteUser(int id)
         {
             // Tìm người dùng theo ID
@@ -416,6 +417,6 @@ namespace BACK_END.Services.Repositories
 
         }
 
-   
+        
     }
 }

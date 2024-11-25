@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BACK_END.Models
 {
@@ -15,10 +14,5 @@ namespace BACK_END.Models
         public DateTime CreateDate { get; set; } = DateTime.Now;
         [Column(TypeName = "tinyint")]
         public bool Status { get; set; } = true;
-        public int? RoomId { get; set; }
-        public Room? Room { get; set; }
-
-        public virtual ICollection<Motel>? Motels { get; set; }
     }
-
 }
