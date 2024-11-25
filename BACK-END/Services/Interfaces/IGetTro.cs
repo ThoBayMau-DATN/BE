@@ -1,7 +1,7 @@
 ﻿using BACK_END.DTOs.MainDto;
 using BACK_END.DTOs.MotelDto;
-using BACK_END.Services.Paging;
 using BACK_END.Services.MyServices;
+using BACK_END.Services.Paging;
 
 
 namespace BACK_END.Services.Interfaces
