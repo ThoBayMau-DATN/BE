@@ -38,8 +38,9 @@ namespace BACK_END.Migrations
 
                     b.Property<int?>("RoomId")
                         .HasColumnType("int");
-                    b.Property<bool>("Status")
-                        .HasColumnType("bit");
+
+                    b.Property<byte>("Status")
+                        .HasColumnType("tinyint");
 
                     b.Property<int>("Total")
                         .HasColumnType("int");
@@ -796,7 +797,7 @@ namespace BACK_END.Migrations
             modelBuilder.Entity("BACK_END.Models.Consumption", b =>
                 {
                     b.HasOne("BACK_END.Models.Room", "Room")
-                        .WithMany()
+                        .WithMany("Consumption")
                         .HasForeignKey("RoomId");
 
                     b.Navigation("Room");
@@ -858,10 +859,11 @@ namespace BACK_END.Migrations
 
             modelBuilder.Entity("BACK_END.Models.Room", b =>
                 {
-
                     b.HasOne("BACK_END.Models.Room_Type", "Room_Type")
-                        .WithMany("rooms")
+                        .WithMany("Rooms")
                         .HasForeignKey("Room_TypeId");
+
+                    b.Navigation("Room_Type");
                 });
 
             modelBuilder.Entity("BACK_END.Models.Room_History", b =>
@@ -1014,13 +1016,24 @@ namespace BACK_END.Migrations
             modelBuilder.Entity("BACK_END.Models.Motel", b =>
                 {
                     b.Navigation("Room_Types");
+
+                    b.Navigation("Services");
+                });
+
+            modelBuilder.Entity("BACK_END.Models.Room", b =>
+                {
+                    b.Navigation("Consumption");
+
+                    b.Navigation("History");
                 });
 
             modelBuilder.Entity("BACK_END.Models.Room_Type", b =>
                 {
                     b.Navigation("Images");
 
-                    b.Navigation("rooms");
+                    b.Navigation("Reviews");
+
+                    b.Navigation("Rooms");
                 });
 
             modelBuilder.Entity("BACK_END.Models.Ticket", b =>
