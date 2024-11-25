@@ -11,9 +11,11 @@ namespace BACK_END.Models
         public string? Title { get; set; }
         [Column(TypeName = "nvarchar(max)")]
         public string? Content { get; set; }
+        [Column(TypeName = "nvarchar(50)")]
         public string? Sender { get; set; }
+        public DateTime CreateDate { get; set; } = DateTime.Now;
         [Column(TypeName = "tinyint")]
-        public int Status { get; set; }
+        public bool Status { get; set; }
     }
-    
+
 }

@@ -64,72 +64,114 @@ namespace BACK_END.Mappers
                     Electric = x?.Electric ?? 0,
                     Other = x?.Other ?? 0
                 }).FirstOrDefault(),
-               
+
             };
         }*/
 
-        public static (Motel motel, List<Room> ListRoom, Price price) MapToMotelAndRoom(this AddMotelAndRoomDto dto)
+        public static (Motel motels, List<Room> rooms, Room_Type roomType, List<Service>? services) MapToAddMotel(this AddMotelDto dto)
         {
-            var motel = new Motel
+            var motels = new Motel
             {
                 Name = dto.Name,
                 Address = dto.Address,
-                UserId = dto.UserId,
+                Description = dto.Description,
+                Location = dto.Location,
                 Status = 1,
-                CreateDate = DateTime.Now
+                CreateDate = DateTime.Now,
+                UserId = dto.OwnerId
+            };
+
+            var roomType = new Room_Type
+            {
+                Name = dto.NameRoomType,
+                Description = dto.DescriptionRoomType,
+                Area = dto.Area,
+                Price = dto.Price,
             };
 
 
-            var ListRoom = new List<Room>();
-            for(int i = 0; i < dto.TotalRoom; i++)
+            var rooms = new List<Room>();
+            for (int i = 0; i < dto.QuantityRoom; i++)
             {
-                ListRoom.Add(new Room{
+                rooms.Add(new Room
+                {
                     RoomNumber = i + 1,
-                    Area = dto.Area,
-                    Price = dto.PriceRoom,
-                    Status = 1
+                    Status = 1,
                 });
             }
 
-            var price = new Price
+            List<Service>? services = null;
+            if (dto.Services != null)
             {
-                Water = dto.PriceWater,
-                Electric = dto.PriceElectric,
-                Other = dto.PriceOther,
-                MotelId = motel.Id
-            };
+                services = new List<Service>();
+                foreach (var item in dto.Services)
+                {
+                    services.Add(new Service
+                    {
+                        Name = item.Name,
+                        Description = item.Description,
+                        Price = item.Price,
+                    });
+                }
 
-            return (motel, ListRoom, price);
+            }
+
+
+
+            return (motels, rooms, roomType, services);
         }
-        public static (Motel motel, Price price) MapToMotelAndPrice(this UpdateMotelDto dto)
+
+        public static (Room_Type roomType, List<Room> rooms) MapToAddRoomType(this AddRoomTypeDto dto)
         {
-            var motel = new Motel
+            var roomType = new Room_Type
             {
                 Name = dto.Name,
-                Address = dto.Address,
+                Description = dto.Description,
+                Area = dto.Area,
+                Price = dto.Price,
             };
 
-            var price = new Price
+            var rooms = new List<Room>();
+            for (int i = 0; i < dto.QuantityRoom; i++)
             {
-                Water = dto?.Water ?? 0,
-                Electric = dto?.Electric ?? 0,
-                Other = dto?.Other ?? 0
-            };
+                rooms.Add(new Room
+                {
+                    RoomNumber = i + 1,
+                    Status = 1,
+                });
+            }
 
-            return (motel, price);
+            return (roomType, rooms);
         }
-        public static GetRoomByMotelIdDto MapToGetRoomByMotelIdDto(this Room room)
-        {
-            return new GetRoomByMotelIdDto
-            {
-                Id = room.Id,
-                RoomNumber = room.RoomNumber,
-                Area = room.Area,
-                UserFromRoom = room.Users?.Count ?? 0,
-                Price = room.Price,
-                Status = room.Status
-            };
-        }
+        // public static (Motel motel, Price price) MapToMotelAndPrice(this UpdateMotelDto dto)
+        // {
+        //     var motel = new Motel
+        //     {
+        //         Name = dto.Name,
+        //         Address = dto.Address,
+        //     };
+
+        //     var price = new Price
+        //     {
+        //         Water = dto?.Water ?? 0,
+        //         Electric = dto?.Electric ?? 0,
+        //         Other = dto?.Other ?? 0
+        //     };
+
+        //     return (motel, price);
+        // }
+        // public static GetRoomByMotelIdDto MapToGetRoomByMotelIdDto(this Room room)
+        // {
+        //     return new GetRoomByMotelIdDto
+        //     {
+        //         Id = room.Id,
+        //         RoomNumber = room.RoomNumber,
+        //         Area = room.Area,
+        //         UserFromRoom = room.Users?.Count ?? 0,
+        //         Price = room.Price,
+        //         Status = room.Status
+        //     };
+        // }
         /*public static ImageDto MapToImageDto(this Image image)
         {
             return new ImageDto

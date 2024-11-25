@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using BACK_END.DTOs.MotelDto;
 using BACK_END.DTOs.NotiDto;
-using BACK_END.DTOs.RoomDto;
 using BACK_END.Models;
 
 namespace BACK_END.Mappers
@@ -20,11 +19,11 @@ namespace BACK_END.Mappers
             .ForMember(dest => dest.PageSize, opt => opt.MapFrom(src => src.PageSize))
             .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src));
 
-            CreateMap<Room, GetRoomById>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.RoomNumber, opt => opt.MapFrom(src => src.RoomNumber))
-                .ForMember(dest => dest.Area, opt => opt.MapFrom(src => src.Area))
-                .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Price));
+            //CreateMap<Room, GetRoomById>()
+            //    .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+            //    .ForMember(dest => dest.RoomNumber, opt => opt.MapFrom(src => src.RoomNumber))
+            //    .ForMember(dest => dest.Area, opt => opt.MapFrom(src => src.Area))
+            //    .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Price));
 
             CreateMap<Motel, MotelAvailabilityDTO>()
             .ForMember(dest => dest.MotelName, opt => opt.MapFrom(src => src.Name))
@@ -48,9 +47,6 @@ namespace BACK_END.Mappers
             .ForMember(dest => dest.PageNumber, opt => opt.MapFrom(src => src.CurrentPage))
             .ForMember(dest => dest.PageSize, opt => opt.MapFrom(src => src.PageSize))
             .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src));
-
-
-
         }
     }
 }

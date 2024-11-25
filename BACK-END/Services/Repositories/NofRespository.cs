@@ -25,7 +25,7 @@ namespace BACK_END.Services.Repositories
 
         public async Task<Notification> addNotificationAsync(Notification notification)
         {
-            notification.Status = 1;
+            notification.Status = false;
             await _db.AddAsync(notification);
             await _db.SaveChangesAsync();
             return notification;
@@ -35,7 +35,7 @@ namespace BACK_END.Services.Repositories
         {
             IQueryable<Notification> data = _db.Notification;
 
-            if (notiQuery.Status > 0)
+            if (notiQuery.Status)
             {
                 data = data.Where(x => x.Status == notiQuery.Status);
             }
@@ -53,7 +53,7 @@ namespace BACK_END.Services.Repositories
         public async Task<List<Notification>> GetSentNotificationsAsync(int userId)
         {
             return await _db.User_Notification
-                .Where(un => un.UserId == userId && un.Notification!.Status == 2)
+                .Where(un => un.UserId == userId && un.Notification!.Status == true)
                 .Include(un => un.Notification)
                 .Select(un => un.Notification)
                 .ToListAsync();
@@ -76,7 +76,7 @@ namespace BACK_END.Services.Repositories
                 return null;
             }
 
-            notification.Status = 2;
+            notification.Status = true;
             _db.Notification.Update(notification);
 
             var usersInRole = await GetUsersByRoleAsync(roleName);
@@ -103,7 +103,7 @@ namespace BACK_END.Services.Repositories
             return notification;
         }
 
-        
+
 
 
         public async Task<Notification> updateNotificationAsync(Notification notification, int id)
@@ -116,7 +116,7 @@ namespace BACK_END.Services.Repositories
             notiExist.Type = notification.Type;
             notiExist.Title = notification.Title;
             notiExist.Content = notification.Content;
-            notiExist.Status = 0;
+            notiExist.Status = false;
             await _db.SaveChangesAsync();
             return notification;
         }
