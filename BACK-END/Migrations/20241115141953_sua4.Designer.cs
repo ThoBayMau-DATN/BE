@@ -4,6 +4,7 @@ using BACK_END.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BACK_END.Migrations
 {
     [DbContext(typeof(BACK_ENDContext))]
-    partial class BACK_ENDContextModelSnapshot : ModelSnapshot
+    [Migration("20241115141953_sua4")]
+    partial class sua4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -38,20 +41,13 @@ namespace BACK_END.Migrations
 
                     b.Property<int?>("RoomId")
                         .HasColumnType("int");
-                    b.Property<bool>("Status")
-                        .HasColumnType("bit");
 
-                    b.Property<int>("Total")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
+                    b.Property<byte>("Status")
+                        .HasColumnType("tinyint");
 
                     b.HasKey("Id");
 
                     b.HasIndex("RoomId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Bill");
                 });
@@ -162,11 +158,8 @@ namespace BACK_END.Migrations
                     b.Property<string>("Content")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreateDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Sender")
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<byte>("Status")
                         .HasColumnType("tinyint");
@@ -362,7 +355,7 @@ namespace BACK_END.Migrations
                     b.Property<byte?>("Status")
                         .HasColumnType("tinyint");
 
-                    b.Property<DateTime>("UpdateDate")
+                    b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
@@ -383,11 +376,14 @@ namespace BACK_END.Migrations
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("DateEnd")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DateStart")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("EndDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<int?>("MotelId")
                         .HasColumnType("int");
@@ -397,9 +393,6 @@ namespace BACK_END.Migrations
 
                     b.Property<int>("Price")
                         .HasColumnType("int");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<byte>("Status")
                         .HasColumnType("tinyint");
@@ -510,9 +503,6 @@ namespace BACK_END.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Content")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int?>("TicketId")
                         .HasColumnType("int");
 
@@ -561,9 +551,6 @@ namespace BACK_END.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool?>("Is_Read")
-                        .HasColumnType("bit");
 
                     b.Property<int?>("NotificationId")
                         .HasColumnType("int");
@@ -784,13 +771,7 @@ namespace BACK_END.Migrations
                         .WithMany()
                         .HasForeignKey("RoomId");
 
-                    b.HasOne("BACK_END.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
-
                     b.Navigation("Room");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("BACK_END.Models.Consumption", b =>
@@ -820,7 +801,7 @@ namespace BACK_END.Migrations
             modelBuilder.Entity("BACK_END.Models.Motel", b =>
                 {
                     b.HasOne("BACK_END.Models.User", "User")
-                        .WithMany()
+                        .WithMany("Motels")
                         .HasForeignKey("UserId");
 
                     b.Navigation("User");
@@ -832,13 +813,13 @@ namespace BACK_END.Migrations
                         .WithMany()
                         .HasForeignKey("PackageId");
 
-                    b.HasOne("BACK_END.Models.User", "User")
+                    b.HasOne("BACK_END.Models.User", "Motel")
                         .WithMany()
                         .HasForeignKey("UserId");
 
-                    b.Navigation("Package");
+                    b.Navigation("Motel");
 
-                    b.Navigation("User");
+                    b.Navigation("Package");
                 });
 
             modelBuilder.Entity("BACK_END.Models.Review", b =>
@@ -858,9 +839,8 @@ namespace BACK_END.Migrations
 
             modelBuilder.Entity("BACK_END.Models.Room", b =>
                 {
-
-                    b.HasOne("BACK_END.Models.Room_Type", "Room_Type")
-                        .WithMany("rooms")
+                    b.HasOne("BACK_END.Models.Room_Type", null)
+                        .WithMany("Rooms")
                         .HasForeignKey("Room_TypeId");
                 });
 
@@ -1014,18 +994,32 @@ namespace BACK_END.Migrations
             modelBuilder.Entity("BACK_END.Models.Motel", b =>
                 {
                     b.Navigation("Room_Types");
+
+                    b.Navigation("Services");
+                });
+
+            modelBuilder.Entity("BACK_END.Models.Room", b =>
+                {
+                    b.Navigation("History");
                 });
 
             modelBuilder.Entity("BACK_END.Models.Room_Type", b =>
                 {
                     b.Navigation("Images");
 
-                    b.Navigation("rooms");
+                    b.Navigation("Reviews");
+
+                    b.Navigation("Rooms");
                 });
 
             modelBuilder.Entity("BACK_END.Models.Ticket", b =>
                 {
                     b.Navigation("Images");
+                });
+
+            modelBuilder.Entity("BACK_END.Models.User", b =>
+                {
+                    b.Navigation("Motels");
                 });
 #pragma warning restore 612, 618
         }

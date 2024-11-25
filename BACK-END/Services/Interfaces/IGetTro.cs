@@ -11,7 +11,5 @@ namespace BACK_END.Services.Interfaces
         Task<List<RoomTypeWithPackageDTO>> GetRoomTypesUnderOneMillionAsync();
 
         Task<RoomTypeDTO> GetRoomTypeByRoomID(int id);
-
-        
     }
 }
