@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
 using BACK_END.Data;
 using BACK_END.DTOs.MainDto;
+using BACK_END.DTOs.MotelDto;
 using BACK_END.Services.Interfaces;
+using BACK_END.Services.Paging;
 using Microsoft.EntityFrameworkCore;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace BACK_END.Services.Repositories
 {
@@ -135,6 +138,65 @@ namespace BACK_END.Services.Repositories
             return Task.FromResult(roomTypeDTO);
         }
 
+        private string? HandlerToken(string token)
+        {
+            try
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var jwtToken = tokenHandler.ReadJwtToken(token);
 
+                return jwtToken.Claims.FirstOrDefault(x => x.Type == "sub")?.Value;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Token error: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<PaginatedResponse<Rentalroomuser>> GetRentalRoomHistoryAsync(string token, int pageIndex, int pageSize)
+        {
+            var email = HandlerToken(token);
+            if (string.IsNullOrEmpty(email))
+                throw new UnauthorizedAccessException("Invalid token");
+
+            var user = await _db.User.FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null)
+                throw new KeyNotFoundException("User not found");
+
+            // Truy vấn Room_History theo UserId
+            var query = _db.Room_History
+                .Where(rh => rh.UserId == user.Id)
+                .Include(rh => rh.Room)
+                    .ThenInclude(r => r.Room_Type)
+                    .ThenInclude(rt => rt.Motel)
+                .Select(rh => new Rentalroomuser
+                {
+                    RoomId = rh.RoomId ?? 0,
+                    CreateDate = rh.CreateDate,
+                    EndDate = rh.EndDate,
+                    RoomNumber = rh.Room.RoomNumber,
+                    Price = rh.Room.Room_Type.Price,
+                    MotelName = rh.Room.Room_Type.Motel.Name
+                });
+
+            // Phân trang
+            var totalItems = await query.CountAsync();
+            var data = await query
+                .Skip((pageIndex - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new PaginatedResponse<Rentalroomuser>
+            {
+                TotalItems = totalItems,
+                Items = data
+            };
+        }
+
+        //public Task<PaginatedResponse<BillDto>> GetBillAsync(int id, int pageIndex, int pageSize)
+        //{
+        //    var Billdetail = _db.Room.Where
+        //}
     }
 }
