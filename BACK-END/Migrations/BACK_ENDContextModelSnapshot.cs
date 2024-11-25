@@ -30,24 +30,29 @@ namespace BACK_END.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreateDate")
+                    b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Price_Room")
+                    b.Property<int>("PriceRoom")
                         .HasColumnType("int");
 
                     b.Property<int?>("RoomId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("Status")
-                        .HasColumnType("bit");
+                    b.Property<byte>("Status")
+                        .HasColumnType("tinyint");
 
                     b.Property<int>("Total")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("RoomId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Bill");
                 });
@@ -87,10 +92,10 @@ namespace BACK_END.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("ImageId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Link")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("Room_TypeId")
@@ -103,8 +108,6 @@ namespace BACK_END.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ImageId");
 
                     b.HasIndex("Room_TypeId");
 
@@ -254,8 +257,8 @@ namespace BACK_END.Migrations
                     b.Property<string>("Content")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Rating")
-                        .HasColumnType("int");
+                    b.Property<float>("Rating")
+                        .HasColumnType("real");
 
                     b.Property<int?>("Room_TypeId")
                         .HasColumnType("int");
@@ -313,11 +316,11 @@ namespace BACK_END.Migrations
                     b.Property<int?>("RoomId")
                         .HasColumnType("int");
 
+                    b.Property<byte?>("Status")
+                        .HasColumnType("tinyint");
+
                     b.Property<int?>("UserId")
                         .HasColumnType("int");
-
-                    b.Property<byte?>("status")
-                        .HasColumnType("tinyint");
 
                     b.HasKey("Id");
 
@@ -360,7 +363,7 @@ namespace BACK_END.Migrations
                     b.Property<byte?>("Status")
                         .HasColumnType("tinyint");
 
-                    b.Property<DateTime?>("UpdateDate")
+                    b.Property<DateTime>("UpdateDate")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
@@ -384,23 +387,26 @@ namespace BACK_END.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<int?>("MotelId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("New_Price")
-                        .HasColumnType("int");
-
                     b.Property<int>("Price")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("UpdateDate")
+                    b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<byte>("status")
+                    b.Property<byte>("Status")
                         .HasColumnType("tinyint");
+
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -779,13 +785,19 @@ namespace BACK_END.Migrations
                         .WithMany()
                         .HasForeignKey("RoomId");
 
+                    b.HasOne("BACK_END.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
                     b.Navigation("Room");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("BACK_END.Models.Consumption", b =>
                 {
                     b.HasOne("BACK_END.Models.Room", "Room")
-                        .WithMany()
+                        .WithMany("Consumption")
                         .HasForeignKey("RoomId");
 
                     b.Navigation("Room");
@@ -793,10 +805,6 @@ namespace BACK_END.Migrations
 
             modelBuilder.Entity("BACK_END.Models.Image", b =>
                 {
-                    b.HasOne("BACK_END.Models.Image", null)
-                        .WithMany("Images")
-                        .HasForeignKey("ImageId");
-
                     b.HasOne("BACK_END.Models.Room_Type", "Room_Type")
                         .WithMany("Images")
                         .HasForeignKey("Room_TypeId");
@@ -837,7 +845,7 @@ namespace BACK_END.Migrations
             modelBuilder.Entity("BACK_END.Models.Review", b =>
                 {
                     b.HasOne("BACK_END.Models.Room_Type", "Room_Type")
-                        .WithMany()
+                        .WithMany("Reviews")
                         .HasForeignKey("Room_TypeId");
 
                     b.HasOne("BACK_END.Models.User", "User")
@@ -852,7 +860,7 @@ namespace BACK_END.Migrations
             modelBuilder.Entity("BACK_END.Models.Room", b =>
                 {
                     b.HasOne("BACK_END.Models.Room_Type", "Room_Type")
-                        .WithMany()
+                        .WithMany("Rooms")
                         .HasForeignKey("Room_TypeId");
 
                     b.Navigation("Room_Type");
@@ -861,7 +869,7 @@ namespace BACK_END.Migrations
             modelBuilder.Entity("BACK_END.Models.Room_History", b =>
                 {
                     b.HasOne("BACK_END.Models.Room", "Room")
-                        .WithMany()
+                        .WithMany("History")
                         .HasForeignKey("RoomId");
 
                     b.HasOne("BACK_END.Models.User", "User")
@@ -885,7 +893,7 @@ namespace BACK_END.Migrations
             modelBuilder.Entity("BACK_END.Models.Service", b =>
                 {
                     b.HasOne("BACK_END.Models.Motel", "Motel")
-                        .WithMany()
+                        .WithMany("Services")
                         .HasForeignKey("MotelId");
 
                     b.Navigation("Motel");
@@ -1005,19 +1013,27 @@ namespace BACK_END.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("BACK_END.Models.Image", b =>
-                {
-                    b.Navigation("Images");
-                });
-
             modelBuilder.Entity("BACK_END.Models.Motel", b =>
                 {
                     b.Navigation("Room_Types");
+
+                    b.Navigation("Services");
+                });
+
+            modelBuilder.Entity("BACK_END.Models.Room", b =>
+                {
+                    b.Navigation("Consumption");
+
+                    b.Navigation("History");
                 });
 
             modelBuilder.Entity("BACK_END.Models.Room_Type", b =>
                 {
                     b.Navigation("Images");
+
+                    b.Navigation("Reviews");
+
+                    b.Navigation("Rooms");
                 });
 
             modelBuilder.Entity("BACK_END.Models.Ticket", b =>

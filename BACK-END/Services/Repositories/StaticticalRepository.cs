@@ -25,8 +25,8 @@ namespace BACK_END.Services.Repositories
             var sixMonthsAgo = DateTime.Now.AddMonths(-5);
 
             var monthlyRevenue = await _db.Bill
-                .Where(bill => bill.CreateDate >= sixMonthsAgo)
-                .GroupBy(bill => new { bill.CreateDate.Year, bill.CreateDate.Month })
+                .Where(bill => bill.CreatedDate >= sixMonthsAgo)
+                .GroupBy(bill => new { bill.CreatedDate.Year, bill.CreatedDate.Month })
                 .Select(g => new MonthlyRevenueDto
                 {
                     Month = g.Key.Month.ToString(),
