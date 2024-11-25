@@ -12,10 +12,12 @@ namespace BACK_END.Controllers
     public class TicketController : Controller
     {
         private readonly ITicket _ticketRepository;
+        private readonly FirebaseStorageService _firebaseStorageService;
 
-        public TicketController(ITicket ticketRepository)
+        public TicketController(ITicket ticketRepository, FirebaseStorageService firebaseStorageService)
         {
             _ticketRepository = ticketRepository;
+            _firebaseStorageService = firebaseStorageService;
         }
         [HttpGet]
         public async Task<IActionResult> Tickets([FromQuery] DTOs.Ticket.TicketQuery ticketQuery)
@@ -168,6 +170,24 @@ namespace BACK_END.Controllers
                     Data = null
                 });
             }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Imgtest([FromForm] List<IFormFile> imgs)
+        {
+            var imageLinks = new List<string>();
+            if (imgs != null && imgs.Count > 0)
+            {
+                foreach (var item in imgs)
+                {
+                    var url = await _firebaseStorageService.UploadFileAsync(item);
+                    if (!string.IsNullOrEmpty(url))
+                    {
+                        imageLinks.Add(url);
+                    }
+                }
+            }
+            return Ok(imageLinks);
         }
     }
 }
