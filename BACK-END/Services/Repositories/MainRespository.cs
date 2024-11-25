@@ -3,9 +3,8 @@ using BACK_END.Data;
 using BACK_END.DTOs.MainDto;
 using BACK_END.DTOs.MotelDto;
 using BACK_END.Services.Interfaces;
-using BACK_END.Services.Paging;
 using BACK_END.Services.MyServices;
-using Microsoft.Build.Evaluation;
+using BACK_END.Services.Paging;
 using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
 
@@ -289,6 +288,26 @@ namespace BACK_END.Services.Repositories
             };
         }
 
+        public async Task<PaginatedResponse<BillDto>> GetBillAsync(int id, int pageIndex, int pageSize)
+        {
+            var BillDetail = _db.Bill.Where(x => x.RoomId == id).Select(b => new BillDto
+            {
+                Id = b.Id,
+                PriceRoom = b.PriceRoom,
+                Status = b.Status,
+                CreatedDate = b.CreatedDate,
+                Total = b.Total,
+            });
 
+            var totalItems = await BillDetail.CountAsync();
+            var data = await BillDetail.Skip((pageIndex - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+            return new PaginatedResponse<BillDto>
+            {
+                TotalItems = totalItems,
+                Items = data
+            };
+        }
     }
 }
