@@ -139,18 +139,20 @@ namespace BACK_END.Services.Repositories
             return Task.FromResult(roomTypeDTO);
         }
         public async Task<PagedList<RoomTypeDTO>> SearchRoomTypeByLocationAsync(
-     string? Province,
-     string? District,
-     string? Ward,
-     string? search,
-     int pageNumber,
-     int pageSize = 10,
-     string? sortOption = null,
-     decimal? minPrice = null,
-     decimal? maxPrice = null,
-     double? minArea = null,
-     double? maxArea = null
- )
+         string? Province,
+         string? District,
+         string? Ward,
+         string? search,
+         int pageNumber,
+         int pageSize = 10,
+         string? sortOption = null,
+         decimal? minPrice = null,
+         decimal? maxPrice = null,
+         double? minArea = null,
+         double? maxArea = null,
+         List<string>? surrounding = null
+
+        )
         {
             // Nếu tất cả thông tin tìm kiếm đều rỗng, trả về danh sách rỗng
             if (string.IsNullOrEmpty(Province) && string.IsNullOrEmpty(District)
@@ -202,6 +204,11 @@ namespace BACK_END.Services.Repositories
             {
                 query = query.Where(rt => rt.Area <= maxArea.Value);
             }
+            if (surrounding != null && surrounding.Any())
+            {
+                query = query.Where(rt => surrounding.All(s => rt.Motel.Description.Contains(s)));
+            }
+                
 
             // Sắp xếp theo tùy chọn
             query = sortOption?.ToLower() switch

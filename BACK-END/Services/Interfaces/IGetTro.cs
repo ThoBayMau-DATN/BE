@@ -21,6 +21,6 @@ namespace BACK_END.Services.Interfaces
         Task<PaginatedResponse<BillDto>> GetBillAsync(int id, int pageIndex, int pageSize);
 
         //search room type by Province or Districtname or Ward
-        Task<PagedList<RoomTypeDTO>> SearchRoomTypeByLocationAsync( string? Province,string? District,string? Ward,string? search,int pageNumber,int pageSize, string? sortOption, decimal? minPrice,decimal? maxPrice, double? minArea, double? maxArea);
+        Task<PagedList<RoomTypeDTO>> SearchRoomTypeByLocationAsync( string? Province,string? District,string? Ward,string? search,int pageNumber,int pageSize, string? sortOption, decimal? minPrice,decimal? maxPrice, double? minArea, double? maxArea, List<string>? surrounding);
     }
 }
