@@ -239,7 +239,7 @@ namespace BACK_END.Services.Repositories
             return await PagedList<RoomTypeDTO>.CreateAsync(projectedQuery, pageNumber, pageSize);
         }
 
- private string? HandlerToken(string token)
+        private string? HandlerToken(string token)
         {
             try
             {
@@ -255,7 +255,7 @@ namespace BACK_END.Services.Repositories
             }
         }
 
-        public async Task<PaginatedResponse<Rentalroomuser>> GetRentalRoomHistoryAsync(string token, int pageIndex, int pageSize)
+        public async Task<PaginatedResponse<Rentalroomuser>> GetRentalRoomHistoryAsync(string token, int pageIndex, int pageSize, string searchTerm)
         {
             var email = HandlerToken(token);
             if (string.IsNullOrEmpty(email))
@@ -265,7 +265,6 @@ namespace BACK_END.Services.Repositories
             if (user == null)
                 throw new KeyNotFoundException("User not found");
 
-            // Truy vấn Room_History theo UserId
             var query = _db.Room_History
                 .Where(rh => rh.UserId == user.Id)
                 .Include(rh => rh.Room)
@@ -281,6 +280,14 @@ namespace BACK_END.Services.Repositories
                     MotelName = rh.Room.Room_Type.Motel.Name
                 });
 
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                query = query.Where(r =>
+                r.RoomNumber.ToString().Contains(searchTerm) ||
+                r.MotelName.Contains(searchTerm));
+            }
+
+
             // Phân trang
             var totalItems = await query.CountAsync();
             var data = await query
@@ -295,7 +302,8 @@ namespace BACK_END.Services.Repositories
             };
         }
 
-        public async Task<PaginatedResponse<BillDto>> GetBillAsync(int id, int pageIndex, int pageSize)
+
+        public async Task<PaginatedResponse<BillDto>> GetBillAsync(int id, int pageIndex, int pageSize, string searchTerm)
         {
             var BillDetail = _db.Bill.Where(x => x.RoomId == id).Select(b => new BillDto
             {
@@ -306,6 +314,16 @@ namespace BACK_END.Services.Repositories
                 Total = b.Total,
             });
 
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                BillDetail = BillDetail.Where(r =>
+                r.PriceRoom.ToString().Contains(searchTerm) ||
+                r.CreatedDate.ToString().Contains(searchTerm)
+                );
+
+
+            }
+
             var totalItems = await BillDetail.CountAsync();
             var data = await BillDetail.Skip((pageIndex - 1) * pageSize)
                 .Take(pageSize)
@@ -315,6 +333,62 @@ namespace BACK_END.Services.Repositories
                 TotalItems = totalItems,
                 Items = data
             };
+        }
+
+        public async Task<BilldetailDto> GetBillDetailsByIdAsync(int billId)
+        {
+            var bill = await _db.Bill
+                .Include(b => b.Room)
+                    .ThenInclude(r => r.Room_Type)
+                        .ThenInclude(rt => rt.Motel)
+                .Include(b => b.Room)
+                    .ThenInclude(r => r.Consumption)
+                    .Include(b => b.User)
+                .FirstOrDefaultAsync(b => b.Id == billId);
+
+            if (bill == null)
+                return null;
+
+            var room = bill.Room;
+
+            if (room == null)
+                return null;
+
+            var services = await _db.Service_Room
+                .Include(sr => sr.Service)
+                .Where(sr => sr.RoomId == room.Id)
+                .ToListAsync();
+
+            var consumption = room.Consumption?
+                .OrderByDescending(c => c.Time)
+                .FirstOrDefault();
+
+            var dto = new BilldetailDto
+            {
+                MotelName = room.Room_Type?.Motel?.Name,
+                Adress = room.Room_Type?.Motel?.Address,
+                RoomNumber = room.RoomNumber,
+                BillId = bill.Id,
+                CreateDate = bill.CreatedDate,
+                Status = bill.Status,
+                FullName = bill.User?.FullName,
+                Electric = consumption?.Electricity ?? 0,
+                Water = consumption?.Water ?? 0,
+                RoomPrice = room.Room_Type?.Price ?? 0,
+                WaterName = services.FirstOrDefault(s => s.Service?.Name == "Water")?.Service?.Name,
+                ElectricName = services.FirstOrDefault(s => s.Service?.Name == "Electric")?.Service?.Name,
+                WaterPrice = services.FirstOrDefault(s => s.Service?.Name == "Water")?.Service?.Price ?? 0,
+                ElectricPrice = services.FirstOrDefault(s => s.Service?.Name == "Electric")?.Service?.Price ?? 0,
+                OtherService = services
+                    .Where(s => s.Service?.Name != "Water" && s.Service?.Name != "Electric")
+                    .Select(s => new OtherServiceBillDTO
+                    {
+                        Name = s.Service?.Name,
+                        price = s.Service?.Price
+                    }).ToList()
+            };
+
+            return dto;
         }
     }
 }
