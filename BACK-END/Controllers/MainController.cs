@@ -2,6 +2,7 @@
 using BACK_END.DTOs.Repository;
 using BACK_END.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 
 namespace BACK_END.Controllers
 {
@@ -124,7 +125,8 @@ namespace BACK_END.Controllers
         [FromQuery] decimal? minPrice = null,     // New parameter for minimum price
         [FromQuery] decimal? maxPrice = null,     // New parameter for maximum price
         [FromQuery] double? minArea = null,       // New parameter for minimum area
-        [FromQuery] double? maxArea = null
+        [FromQuery] double? maxArea = null,
+        [FromQuery] string? surrounding = null
 
 
 
@@ -132,7 +134,13 @@ namespace BACK_END.Controllers
         {
             try
             {
-                var result = await _repo.SearchRoomTypeByLocationAsync(Province, District, Ward, search, pageNumber, pageSize, sortOption, minPrice, maxPrice, minArea, maxArea);
+
+                List<string> surroundingList = string.IsNullOrEmpty(surrounding)
+           ? new List<string>()
+           : surrounding.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+
+
+                var result = await _repo.SearchRoomTypeByLocationAsync(Province, District, Ward, search, pageNumber, pageSize, sortOption, minPrice, maxPrice, minArea, maxArea, surroundingList);
 
                 if (!result.Any())
                 {
