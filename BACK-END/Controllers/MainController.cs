@@ -63,11 +63,19 @@ namespace BACK_END.Controllers
 
 
         [HttpGet("get-rental-history")]
-        public async Task<IActionResult> GetRentalRoomHistory([FromQuery] string token, [FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10)
+        public async Task<IActionResult> GetRentalRoomHistory(
+            [FromQuery] string token,
+            [FromQuery] int pageIndex = 1,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] string searchTerm = null
+        ) // Thêm tham số searchTerm
+
+    
+    
         {
             try
             {
-                var result = await _repo.GetRentalRoomHistoryAsync(token, pageIndex, pageSize);
+                var result = await _repo.GetRentalRoomHistoryAsync(token, pageIndex, pageSize, searchTerm);
                 return Ok(result);
             }
             catch (UnauthorizedAccessException ex)
@@ -85,11 +93,11 @@ namespace BACK_END.Controllers
         }
 
         [HttpGet("get-Bill")]
-        public async Task<IActionResult> GetBillAsync(int id, [FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10)
+        public async Task<IActionResult> GetBillAsync(int id, [FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10, [FromQuery] string searchTerm = null)
         {
             try
             {
-                var result = await _repo.GetBillAsync(id, pageIndex, pageSize);
+                var result = await _repo.GetBillAsync(id, pageIndex, pageSize, searchTerm);
                 return Ok(result);
             }
             catch (UnauthorizedAccessException ex)
@@ -104,6 +112,16 @@ namespace BACK_END.Controllers
             {
                 return StatusCode(500, new { message = "An error occurred", details = ex.Message });
             }
+        }
+
+        [HttpGet("get-Bill-detail/{BillId}")]
+        public async Task<IActionResult> GetRoomBillDetails(int BillId)
+        {
+            var result = await _repo.GetBillDetailsByIdAsync(BillId);
+            if (result == null)
+                return NotFound("Room or related data not found.");
+
+            return Ok(result);
         }
         class CustomData
         {
