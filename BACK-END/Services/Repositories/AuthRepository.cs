@@ -599,7 +599,6 @@ namespace BACK_END.Services.Repositories
             var consumption = await _db.Consumption.FirstOrDefaultAsync(c => c.RoomId == room.Id);
             int waterUsage = consumption?.Water ?? 0;
             int electricUsage = consumption?.Electricity ?? 0;
-
             int waterPrice = 0, electricPrice = 0, otherServicePrice = 0;
             List<OtherServiceDTO> otherServices = new List<OtherServiceDTO>();
 

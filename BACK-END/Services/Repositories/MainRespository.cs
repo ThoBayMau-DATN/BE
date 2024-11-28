@@ -277,14 +277,18 @@ namespace BACK_END.Services.Repositories
                     EndDate = rh.EndDate,
                     RoomNumber = rh.Room.RoomNumber,
                     Price = rh.Room.Room_Type.Price,
-                    MotelName = rh.Room.Room_Type.Motel.Name
+                    MotelName = rh.Room.Room_Type.Motel.Name,
+                    Adress = rh.Room.Room_Type.Motel.Address
                 });
 
             if (!string.IsNullOrEmpty(searchTerm))
             {
                 query = query.Where(r =>
                 r.RoomNumber.ToString().Contains(searchTerm) ||
-                r.MotelName.Contains(searchTerm));
+                r.MotelName.Contains(searchTerm) || r.Adress.Contains(searchTerm))
+                ;
+                
+
             }
 
 
