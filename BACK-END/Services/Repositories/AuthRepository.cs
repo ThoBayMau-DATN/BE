@@ -595,11 +595,18 @@ namespace BACK_END.Services.Repositories
             if (room == null)
                 return null;
 
+            var bill = await _db.Bill
+        .Where(b => b.RoomId == room.Id && b.UserId == user.Id)
+        .OrderByDescending(b => b.CreatedDate) // Lấy hóa đơn mới nhất
+        .FirstOrDefaultAsync();
+
+            int? billId = bill?.Id;
+            int? total = bill?.Total;
+
             // Lấy thông tin sử dụng nước và điện
             var consumption = await _db.Consumption.FirstOrDefaultAsync(c => c.RoomId == room.Id);
             int waterUsage = consumption?.Water ?? 0;
             int electricUsage = consumption?.Electricity ?? 0;
-
             int waterPrice = 0, electricPrice = 0, otherServicePrice = 0;
             List<OtherServiceDTO> otherServices = new List<OtherServiceDTO>();
 
@@ -693,7 +700,9 @@ namespace BACK_END.Services.Repositories
                 OtherService = otherServices, // Các dịch vụ ngoài nước và điện
                 owner = ownerName,
                 phone = ownerPhone,
-                RoomImages = roomImages // Trả về danh sách hình ảnh của RoomType
+                RoomImages = roomImages,
+                BillId = billId,
+                TotalMoney = total
             };
         }
 

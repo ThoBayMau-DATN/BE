@@ -1,4 +1,5 @@
-﻿using BACK_END.Services.Interfaces;
+﻿using BACK_END.Services;
+using BACK_END.Services.Interfaces;
 using BACK_END.Services.MyServices;
 using BACK_END.Services.Repositories;
 
@@ -20,6 +21,7 @@ namespace BACK_END.Data
             services.AddScoped<IRole, RoleRepository>();
             services.AddScoped<IService, ServiceRepository>();
             services.AddScoped<IGetTro, MainRespository>();
+            services.AddSingleton<IVnPayService, VnPayService>();
         }
     }
 }
