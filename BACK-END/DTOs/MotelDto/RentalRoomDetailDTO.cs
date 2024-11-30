@@ -18,6 +18,8 @@
 
         // Thêm danh sách hình ảnh RoomType dưới dạng ImageDTO
         public List<RoomImageDTO> RoomImages { get; set; } = new List<RoomImageDTO>();
+        public int? BillId { get; set; }
+        public int? TotalMoney {  get; set; }
     }
 
     public class OtherServiceDTO
