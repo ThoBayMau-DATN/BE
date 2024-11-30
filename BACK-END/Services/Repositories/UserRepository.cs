@@ -1,5 +1,6 @@
 ﻿using BACK_END.Data;
 using BACK_END.DTOs.MainDto;
+using BACK_END.DTOs.Ticket;
 using BACK_END.DTOs.UserDto;
 using BACK_END.Models;
 using BACK_END.Services.Interfaces;
@@ -14,43 +15,44 @@ namespace BACK_END.Services.Repositories
         private readonly UserManager<IdentityUser> _userManager;
         private readonly BACK_ENDContext _db;
         private readonly RoleManager<IdentityRole> _roleManager;
-       
-        public UserRepository(BACK_ENDContext db, RoleManager<IdentityRole> roleManager, UserManager<IdentityUser> userManager)
+        private readonly IAuth _auth;
+        public UserRepository(BACK_ENDContext db, RoleManager<IdentityRole> roleManager, UserManager<IdentityUser> userManager, IAuth auth)
         {
             _db = db;
           _roleManager = roleManager;
           _userManager = userManager;
+            _auth = auth;
         }
 
        
-        public async Task<PagedList<GetAllUserRepositoryDto>> GetAllUser(string searchString, string sortColumn, string sortOrder, int pageNumber, int pageSize)
+        public async Task<PagedList<GetAllUserRepositoryDto>> GetAllUser(string searchString, string sortColumn, string sortOrder, int pageNumber, int pageSize, string token)
         {
-
-            var query = _db.User.Where(x=>x.Status==true).AsQueryable();
+           
+            var query = _db.User.Where(x=>x.Status==true);
+            //check token 
+            var isUser = await _auth.GetUserByToken(token);
+            if (isUser.Role.ToUpper() =="ADMIN" )
+            {
+                query = query;
+            }
+            else
+            {
+                //return error không có quyền truy cập
+                throw new KeyNotFoundException("Không có quyền truy cập");
+            }
             if (!string.IsNullOrEmpty(searchString))
             {
                 query = query.Where(x => x.FullName.Contains(searchString) || x.Email.Contains(searchString) || x.Phone.Contains(searchString));
             }
-            //// Lấy danh sách người dùng trước khi phân trang (theo query)
             var users = await query.ToListAsync();
-            //for (int i = 0; i < users.Count; i++)
-            //{
-            //    Console.WriteLine(users[i].Id);
-            //    Console.WriteLine(users[i].Email);
-            //}
-            // key: email, value: role (1 role)
+           
             Dictionary<string, string> userRoles = new Dictionary<string, string>();
            
-            //lấy danh sách người dùng từ identity
-
             IList<IdentityUser> iusers = await _userManager.Users.ToListAsync(); // tất cả người dùng trong identity
 
 
-           // Console.WriteLine("====================================");
             for (int i = 0; i < iusers.Count; i++)
             {
-                //Console.WriteLine(iusers[i].Id);
-                //Console.WriteLine(iusers[i].Email);
                 var roles = await _userManager.GetRolesAsync(iusers[i]);
                 for (int j = 0; j < roles.Count; j++)
                 {
@@ -65,15 +67,7 @@ namespace BACK_END.Services.Repositories
                 userDict.Add(user.Email, user);
                 Console.WriteLine("Email người dùng: " + user.Email);
             }
-            //
-            //Dictionary<string, User> userDict = new Dictionary<string, User>();
-            //for (int i = 0; i < users.Count; i++)
-            //{
-            //    userDict.Add(users[i].Email, users[i]);
-            //    Console.WriteLine("Email người dùng: " + users[i].Email);
-            //}
-            //lấy danh sách sau đó tìm kiếm
-
+           
             var usersWithRoles = query.Select(user => new GetAllUserRepositoryDto
             {   
                 Id = userDict[user.Email].Id,
@@ -193,31 +187,7 @@ namespace BACK_END.Services.Repositories
 
             return Task.FromResult(users);
 
-            //var query = _db.User.AsQueryable().Where(x => x.Id == id).FirstOrDefaultAsync();
-            ////lấy người dùng theo email trong identity
-            //var identityUser = _userManager.FindByEmailAsync(query.Result.Email).Result;
-            //Console.WriteLine("Email người dùng: " + identityUser.Email);
-            //if (identityUser == null)
-            //{
-            //    throw new KeyNotFoundException($"Identity user with ID {query.Result.Id} not found.");
-            //}
-            ////lấy role của người dùng
-            //var roles = _userManager.GetRolesAsync(identityUser).Result;
-            //Console.WriteLine("Role của người dùng: " + roles[0]);
-            ////tạo user mới add role
-            //var users = new GetAllUserRepositoryDto
-            //{
-            //    Id = query.Result.Id,
-            //    FullName = query.Result.FullName,
-            //    Phone = query.Result.Phone,
-            //    Email = query.Result.Email,
-            //    Avatar = query.Result.Avatar,
-            //    TimeCreated = query.Result.CreateDate,
-            //    Status = query.Result.Status,
-            //    Role = roles[0]
-            //};
-
-            //return Task.FromResult(users);
+           
 
 
         }
@@ -299,6 +269,7 @@ namespace BACK_END.Services.Repositories
             {
                 throw new KeyNotFoundException($"Không tìm thấy người dùng.");
             }
+            
             //tìm người dùng trong identity trước khi cập nhật
             var identityUser = await _userManager.FindByEmailAsync(existingUser.Email);
 
@@ -337,16 +308,15 @@ namespace BACK_END.Services.Repositories
             identityUser.Email = user.Email;
             identityUser.UserName = user.Email; // Cập nhật UserName nếu cần
 
-            // Cập nhật vai trò nếu có sự thay đổi
+            //pdate role
             var currentRoles = await _userManager.GetRolesAsync(identityUser);
             if (currentRoles.FirstOrDefault() != user.Role)
             {
-                // Gỡ bỏ vai trò cũ
                 await _userManager.RemoveFromRolesAsync(identityUser, currentRoles);
-                // Thêm vai trò mới
                 await _userManager.AddToRoleAsync(identityUser, user.Role);
             }
 
+           
             // Lưu thay đổi vào cơ sở dữ liệu
             var result = await _userManager.UpdateAsync(identityUser);
             if (!result.Succeeded)

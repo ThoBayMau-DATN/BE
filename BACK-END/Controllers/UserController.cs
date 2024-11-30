@@ -28,15 +28,19 @@ namespace BACK_END.Controllers
 
         [HttpGet]
         public async Task<IActionResult> GetAllUser(
+            string token,
             [FromQuery] string? searchString,
             [FromQuery] string? sortColumn,
             [FromQuery] string? sortOrder = "asc",
             [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 6)
+            [FromQuery] int pageSize = 6
+           
+            )
         {
+           
             try
             {
-                PagedList<GetAllUserRepositoryDto>  listUser = await _user.GetAllUser(searchString, sortColumn, sortOrder, pageNumber, pageSize);
+                PagedList<GetAllUserRepositoryDto>  listUser = await _user.GetAllUser(searchString, sortColumn, sortOrder, pageNumber, pageSize, token);
                 Console.WriteLine(listUser.TotalCount);
                 if (listUser == null ||!listUser.Any()) {
                     return NotFound(new ApiResponse<object>
@@ -67,7 +71,13 @@ namespace BACK_END.Controllers
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                return BadRequest(ex.Message);
+                return BadRequest(new ApiResponse<object>
+                {
+                    Code = 403,
+                    Status = "error",
+                    Message = ex.Message,
+                    Data = null
+                });
             }
         }
         [HttpGet("{id}")]
