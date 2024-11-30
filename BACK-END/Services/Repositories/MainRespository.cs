@@ -2,6 +2,9 @@
 using BACK_END.Data;
 using BACK_END.DTOs.MainDto;
 using BACK_END.DTOs.MotelDto;
+using BACK_END.Helper;
+using BACK_END.Models;
+using BACK_END.Repositories.VnpayDTO;
 using BACK_END.Services.Interfaces;
 using BACK_END.Services.MyServices;
 using BACK_END.Services.Paging;
@@ -15,11 +18,13 @@ namespace BACK_END.Services.Repositories
         private readonly BACK_ENDContext _db;
         private readonly FirebaseStorageService _firebaseStorageService;
         private readonly IMapper _mapper;
-        public MainRespository(BACK_ENDContext db, FirebaseStorageService firebaseStorageService, IMapper mapper)
+        private readonly IConfiguration _configuration;
+        public MainRespository(BACK_ENDContext db, FirebaseStorageService firebaseStorageService, IMapper mapper, IConfiguration configuration)
         {
             _db = db;
             _firebaseStorageService = firebaseStorageService;
             _mapper = mapper;
+            _configuration = configuration;
         }
 
         public async Task<IEnumerable<RoomTypeWithPackageDTO>> GetRoomTypesWithFeature()
@@ -208,7 +213,7 @@ namespace BACK_END.Services.Repositories
             {
                 query = query.Where(rt => surrounding.All(s => rt.Motel.Description.Contains(s)));
             }
-                
+
 
             // Sắp xếp theo tùy chọn
             query = sortOption?.ToLower() switch
@@ -287,7 +292,7 @@ namespace BACK_END.Services.Repositories
                 r.RoomNumber.ToString().Contains(searchTerm) ||
                 r.MotelName.Contains(searchTerm) || r.Adress.Contains(searchTerm))
                 ;
-                
+
 
             }
 
@@ -393,6 +398,60 @@ namespace BACK_END.Services.Repositories
             };
 
             return dto;
+        }
+
+
+        public async Task<PaymentResponseModel> ProcessVnpayResponseAsync(IQueryCollection query)
+        {
+            var hashSecret = _configuration["Vnpay:HashSecret"];
+            var vnPay = new VnPayLibrary();
+            var response = vnPay.GetFullResponseData(query, hashSecret);
+
+            if (response.Success)
+            {
+                var billId = int.Parse(response.OrderId);
+                var bill = await _db.Bill.FirstOrDefaultAsync(b => b.Id == billId);
+
+                if (bill != null)
+                {
+                    bill.Status = 2;
+                    bill.Total = int.Parse(response.TransactionId);
+                    await _db.SaveChangesAsync();
+                }
+            }
+
+            return response;
+        }
+
+
+
+
+        public async Task<Bill?> UpdateBillStatusAsync(int billId)
+        {
+            var bill = await _db.Bill.FirstOrDefaultAsync(b => b.Id == billId);
+
+            if (bill == null)
+            {
+                return null;
+            }
+            bill.Status = 2;
+
+            _db.Bill.Update(bill);
+            await _db.SaveChangesAsync();
+
+            return bill;
+        }
+
+        public async Task<Bill?> GetTotalByBillAsync(int billId)
+        {
+            var bill = await _db.Bill.FirstOrDefaultAsync(b => b.Id == billId);
+
+            if (bill == null)
+            {
+                return null;
+            }
+
+            return bill;
         }
     }
 }

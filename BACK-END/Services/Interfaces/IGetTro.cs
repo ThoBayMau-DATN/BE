@@ -1,5 +1,6 @@
 ﻿using BACK_END.DTOs.MainDto;
 using BACK_END.DTOs.MotelDto;
+using BACK_END.Models;
 using BACK_END.Services.MyServices;
 using BACK_END.Services.Paging;
 
@@ -23,6 +24,10 @@ namespace BACK_END.Services.Interfaces
         Task<BilldetailDto> GetBillDetailsByIdAsync(int billId);
 
         //search room type by Province or Districtname or Ward
-        Task<PagedList<RoomTypeDTO>> SearchRoomTypeByLocationAsync( string? Province,string? District,string? Ward,string? search,int pageNumber,int pageSize, string? sortOption, decimal? minPrice,decimal? maxPrice, double? minArea, double? maxArea, List<string>? surrounding);
+        Task<PagedList<RoomTypeDTO>> SearchRoomTypeByLocationAsync(string? Province, string? District, string? Ward, string? search, int pageNumber, int pageSize, string? sortOption, decimal? minPrice, decimal? maxPrice, double? minArea, double? maxArea, List<string>? surrounding);
+
+        Task<Bill?> UpdateBillStatusAsync(int billId);
+
+        Task<Bill?> GetTotalByBillAsync(int billId);
     }
 }
