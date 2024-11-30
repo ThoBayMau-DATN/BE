@@ -1,8 +1,9 @@
 ﻿using BACK_END.DTOs.MainDto;
 using BACK_END.DTOs.Repository;
+using BACK_END.Repositories.VnpayDTO;
+using BACK_END.Services;
 using BACK_END.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 
 namespace BACK_END.Controllers
 {
@@ -11,10 +12,12 @@ namespace BACK_END.Controllers
     public class MainController : ControllerBase
     {
         private readonly IGetTro _repo;
+        private readonly IVnPayService _vnPayService;
 
-        public MainController(IGetTro repo)
+        public MainController(IGetTro repo, IVnPayService vnPayService)
         {
             _repo = repo;
+            _vnPayService = vnPayService;
         }
 
         [HttpGet("outstanding-motels")]
@@ -71,8 +74,8 @@ namespace BACK_END.Controllers
             [FromQuery] string searchTerm = null
         ) // Thêm tham số searchTerm
 
-    
-    
+
+
         {
             try
             {
@@ -130,7 +133,7 @@ namespace BACK_END.Controllers
             public int TotalPage { get; set; }
         }
         //search room type by Province or Districtname or Ward
-        
+
         [HttpGet("search")]
         public async Task<IActionResult> SearchRoomTypeByLocationAsync(
         [FromQuery] string? Province,
@@ -195,5 +198,57 @@ namespace BACK_END.Controllers
                 });
             }
         }
+
+        [HttpPut("update-status/{billId}")]
+        public async Task<IActionResult> UpdateBillStatus(int billId)
+        {
+            var bill = await _repo.UpdateBillStatusAsync(billId);
+            if (bill == null)
+            {
+                return NotFound(new { message = "Bill không tồn tại." });
+            }
+
+            return Ok();
+        }
+
+        [HttpPost("create-order")]
+        public IActionResult CreateOrder(PaymentInformationModel model)
+        {
+            var url = _vnPayService.CreatePaymentUrl(model, HttpContext);
+            return Ok(url);
+        }
+
+        [HttpGet("vnpay-return")]
+        public async Task<IActionResult> PaymentCallback()
+        {
+            var response = _vnPayService.PaymentExecute(Request.Query);
+            if (response.VnPayResponseCode == "00")
+            {
+                await _repo.UpdateBillStatusAsync(int.Parse(response.OrderId));
+                return Ok(new { success = true, message = "Thanh toán thành công" });
+
+            }
+            return Ok(new { success = false, message = "Lỗi thanh toán" });
+        }
+
+        [HttpGet("update-status/{billId}")]
+        public async Task<IActionResult> GetTotalByBill(int billId)
+        {
+            var bill = await _repo.UpdateBillStatusAsync(billId);
+            if (bill == null)
+            {
+                return NotFound(new { message = "Bill không tồn tại." });
+            }
+
+            var paymentInfo = new PaymentInformationModel
+            {
+                OrderId = bill.Id.ToString(),
+                Amount = bill.Total
+            };
+
+            return Ok(new { success = true, message = "Trả về thành công.", paymentInfo });
+        }
+
+
     }
 }
