@@ -682,7 +682,7 @@ namespace BACK_END.Services.Repositories
             }
 
             // Kiểm tra tình trạng thanh toán
-            bool hasPaid = await _db.Bill.AnyAsync(b => b.UserId == user.Id);
+            var hasPaid = await _db.Bill.FirstOrDefaultAsync(b => b.UserId == user.Id);
 
             // Trả về DTO RentalRoomDetailDTO
             return new RentalRoomDetailDTO
@@ -695,7 +695,7 @@ namespace BACK_END.Services.Repositories
                 Price = room.Room_Type?.Price ?? 0,
                 Area = room.Room_Type?.Area ?? 0,
                 CreateDate = roomHistory.CreateDate,
-                Status = hasPaid,
+                Status = hasPaid.Status,
                 WaterPrice = waterPrice,
                 ElectricPrice = electricPrice,
                 OtherService = otherServices, // Các dịch vụ ngoài nước và điện
