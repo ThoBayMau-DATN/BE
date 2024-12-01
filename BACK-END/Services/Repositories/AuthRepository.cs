@@ -521,6 +521,7 @@ namespace BACK_END.Services.Repositories
                 return null;
             identityUser.Email = userDetailDto.Email ?? identityUser.Email;
             identityUser.PhoneNumber = userDetailDto.Phone ?? identityUser.PhoneNumber;
+            identityUser.UserName = userDetailDto.Email ?? identityUser.Email;
             var identityResult = await _userManager.UpdateAsync(identityUser);
             if (!identityResult.Succeeded)
                 return null;
