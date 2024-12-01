@@ -225,10 +225,9 @@ namespace BACK_END.Controllers
             if (response.VnPayResponseCode == "00")
             {
                 await _repo.UpdateBillStatusAsync(int.Parse(response.OrderId));
-                return Ok(new { success = true, message = "Thanh toán thành công" });
-
+                return Redirect($"http://localhost:3000/user/motel?status=success&orderId={response.OrderId}");
             }
-            return Ok(new { success = false, message = "Lỗi thanh toán" });
+            return Redirect("http://localhost:3000/user/motel?status=fail");
         }
 
         [HttpGet("update-status/{billId}")]

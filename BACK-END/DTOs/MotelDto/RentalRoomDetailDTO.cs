@@ -10,7 +10,7 @@
         public int Price { get; set; }
         public int Area { get; set; }
         public DateTime? CreateDate { get; set; } = DateTime.Now;
-        public bool Status { get; set; }
+        public int Status { get; set; }
         public int WaterPrice { get; set; }
         public int ElectricPrice { get; set; }
         public List<OtherServiceDTO>? OtherService { get; set; }
