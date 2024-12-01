@@ -36,15 +36,29 @@ namespace BACK_END.Services.Repositories
             }
 
             IQueryable<Ticket> data = _db.Ticket.Include(x => x.Images).OrderByDescending(x => x.CreateDate);
-
-            if (user.Role == "Admin" || user.Role == "Staff")
+            if (user.Role == "Admin")
             {
-                data = data.Where(x => x.Type == 1 || x.Type == 3 || x.Receiver == user.Id.ToString());
+                var removeTickets = data.Where(x => x.MotelId != null && (x.Type == 2 || x.Type == 4)).Select(x => x.Id);
+                data = data.Where(x => !removeTickets.Contains(x.Id));
             }
-            if (user.Role == "Owner")
+            else if (user.Role == "Staff")
             {
-                var motelId = await _db.Motel.Where(x => x.UserId == user.Id).Select(x => x.Id).ToListAsync();
-                data = data.Where(x => x.MotelId.HasValue && motelId.Contains(x.MotelId.Value) && x.Type != 1 && x.Type != 3);
+                data = data.Where(x => x.Receiver == user.Id.ToString());
+            }
+            else if (user.Role == "Owner")
+            {
+                var motelIds = await _db.Motel
+                        .Where(x => x.UserId == user.Id)
+                        .Select(x => x.Id)
+                        .ToListAsync();
+                data = data.Where(x => x.MotelId.HasValue
+                    && motelIds.Contains(x.MotelId.Value)
+                    && x.Type != 1
+                    && x.Type != 3);
+            }
+            else
+            {
+                return null;
             }
 
             if (ticketQuery.Status > 0)
@@ -71,16 +85,34 @@ namespace BACK_END.Services.Repositories
             {
                 return null;
             }
-            var ticket = new Ticket();
-            if (user.Role == "Admin" || user.Role == "Staff")
+            IQueryable<Ticket> data = _db.Ticket
+                .Include(x => x.Images)
+                .Include(x => x.User);
+            if (user.Role == "Admin")
             {
-                ticket = await _db.Ticket.Include(x => x.Images).Include(x => x.User).FirstOrDefaultAsync(x => x.Id == infoticketQuery.Id && (x.Type == 1 || x.Type == 3 || x.Receiver == user.Id.ToString()));
+                var removeTickets = data.Where(x => x.MotelId != null && (x.Type == 2 || x.Type == 4)).Select(x => x.Id);
+                data = data.Where(x => !removeTickets.Contains(x.Id));
             }
-            if (user.Role == "Owner")
+            else if (user.Role == "Staff")
             {
-                var motelId = await _db.Motel.Where(x => x.UserId == user.Id).Select(x => x.Id).ToListAsync();
-                ticket = await _db.Ticket.Include(x => x.Images).Include(x => x.User).FirstOrDefaultAsync(x => x.Id == infoticketQuery.Id && x.MotelId.HasValue && motelId.Contains(x.MotelId.Value) && x.Type != 1 && x.Type != 3);
+                data = data.Where(x => x.Receiver == user.Id.ToString());
             }
+            else if (user.Role == "Owner")
+            {
+                var motelIds = await _db.Motel
+                        .Where(x => x.UserId == user.Id)
+                        .Select(x => x.Id)
+                        .ToListAsync();
+                data = data.Where(x => x.MotelId.HasValue
+                    && motelIds.Contains(x.MotelId.Value)
+                    && x.Type != 1
+                    && x.Type != 3);
+            }
+            else
+            {
+                return null;
+            }
+            var ticket = await data.FirstOrDefaultAsync(x => x.Id == infoticketQuery.Id);
             if (ticket != null)
             {
                 var map = _mapper.Map<DTOs.Ticket.Infoticket>(ticket);

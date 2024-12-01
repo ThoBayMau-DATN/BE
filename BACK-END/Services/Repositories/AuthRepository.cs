@@ -680,6 +680,7 @@ namespace BACK_END.Services.Repositories
             // Trả về DTO RentalRoomDetailDTO
             return new RentalRoomDetailDTO
             {
+                Id = motel.Id,
                 MotelName = motelName,
                 MotelAdress = motelAddress,
                 fullName = user.FullName,
