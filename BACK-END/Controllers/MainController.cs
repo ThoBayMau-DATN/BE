@@ -248,6 +248,23 @@ namespace BACK_END.Controllers
             return Ok(new { success = true, message = "Trả về thành công.", paymentInfo });
         }
 
+        [HttpGet("get-RealatedRoom-By-Adress")]
+        public async Task<IActionResult> GetRelatedRoomByAdressAsync([FromQuery]string adress)
+        {
+            var Related = await _repo.SearchRoomTypesByAddress(adress);
+            if (Related == null)
+            {
+                return NotFound(new { message = "Phòng không tồn tại." });
+            }
+            return Ok(new ApiResponse<object>
+            {
+                Code = 200,
+                Status = "success",
+                Message = "Lấy danh sách trọ thành công",
+                Data = Related
+            });
+        }
+
 
     }
 }

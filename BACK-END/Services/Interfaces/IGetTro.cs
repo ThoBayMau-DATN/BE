@@ -3,6 +3,7 @@ using BACK_END.DTOs.MotelDto;
 using BACK_END.Models;
 using BACK_END.Services.MyServices;
 using BACK_END.Services.Paging;
+using Microsoft.AspNetCore.Mvc;
 
 
 namespace BACK_END.Services.Interfaces
@@ -12,6 +13,8 @@ namespace BACK_END.Services.Interfaces
         Task<IEnumerable<RoomTypeWithPackageDTO>> GetRoomTypesWithFeature();
 
         Task<List<RoomTypeWithPackageDTO>> GetNewRoomTypesAsync();
+
+        Task<ActionResult<IEnumerable<RoomTypeWithPackageDTO>>> SearchRoomTypesByAddress(string address);
 
         Task<List<RoomTypeWithPackageDTO>> GetRoomTypesUnderOneMillionAsync();
 
