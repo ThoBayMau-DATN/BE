@@ -4,6 +4,7 @@ using BACK_END.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BACK_END.Migrations
 {
     [DbContext(typeof(BACK_ENDContext))]
-    partial class BACK_ENDContextModelSnapshot : ModelSnapshot
+    [Migration("20241130125659_delete_name_img")]
+    partial class delete_name_img
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -429,14 +432,9 @@ namespace BACK_END.Migrations
                     b.Property<int>("Price_Service")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ServiceId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("BillId");
-
-                    b.HasIndex("ServiceId");
 
                     b.ToTable("Service_Bill");
                 });
@@ -907,13 +905,7 @@ namespace BACK_END.Migrations
                         .WithMany()
                         .HasForeignKey("BillId");
 
-                    b.HasOne("BACK_END.Models.Service", "Service")
-                        .WithMany()
-                        .HasForeignKey("ServiceId");
-
                     b.Navigation("Bill");
-
-                    b.Navigation("Service");
                 });
 
             modelBuilder.Entity("BACK_END.Models.Service_Room", b =>
