@@ -8,6 +8,7 @@ using BACK_END.Repositories.VnpayDTO;
 using BACK_END.Services.Interfaces;
 using BACK_END.Services.MyServices;
 using BACK_END.Services.Paging;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
 
@@ -30,8 +31,10 @@ namespace BACK_END.Services.Repositories
         public async Task<IEnumerable<RoomTypeWithPackageDTO>> GetRoomTypesWithFeature()
         {
             var roomTypes = await _db.Room_Type
-                .Include(r => r.Motel)
-                .Include(r => r.Images)
+                .Include(rt => rt.Motel)
+                .Include(rt => rt.Images)
+                .Include(rt => rt.Rooms)
+                    .ThenInclude(r => r.History)
                 .ToListAsync();
 
             var result = roomTypes.Select(roomType => new RoomTypeWithPackageDTO
@@ -46,12 +49,18 @@ namespace BACK_END.Services.Repositories
                     Link = i.Link,
                     Type = i.Type
                 }).ToList(),
-                IsFeatured = _db.Package_User.Any(pu => pu.UserId == roomType.Motel.UserId)
-            }).Where(r => r.IsFeatured)
-              .ToList();
+                IsFeatured = _db.Package_User.Any(pu => pu.UserId == roomType.Motel.UserId),
+                IsAvailable = roomType.Rooms.Any(room =>
+                    room.History == null || room.History.All(h => h.EndDate != null && h.EndDate <= DateTime.Now)
+                )
+            })
+            .Where(r => r.IsFeatured && r.IsAvailable)
+            .Take(12)
+            .ToList();
 
             return result;
         }
+
         public async Task<List<RoomTypeWithPackageDTO>> GetNewRoomTypesAsync()
         {
             var recentDate = DateTime.Now.AddMonths(-3);
@@ -71,8 +80,11 @@ namespace BACK_END.Services.Repositories
                         Link = i.Link,
                         Type = i.Type
                     }).ToList(),
-                })
-                .ToListAsync();
+                    IsAvailable = rt.Rooms.Any(room =>
+                    room.History == null || room.History.All(h => h.EndDate != null && h.EndDate <= DateTime.Now)
+                )
+                }).Where(r => r.IsFeatured && r.IsAvailable)
+                .Take(12).ToListAsync();
 
             return roomTypes;
         }
@@ -453,5 +465,90 @@ namespace BACK_END.Services.Repositories
 
             return bill;
         }
+
+        public class Address
+        {
+            public string Street { get; set; }
+            public string District { get; set; }
+            public string City { get; set; }
+            public string Province { get; set; }
+        }
+
+        public async Task<ActionResult<IEnumerable<RoomTypeWithPackageDTO>>> SearchRoomTypesByAddress(string address)
+        {
+
+            string[] addressParts = address.Split(new string[] { ", " }, StringSplitOptions.None);
+                Address addressObj = new Address
+                {
+                    Street = addressParts[0], 
+                    District = addressParts[1], 
+                    City = addressParts[2],      
+                    Province = addressParts[3]   
+                };
+                if (string.IsNullOrWhiteSpace(address))
+                return null;
+                
+            var roomTypes = await _db.Room_Type
+                .Include(rt => rt.Motel)
+                .Include(rt => rt.Images)
+                .Include(rt => rt.Rooms)
+                    .ThenInclude(r => r.History)
+                .ToListAsync();
+            var filteredRoomTypes = roomTypes
+                .Where(rt => !string.IsNullOrEmpty(rt.Motel?.Address) &&
+                             (
+                                rt.Motel.Address.Contains(addressObj.Street, StringComparison.OrdinalIgnoreCase)) ||
+                                 rt.Motel.Address.Contains(addressObj.District, StringComparison.OrdinalIgnoreCase) ||
+                                 rt.Motel.Address.Contains(addressObj.City, StringComparison.OrdinalIgnoreCase) ||
+                                 rt.Motel.Address.Contains(addressObj.Province, StringComparison.OrdinalIgnoreCase)
+                             )  
+                .Select(roomType => new RoomTypeWithPackageDTO
+                {
+                    Id = roomType.Id,
+                    Price = roomType.Price,
+                    Name = roomType.Name,
+                    Address = roomType.Motel?.Address,
+                    Images = roomType.Images?.Select(i => new ImageDTO
+                    {
+                        Id = i.Id,
+                        Link = i.Link,
+                        Type = i.Type
+                    }).ToList(),
+                    IsFeatured = _db.Package_User.Any(pu => pu.UserId == roomType.Motel.UserId),
+                    IsAvailable = roomType.Rooms.Any(room =>
+                        room.History == null ||
+                        room.History.All(h => h.EndDate != null && h.EndDate <= DateTime.Now))
+                })
+                .Where(r => r.IsAvailable).Take(8)
+                .ToList();
+            if (!filteredRoomTypes.Any())
+            {
+                filteredRoomTypes = roomTypes
+                    .Where(rt => _db.Package_User.Any(pu => pu.UserId == rt.Motel.UserId))
+                    .Select(roomType => new RoomTypeWithPackageDTO
+                    {
+                        Id = roomType.Id,
+                        Price = roomType.Price,
+                        Name = roomType.Name,
+                        Address = roomType.Motel?.Address,
+                        Images = roomType.Images?.Select(i => new ImageDTO
+                        {
+                            Id = i.Id,
+                            Link = i.Link,
+                            Type = i.Type
+                        }).ToList(),
+                        IsFeatured = true,
+                        IsAvailable = roomType.Rooms.Any(room =>
+                            room.History == null ||
+                            room.History.All(h => h.EndDate != null && h.EndDate <= DateTime.Now))
+                    })
+                    .Where(r => r.IsAvailable)
+                    .Take(8)
+                    .ToList();
+            }
+
+            return filteredRoomTypes;
+        }
+
     }
 }
