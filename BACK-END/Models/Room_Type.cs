@@ -7,6 +7,7 @@ namespace BACK_END.Models
         public int Id { get; set; }
         [Column(TypeName = "nvarchar(max)")]
         public string? Name { get; set; }
+        [Column(TypeName = "tinyint")]
         public int Area { get; set; }
         [Column(TypeName = "nvarchar(max)")]
         public string? Description { get; set; }
