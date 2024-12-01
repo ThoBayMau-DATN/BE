@@ -2,6 +2,7 @@
 {
     public class RentalRoomDetailDTO
     {
+        public int Id { get; set; }
         public string? MotelName { get; set; }
         public string? MotelAdress { get; set; }
         public string? fullName { get; set; }
