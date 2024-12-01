@@ -19,8 +19,8 @@ namespace BACK_END.Services.Repositories
         public UserRepository(BACK_ENDContext db, RoleManager<IdentityRole> roleManager, UserManager<IdentityUser> userManager, IAuth auth)
         {
             _db = db;
-          _roleManager = roleManager;
-          _userManager = userManager;
+            _roleManager = roleManager;
+            _userManager = userManager;
             _auth = auth;
         }
 
