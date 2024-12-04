@@ -27,10 +27,17 @@ namespace BACK_END.Services.Repositories
        
         public async Task<PagedList<GetAllUserRepositoryDto>> GetAllUser(string searchString, string sortColumn, string sortOrder, int pageNumber, int pageSize, string token)
         {
-           
+           if(token == null)
+            {
+               return null;
+            }
             var query = _db.User.Where(x=>x.Status==true);
             //check token 
             var isUser = await _auth.GetUserByToken(token);
+            if(isUser == null)
+            {
+                throw new KeyNotFoundException("Không tìm thấy người dùng");
+            }
             if (isUser.Role.ToUpper() =="ADMIN" )
             {
                 query = query;
