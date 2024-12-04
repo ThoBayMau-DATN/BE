@@ -32,5 +32,9 @@ namespace BACK_END.Services.Interfaces
         Task<Bill?> UpdateBillStatusAsync(int billId);
 
         Task<Bill?> GetTotalByBillAsync(int billId);
+
+        //get register motel owner
+        Task<IEnumerable<DTOs.MotelDto.InfomationRegisterMotelDTO>?> GetInfomationRegisterMotelAsync(int id);
+        Task<DTOs.MotelDto.ResultDeleteMotelDTO?> DeleteRegisterMotelAsync(int id);
     }
 }
