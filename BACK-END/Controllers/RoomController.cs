@@ -337,6 +337,78 @@ namespace BACK_END.Controllers
             }
         }
 
+        [HttpGet("get-history-by-room-id/{roomId}")]
+        public async Task<IActionResult> GetHistoryByRoomId(int roomId)
+        {
+            try
+            {
+                var result = await _room.GetHistoryByRoomId(roomId);
+                if (result == null)
+                {
+                    return BadRequest(new MotelRepository<object> { Code = 400, Success = false, Message = "Không tìm thấy lịch sử phòng trọ" });
+                }
+                return Ok(new MotelRepository<object> { Code = 200, Success = true, Message = "Lấy lịch sử phòng trọ thành công", Data = result });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new MotelRepository<object> { Code = 400, Success = false, Message = ex.Message });
+            }
+        }
+
+        [HttpGet("get-room-by-export-bill/{roomTypeId}")]
+        public async Task<IActionResult> GetRoomByExportBill(int roomTypeId)
+        {
+            try
+            {
+                var result = await _room.GetRoomByExportBill(roomTypeId);
+                if (result == null)
+                {
+                    return BadRequest(new MotelRepository<object> { Code = 400, Success = false, Message = "Không tìm thấy phòng trọ" });
+                }
+                return Ok(new MotelRepository<object> { Code = 200, Success = true, Message = "Lấy phòng trọ thành công", Data = result });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new MotelRepository<object> { Code = 400, Success = false, Message = ex.Message });
+            }
+        }
+
+        [HttpPost("add-electric-and-water-to-bill")]
+        public async Task<IActionResult> AddElectricAndWaterToBill([FromBody] AddElectricAndWaterDto dto)
+        {
+            try
+            {
+                var result = await _room.AddElectricAndWaterToBill(dto);
+                if (!result || result == false)
+                {
+                return BadRequest(new MotelRepository<object> { Code = 400, Success = false, Message = "Thêm điện nước vào hóa đơn thất bại" });
+            }
+                return Ok(new MotelRepository<object> { Code = 200, Success = true, Message = "Thêm điện nước vào hóa đơn thành công" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new MotelRepository<object> { Code = 400, Success = false, Message = ex.Message });
+            }
+        }
+
+        [HttpGet("get-price-by-room-type-id/{roomTypeId}")]
+        public async Task<IActionResult> GetPriceByRoomTypeId(int roomTypeId)
+        {
+            try
+            {
+                var result = await _room.GetPriceByRoomTypeId(roomTypeId);
+                if (result == null)
+                {
+                    return BadRequest(new MotelRepository<object> { Code = 400, Success = false, Message = "Không tìm thấy phòng trọ" });
+                }
+                return Ok(new MotelRepository<object> { Code = 200, Success = true, Message = "Lấy giá phòng trọ thành công", Data = result });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new MotelRepository<object> { Code = 400, Success = false, Message = ex.Message });
+            }
+        }
+
         // [HttpGet("get-room-by-motel-id/{motelId}")]
         // public async Task<IActionResult> GetRoomByMotelId(int motelId)
         // {
