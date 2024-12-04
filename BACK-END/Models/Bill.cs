@@ -11,7 +11,7 @@ namespace BACK_END.Models
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public int Total { get; set; }
         public int? RoomId { get; set; }
-        public Room? Room { get; set; }
+        public Room? Room { get; set; } 
         public int? UserId { get; set; }
         public User? User { get; set; }
 
