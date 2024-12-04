@@ -67,6 +67,13 @@ namespace BACK_END.Mappers
 
             //edit room type
             CreateMap<Room_Type, GetRoomTypeByEditDto>();
+
+            //get history
+            CreateMap<Room_History, GetHistoryDto>();
+
+            //get room by export bill
+            CreateMap<Room, GetRoomByExportBillDto>()
+                .ForMember(dest => dest.Consumption, opt => opt.MapFrom(src => src.Consumption != null ? src.Consumption.OrderByDescending(c => c.Time).FirstOrDefault() : null));
         }
 
         private static float CalculateAverageRating(Motel motel)

@@ -143,42 +143,17 @@ namespace BACK_END.Mappers
 
             return (roomType, rooms);
         }
-        // public static (Motel motel, Price price) MapToMotelAndPrice(this UpdateMotelDto dto)
-        // {
-        //     var motel = new Motel
-        //     {
-        //         Name = dto.Name,
-        //         Address = dto.Address,
-        //     };
+        
 
-        //     var price = new Price
-        //     {
-        //         Water = dto?.Water ?? 0,
-        //         Electric = dto?.Electric ?? 0,
-        //         Other = dto?.Other ?? 0
-        //     };
-
-        //     return (motel, price);
-        // }
-        // public static GetRoomByMotelIdDto MapToGetRoomByMotelIdDto(this Room room)
-        // {
-        //     return new GetRoomByMotelIdDto
-        //     {
-        //         Id = room.Id,
-        //         RoomNumber = room.RoomNumber,
-        //         Area = room.Area,
-        //         UserFromRoom = room.Users?.Count ?? 0,
-        //         Price = room.Price,
-        //         Status = room.Status
-        //     };
-        // }
-        /*public static ImageDto MapToImageDto(this Image image)
+        public static GetPriceByRoomTypeIdDto MapToGetPriceByRoomTypeIdDto(this Room_Type roomType)
         {
-            return new ImageDto
+            return new GetPriceByRoomTypeIdDto
             {
-                Id = image.Id,
-                Link = image.Link ?? ""
+                RoomTypeId = roomType?.Id ?? 0,
+                Price = roomType?.Price ?? 0,
+                Price_Electric = roomType?.Motel?.Services?.Where(x => x.Name == "Điện").FirstOrDefault()?.Price ?? 0,
+                Price_Water = roomType?.Motel?.Services?.Where(x => x.Name == "Nước").FirstOrDefault()?.Price ?? 0,
             };
-        }*/
+        }
     }
 }

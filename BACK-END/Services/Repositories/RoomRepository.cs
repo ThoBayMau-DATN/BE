@@ -1,4 +1,3 @@
-
 using AutoMapper;
 using BACK_END.Data;
 using BACK_END.DTOs.RoomDto;
@@ -531,6 +530,125 @@ namespace BACK_END.Services.Repositories
             _db.Image.RemoveRange(images);
             await _db.SaveChangesAsync();
         }
+
+        public async Task<List<GetHistoryDto>?> GetHistoryByRoomId(int roomId)
+        {
+            var room = await _db.Room.FindAsync(roomId);
+            if (room == null) return null;
+            var history = await _db.Room_History
+                .Include(x => x.User)
+                .Where(x => x.RoomId == roomId).ToListAsync();
+            return _mapper.Map<List<GetHistoryDto>>(history);
+        }
+
+        public async Task<List<GetRoomByExportBillDto>?> GetRoomByExportBill(int roomTypeId)
+        {
+            var room = await _db.Room
+            .Include(x => x.Consumption)
+            .Where(x => x.Room_TypeId == roomTypeId && x.Status == 2)
+            .ToListAsync();
+            if (room == null) return null;
+            return _mapper.Map<List<GetRoomByExportBillDto>>(room);
+        }
+
+        public async Task<bool> AddElectricAndWaterToBill(AddElectricAndWaterDto dto)
+        {
+            using var transaction = await _db.Database.BeginTransactionAsync();
+            try
+            {
+                var room = await _db.Room.FindAsync(dto.RoomId);
+                if (room == null) return false;
+                var roomType = await _db.Room_Type.FindAsync(room.Room_TypeId);
+                if (roomType == null) return false;
+                var motel = await _db.Motel.FindAsync(roomType.MotelId);
+                if (motel == null) return false;
+                var service = await _db.Service.Where(x => x.MotelId == motel.Id).ToListAsync();
+
+                var oldConsumption = await _db.Consumption.Where(x => x.RoomId == dto.RoomId).OrderByDescending(x => x.Time).FirstOrDefaultAsync();
+
+                if (roomType.NewPrice != null && roomType.NewPrice > 0)
+                {
+                    roomType.Price = roomType.NewPrice;
+                    _db.Update(roomType);
+                }
+
+                if (dto.Electric > 0 || dto.Water > 0)
+                {
+                    var consumption = new Consumption
+                    {
+                        RoomId = dto.RoomId,
+                        Electricity = dto.Electric,
+                        Water = dto.Water,
+                        Time = DateTime.Now
+                    };
+                    await _db.Consumption.AddAsync(consumption);
+                }
+
+                var priceElectric = dto.Electric > 0 ? (dto.Electric - (oldConsumption?.Electricity ?? 0)) * (service.FirstOrDefault(x => x.Name == "Điện")?.Price ?? 0) : 0;
+                var priceWater = dto.Water > 0 ? (dto.Water - (oldConsumption?.Water ?? 0)) * (service.FirstOrDefault(x => x.Name == "Nước")?.Price ?? 0) : 0;
+                var total = roomType.Price + priceElectric + priceWater + dto.Other;
+
+                var bill = new Bill
+                {
+                    RoomId = dto.RoomId,
+                    PriceRoom = roomType.Price,
+                    Total = total,
+                    Status = 2
+                };
+                await _db.Bill.AddAsync(bill);
+                await _db.SaveChangesAsync();
+                if (dto.Electric > 0)
+                {
+                    var serviceBill = new Service_Bill
+                    {
+                        Name = "Điện",
+                        Price_Service = priceElectric,
+                        BillId = bill.Id
+                    };
+                    await _db.Service_Bill.AddAsync(serviceBill);
+                }
+                if (dto.Water > 0)
+                {
+                    var serviceBill = new Service_Bill
+                    {
+                        Name = "Nước",
+                        Price_Service = priceWater,
+                        BillId = bill.Id
+                    };
+                    await _db.Service_Bill.AddAsync(serviceBill);
+                }
+                if (dto.Other > 0)
+                {
+                    var serviceBill = new Service_Bill
+                    {
+                        Name = "Khác",
+                        Price_Service = dto.Other,
+                        BillId = bill.Id
+                    };
+                    await _db.Service_Bill.AddAsync(serviceBill);
+                }
+                await _db.SaveChangesAsync();
+                await transaction.CommitAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                return false;
+            }
+        }
+
+        public async Task<GetPriceByRoomTypeIdDto?> GetPriceByRoomTypeId(int roomTypeId)
+        {
+            var roomType = await _db.Room_Type
+            .Include(x => x.Motel)
+            .ThenInclude(x => x.Services)
+            .FirstOrDefaultAsync(x => x.Id == roomTypeId);
+            return roomType.MapToGetPriceByRoomTypeIdDto();
+        }
+
+
+
 
         //    private async Task UpdateTerm(int motelId, IFormFile fileTerm)
         //    {
