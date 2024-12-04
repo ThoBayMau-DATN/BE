@@ -15,6 +15,7 @@ namespace BACK_END.Services.Interfaces
         Task<Notification?> SendNotificationToRolesByIdAsync(int notificationId, string roleName);
         Task<User?> GetUserByEmailAsync(string email);
         Task<List<Notification>> GetSentNotificationsAsync(int userId);
+        Task<IEnumerable<NotiByTypeDto>> GetNotificationsByTokenAndTypeAsync(string token, int type);
 
     }
 }
