@@ -13,11 +13,13 @@ namespace BACK_END.Controllers
     {
         private readonly IGetTro _repo;
         private readonly IVnPayService _vnPayService;
+        private readonly IAuth _auth;
 
-        public MainController(IGetTro repo, IVnPayService vnPayService)
+        public MainController(IGetTro repo, IVnPayService vnPayService, IAuth auth)
         {
             _repo = repo;
             _vnPayService = vnPayService;
+            _auth = auth;
         }
 
         [HttpGet("outstanding-motels")]
@@ -249,7 +251,7 @@ namespace BACK_END.Controllers
         }
 
         [HttpGet("get-RealatedRoom-By-Adress")]
-        public async Task<IActionResult> GetRelatedRoomByAdressAsync([FromQuery]string adress)
+        public async Task<IActionResult> GetRelatedRoomByAdressAsync([FromQuery] string adress)
         {
             var Related = await _repo.SearchRoomTypesByAddress(adress);
             if (Related == null)
@@ -265,6 +267,61 @@ namespace BACK_END.Controllers
             });
         }
 
+        [HttpGet("get-infomation-register-motel")]
+        public async Task<IActionResult> GetInfomationRegisterMotel([FromQuery] string? token)
+        {
+            if (string.IsNullOrEmpty(token))
+            {
+                return BadRequest(new ApiResponse<object>
+                {
+                    Code = 400,
+                    Status = "error",
+                    Message = "Token không có hoặc không đúng định dạng",
+                    Data = null
+                });
+            }
+            var user = await _auth.GetUserByToken(token);
+            if (user == null)
+            {
+                return BadRequest(new ApiResponse<object>
+                {
+                    Code = 404,
+                    Status = "error",
+                    Message = "Không có dữ liệu",
+                    Data = null
+                });
+            }
+            var data = await _repo.GetInfomationRegisterMotelAsync(user.Id);
+            return Ok(new ApiResponse<object>
+            {
+                Code = 200,
+                Status = "success",
+                Message = "Lấy danh sách trọ thành công",
+                Data = data
+            });
+        }
 
+        [HttpDelete("delete-register-motel-owner")]
+        public async Task<IActionResult> DeleteRegisterMotelOwner(int id)
+        {
+            var motel = await _repo.DeleteRegisterMotelAsync(id);
+            if (motel == null)
+            {
+                return BadRequest(new ApiResponse<object>
+                {
+                    Code = 404,
+                    Status = "error",
+                    Message = "Không có dữ liệu",
+                    Data = null
+                });
+            }
+            return Ok(new ApiResponse<object>
+            {
+                Code = 200,
+                Status = "success",
+                Message = "Lấy danh sách trọ thành công",
+                Data = motel
+            });
+        }
     }
 }
