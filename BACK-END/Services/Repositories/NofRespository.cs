@@ -7,6 +7,7 @@ using BACK_END.Services.Interfaces;
 using BACK_END.Services.MyServices;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace BACK_END.Services.Repositories
 {
@@ -48,6 +49,31 @@ namespace BACK_END.Services.Repositories
 
             var paginationResult = _mapper.Map<listNotificationDto>(page);
             return paginationResult;
+        }
+
+        public async Task<IEnumerable<NotiByTypeDto>> GetNotificationsByTokenAndTypeAsync(string token, int type)
+        {
+            var email = HandlerToken(token);
+            if (string.IsNullOrEmpty(email))
+                return null;
+            var user = await _db.User.FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null)
+                return null;
+            var notifications = await _db.User_Notification
+                .Include(un => un.Notification)
+                .Where(un => un.UserId == user.Id && un.Notification != null && un.Notification.Type == type)
+                .Select(un => new NotiByTypeDto
+                {
+                    Id = un.Notification.Id,
+                    Type = un.Notification.Type,
+                    Title = un.Notification.Title,
+                    Content = un.Notification.Content,
+                    Sender = un.Notification.Sender,
+                    CreateDate = un.Notification.CreateDate
+                })
+                .ToListAsync();
+
+            return notifications;
         }
 
         public async Task<List<Notification>> GetSentNotificationsAsync(int userId)
@@ -119,6 +145,22 @@ namespace BACK_END.Services.Repositories
             notiExist.Status = false;
             await _db.SaveChangesAsync();
             return notification;
+        }
+
+        private string? HandlerToken(string token)
+        {
+            try
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var jwtToken = tokenHandler.ReadJwtToken(token);
+
+                return jwtToken.Claims.FirstOrDefault(x => x.Type == "sub")?.Value;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Token error: {ex.Message}");
+                return null;
+            }
         }
     }
 }
