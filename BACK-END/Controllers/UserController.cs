@@ -1,10 +1,7 @@
 ﻿using BACK_END.DTOs.Repository;
 using BACK_END.DTOs.UserDto;
-using BACK_END.Models;
 using BACK_END.Services.Interfaces;
 using BACK_END.Services.MyServices;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BACK_END.Controllers
@@ -22,8 +19,8 @@ namespace BACK_END.Controllers
 
         class CustomData
         {
-           public List<GetAllUserRepositoryDto> list { get; set; }
-           public int TotalPage { get; set; }
+            public List<GetAllUserRepositoryDto> list { get; set; }
+            public int TotalPage { get; set; }
         }
 
         [HttpGet]
@@ -34,15 +31,16 @@ namespace BACK_END.Controllers
             [FromQuery] string? sortOrder = "asc",
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 6
-           
+
             )
         {
-           
+
             try
             {
-                PagedList<GetAllUserRepositoryDto>  listUser = await _user.GetAllUser(searchString, sortColumn, sortOrder, pageNumber, pageSize, token);
+                PagedList<GetAllUserRepositoryDto> listUser = await _user.GetAllUser(searchString, sortColumn, sortOrder, pageNumber, pageSize, token);
                 Console.WriteLine(listUser.TotalCount);
-                if (listUser == null ||!listUser.Any()) {
+                if (listUser == null || !listUser.Any())
+                {
                     return NotFound(new ApiResponse<object>
                     {
                         Code = 404,
@@ -64,9 +62,9 @@ namespace BACK_END.Controllers
                             TotalPage = listUser.TotalPages
                         }
                     });
-                
+
                 }
-               
+
             }
             catch (Exception ex)
             {
@@ -126,7 +124,7 @@ namespace BACK_END.Controllers
             {
                 var result = await _user.CreateUser(user);
                 if (result == null)
-                    {
+                {
                     return BadRequest(new ApiResponse<object>
                     {
                         Code = 400,
@@ -146,7 +144,7 @@ namespace BACK_END.Controllers
                     });
 
                 }
-               
+
             }
             catch (Exception ex)
             {
@@ -171,7 +169,7 @@ namespace BACK_END.Controllers
                 {
                     Code = 200,
                     Status = "success",
-                    Message = "Cạ̣p nhạ̣t người dùng thành công",
+                    Message = "Cập nhật người dùng thành công",
                     Data = result
                 });
             }
@@ -213,7 +211,7 @@ namespace BACK_END.Controllers
                         Data = result
                     });
                 }
-               
+
             }
             catch (Exception ex)
             {

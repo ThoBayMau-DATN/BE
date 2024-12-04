@@ -9,10 +9,8 @@ using BACK_END.Services.Interfaces;
 using BACK_END.Services.MyServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Drawing.Printing;
 using System.Globalization;
 using System.Linq.Expressions;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace BACK_END.Services.Repositories
 {
@@ -246,9 +244,6 @@ namespace BACK_END.Services.Repositories
                 await _db.SaveChangesAsync();
             }
         }
-
-
-
 
         public async Task<GetMotelEditDto?> GetMotelEdit(int motelId)
         {
