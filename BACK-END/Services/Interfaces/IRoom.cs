@@ -8,13 +8,13 @@ namespace BACK_END.Services.Interfaces
     {
 
         /*Task<List<GetAllRoomRepositoryDto>?> GetAllRoomByUser(string searchAddress, string sortColumn, string sortOrder, int pageNumber, int pageSize);*/
-        Task<PagedResultDto<RoomMotelDto>?> GetAllMotelByAdmin(MotelQueryDto queryDto); 
+        Task<PagedResultDto<RoomMotelDto>?> GetAllMotelByAdmin(MotelQueryDto queryDto);
         Task<PagedResultDto<RoomMotelDto>?> GetMotelByOwner(int userId, MotelQueryDto queryDto);
         Task<RoomMotelDto?> AddMotel(AddMotelDto addMotelDto);
         Task<GetMotelByIdDto?> GetMotelById(int motelId);
         Task<GetMotelEditDto?> GetMotelEdit(int motelId);
         Task<GetMotelByIdDto?> EditMotel(EditMotelDto editMotelDto);
-                Task<bool> RejectMotel(int motelId);
+        Task<bool> RejectMotel(int motelId);
         Task<bool> ApproveMotel(int motelId);
         Task<bool> LockMotel(int motelId);
         Task<bool> UnlockMotel(int motelId);

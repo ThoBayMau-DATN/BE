@@ -571,7 +571,7 @@ namespace BACK_END.Services.Repositories
                 Phone = user.Phone,
                 Avatar = user.Avatar,
                 Email = user.Email,
-
+                Role = (await _userManager.GetRolesAsync(identityUser)).FirstOrDefault()
             };
         }
 

@@ -20,12 +20,15 @@ namespace BACK_END.Services.Repositories
         private readonly FirebaseStorageService _firebaseStorageService;
         private readonly IMapper _mapper;
         private readonly IConfiguration _configuration;
-        public MainRespository(BACK_ENDContext db, FirebaseStorageService firebaseStorageService, IMapper mapper, IConfiguration configuration)
+        private readonly IAuth _auth;
+
+        public MainRespository(BACK_ENDContext db, FirebaseStorageService firebaseStorageService, IMapper mapper, IConfiguration configuration, IAuth auth)
         {
             _db = db;
             _firebaseStorageService = firebaseStorageService;
             _mapper = mapper;
             _configuration = configuration;
+            _auth = auth;
         }
 
         public async Task<IEnumerable<RoomTypeWithPackageDTO>> GetRoomTypesWithFeature()
@@ -478,16 +481,16 @@ namespace BACK_END.Services.Repositories
         {
 
             string[] addressParts = address.Split(new string[] { ", " }, StringSplitOptions.None);
-                Address addressObj = new Address
-                {
-                    Street = addressParts[0], 
-                    District = addressParts[1], 
-                    City = addressParts[2],      
-                    Province = addressParts[3]   
-                };
-                if (string.IsNullOrWhiteSpace(address))
+            Address addressObj = new Address
+            {
+                Street = addressParts[0],
+                District = addressParts[1],
+                City = addressParts[2],
+                Province = addressParts[3]
+            };
+            if (string.IsNullOrWhiteSpace(address))
                 return null;
-                
+
             var roomTypes = await _db.Room_Type
                 .Include(rt => rt.Motel)
                 .Include(rt => rt.Images)
@@ -501,7 +504,7 @@ namespace BACK_END.Services.Repositories
                                  rt.Motel.Address.Contains(addressObj.District, StringComparison.OrdinalIgnoreCase) ||
                                  rt.Motel.Address.Contains(addressObj.City, StringComparison.OrdinalIgnoreCase) ||
                                  rt.Motel.Address.Contains(addressObj.Province, StringComparison.OrdinalIgnoreCase)
-                             )  
+                             )
                 .Select(roomType => new RoomTypeWithPackageDTO
                 {
                     Id = roomType.Id,
@@ -549,6 +552,56 @@ namespace BACK_END.Services.Repositories
 
             return filteredRoomTypes;
         }
+        public async Task<IEnumerable<DTOs.MotelDto.InfomationRegisterMotelDTO>?> GetInfomationRegisterMotelAsync(int id)
+        {
+            var motel = await _db.Motel
+                .Include(x => x.Services)
+                .Include(x => x.Room_Types)
+                .ThenInclude(x => x.Images)
+                .Include(x => x.Room_Types)
+                .ThenInclude(x => x.Rooms)
+                .Where(x => x.UserId == id && x.Status == 1)
+                .ToListAsync();
+            if (motel.Count() == 0) return null;
+            var map = _mapper.Map<List<DTOs.MotelDto.InfomationRegisterMotelDTO>?>(motel);
+            return map;
+        }
 
+        public async Task<DTOs.MotelDto.ResultDeleteMotelDTO?> DeleteRegisterMotelAsync(int id)
+        {
+            var motel = await _db.Motel.FirstOrDefaultAsync(x => x.Id == id);
+            if (motel == null) return null;
+
+            var services = await _db.Service.Where(x => x.MotelId == id).ToListAsync();
+            if (services.Any())
+            {
+                _db.Service.RemoveRange(services);
+            }
+
+            var roomTypes = await _db.Room_Type.Where(x => x.MotelId == id).ToListAsync();
+            if (roomTypes.Any())
+            {
+                foreach (var roomType in roomTypes)
+                {
+                    var imgs = await _db.Image.Where(x => x.Room_TypeId == roomType.Id).ToListAsync();
+                    if (imgs.Any())
+                    {
+                        _db.Image.RemoveRange(imgs);
+                    }
+                    var rooms = await _db.Room.Where(x => x.Room_TypeId == roomType.Id).ToListAsync();
+                    if (rooms.Any())
+                    {
+                        _db.Room.RemoveRange(rooms);
+                    }
+                }
+
+                _db.Room_Type.RemoveRange(roomTypes);
+            }
+
+            _db.Motel.Remove(motel);
+            await _db.SaveChangesAsync();
+            var map = _mapper.Map<DTOs.MotelDto.ResultDeleteMotelDTO>(motel);
+            return map;
+        }
     }
 }
