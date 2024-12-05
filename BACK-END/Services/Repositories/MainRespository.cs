@@ -2,9 +2,13 @@
 using BACK_END.Data;
 using BACK_END.DTOs.MainDto;
 using BACK_END.DTOs.MotelDto;
+using BACK_END.Helper;
+using BACK_END.Models;
+using BACK_END.Repositories.VnpayDTO;
 using BACK_END.Services.Interfaces;
 using BACK_END.Services.MyServices;
 using BACK_END.Services.Paging;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
 
@@ -15,18 +19,25 @@ namespace BACK_END.Services.Repositories
         private readonly BACK_ENDContext _db;
         private readonly FirebaseStorageService _firebaseStorageService;
         private readonly IMapper _mapper;
-        public MainRespository(BACK_ENDContext db, FirebaseStorageService firebaseStorageService, IMapper mapper)
+        private readonly IConfiguration _configuration;
+        private readonly IAuth _auth;
+
+        public MainRespository(BACK_ENDContext db, FirebaseStorageService firebaseStorageService, IMapper mapper, IConfiguration configuration, IAuth auth)
         {
             _db = db;
             _firebaseStorageService = firebaseStorageService;
             _mapper = mapper;
+            _configuration = configuration;
+            _auth = auth;
         }
 
         public async Task<IEnumerable<RoomTypeWithPackageDTO>> GetRoomTypesWithFeature()
         {
             var roomTypes = await _db.Room_Type
-                .Include(r => r.Motel)
-                .Include(r => r.Images)
+                .Include(rt => rt.Motel)
+                .Include(rt => rt.Images)
+                .Include(rt => rt.Rooms)
+                    .ThenInclude(r => r.History)
                 .ToListAsync();
 
             var result = roomTypes.Select(roomType => new RoomTypeWithPackageDTO
@@ -41,12 +52,18 @@ namespace BACK_END.Services.Repositories
                     Link = i.Link,
                     Type = i.Type
                 }).ToList(),
-                IsFeatured = _db.Package_User.Any(pu => pu.UserId == roomType.Motel.UserId)
-            }).Where(r => r.IsFeatured)
-              .ToList();
+                IsFeatured = _db.Package_User.Any(pu => pu.UserId == roomType.Motel.UserId),
+                IsAvailable = roomType.Rooms.Any(room =>
+                    room.History == null || room.History.All(h => h.EndDate != null && h.EndDate <= DateTime.Now)
+                )
+            })
+            .Where(r => r.IsFeatured && r.IsAvailable)
+            .Take(12)
+            .ToList();
 
             return result;
         }
+
         public async Task<List<RoomTypeWithPackageDTO>> GetNewRoomTypesAsync()
         {
             var recentDate = DateTime.Now.AddMonths(-3);
@@ -66,8 +83,11 @@ namespace BACK_END.Services.Repositories
                         Link = i.Link,
                         Type = i.Type
                     }).ToList(),
-                })
-                .ToListAsync();
+                    IsAvailable = rt.Rooms.Any(room =>
+                    room.History == null || room.History.All(h => h.EndDate != null && h.EndDate <= DateTime.Now)
+                )
+                }).Where(r => r.IsFeatured && r.IsAvailable)
+                .Take(12).ToListAsync();
 
             return roomTypes;
         }
@@ -139,18 +159,20 @@ namespace BACK_END.Services.Repositories
             return Task.FromResult(roomTypeDTO);
         }
         public async Task<PagedList<RoomTypeDTO>> SearchRoomTypeByLocationAsync(
-     string? Province,
-     string? District,
-     string? Ward,
-     string? search,
-     int pageNumber,
-     int pageSize = 10,
-     string? sortOption = null,
-     decimal? minPrice = null,
-     decimal? maxPrice = null,
-     double? minArea = null,
-     double? maxArea = null
- )
+         string? Province,
+         string? District,
+         string? Ward,
+         string? search,
+         int pageNumber,
+         int pageSize = 10,
+         string? sortOption = null,
+         decimal? minPrice = null,
+         decimal? maxPrice = null,
+         double? minArea = null,
+         double? maxArea = null,
+         List<string>? surrounding = null
+
+        )
         {
             // Nếu tất cả thông tin tìm kiếm đều rỗng, trả về danh sách rỗng
             if (string.IsNullOrEmpty(Province) && string.IsNullOrEmpty(District)
@@ -202,6 +224,11 @@ namespace BACK_END.Services.Repositories
             {
                 query = query.Where(rt => rt.Area <= maxArea.Value);
             }
+            if (surrounding != null && surrounding.Any())
+            {
+                query = query.Where(rt => surrounding.All(s => rt.Motel.Description.Contains(s)));
+            }
+
 
             // Sắp xếp theo tùy chọn
             query = sortOption?.ToLower() switch
@@ -232,7 +259,7 @@ namespace BACK_END.Services.Repositories
             return await PagedList<RoomTypeDTO>.CreateAsync(projectedQuery, pageNumber, pageSize);
         }
 
- private string? HandlerToken(string token)
+        private string? HandlerToken(string token)
         {
             try
             {
@@ -248,7 +275,7 @@ namespace BACK_END.Services.Repositories
             }
         }
 
-        public async Task<PaginatedResponse<Rentalroomuser>> GetRentalRoomHistoryAsync(string token, int pageIndex, int pageSize)
+        public async Task<PaginatedResponse<Rentalroomuser>> GetRentalRoomHistoryAsync(string token, int pageIndex, int pageSize, string searchTerm)
         {
             var email = HandlerToken(token);
             if (string.IsNullOrEmpty(email))
@@ -258,7 +285,6 @@ namespace BACK_END.Services.Repositories
             if (user == null)
                 throw new KeyNotFoundException("User not found");
 
-            // Truy vấn Room_History theo UserId
             var query = _db.Room_History
                 .Where(rh => rh.UserId == user.Id)
                 .Include(rh => rh.Room)
@@ -271,8 +297,20 @@ namespace BACK_END.Services.Repositories
                     EndDate = rh.EndDate,
                     RoomNumber = rh.Room.RoomNumber,
                     Price = rh.Room.Room_Type.Price,
-                    MotelName = rh.Room.Room_Type.Motel.Name
+                    MotelName = rh.Room.Room_Type.Motel.Name,
+                    Adress = rh.Room.Room_Type.Motel.Address
                 });
+
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                query = query.Where(r =>
+                r.RoomNumber.ToString().Contains(searchTerm) ||
+                r.MotelName.Contains(searchTerm) || r.Adress.Contains(searchTerm))
+                ;
+
+
+            }
+
 
             // Phân trang
             var totalItems = await query.CountAsync();
@@ -288,7 +326,8 @@ namespace BACK_END.Services.Repositories
             };
         }
 
-        public async Task<PaginatedResponse<BillDto>> GetBillAsync(int id, int pageIndex, int pageSize)
+
+        public async Task<PaginatedResponse<BillDto>> GetBillAsync(int id, int pageIndex, int pageSize, string searchTerm)
         {
             var BillDetail = _db.Bill.Where(x => x.RoomId == id).Select(b => new BillDto
             {
@@ -299,6 +338,16 @@ namespace BACK_END.Services.Repositories
                 Total = b.Total,
             });
 
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                BillDetail = BillDetail.Where(r =>
+                r.PriceRoom.ToString().Contains(searchTerm) ||
+                r.CreatedDate.ToString().Contains(searchTerm)
+                );
+
+
+            }
+
             var totalItems = await BillDetail.CountAsync();
             var data = await BillDetail.Skip((pageIndex - 1) * pageSize)
                 .Take(pageSize)
@@ -308,6 +357,251 @@ namespace BACK_END.Services.Repositories
                 TotalItems = totalItems,
                 Items = data
             };
+        }
+
+        public async Task<BilldetailDto> GetBillDetailsByIdAsync(int billId)
+        {
+            var bill = await _db.Bill
+                .Include(b => b.Room)
+                    .ThenInclude(r => r.Room_Type)
+                        .ThenInclude(rt => rt.Motel)
+                .Include(b => b.Room)
+                    .ThenInclude(r => r.Consumption)
+                    .Include(b => b.User)
+                .FirstOrDefaultAsync(b => b.Id == billId);
+
+            if (bill == null)
+                return null;
+
+            var room = bill.Room;
+
+            if (room == null)
+                return null;
+
+            var services = await _db.Service_Room
+                .Include(sr => sr.Service)
+                .Where(sr => sr.RoomId == room.Id)
+                .ToListAsync();
+
+            var consumption = room.Consumption?
+                .OrderByDescending(c => c.Time)
+                .FirstOrDefault();
+
+            var dto = new BilldetailDto
+            {
+                MotelName = room.Room_Type?.Motel?.Name,
+                Adress = room.Room_Type?.Motel?.Address,
+                RoomNumber = room.RoomNumber,
+                BillId = bill.Id,
+                CreateDate = bill.CreatedDate,
+                Status = bill.Status,
+                FullName = bill.User?.FullName,
+                Electric = consumption?.Electricity ?? 0,
+                Water = consumption?.Water ?? 0,
+                RoomPrice = room.Room_Type?.Price ?? 0,
+                WaterName = services.FirstOrDefault(s => s.Service?.Name == "Water")?.Service?.Name,
+                ElectricName = services.FirstOrDefault(s => s.Service?.Name == "Electric")?.Service?.Name,
+                WaterPrice = services.FirstOrDefault(s => s.Service?.Name == "Water")?.Service?.Price ?? 0,
+                ElectricPrice = services.FirstOrDefault(s => s.Service?.Name == "Electric")?.Service?.Price ?? 0,
+                OtherService = services
+                    .Where(s => s.Service?.Name != "Water" && s.Service?.Name != "Electric")
+                    .Select(s => new OtherServiceBillDTO
+                    {
+                        Name = s.Service?.Name,
+                        price = s.Service?.Price
+                    }).ToList()
+            };
+
+            return dto;
+        }
+
+
+        public async Task<PaymentResponseModel> ProcessVnpayResponseAsync(IQueryCollection query)
+        {
+            var hashSecret = _configuration["Vnpay:HashSecret"];
+            var vnPay = new VnPayLibrary();
+            var response = vnPay.GetFullResponseData(query, hashSecret);
+
+            if (response.Success)
+            {
+                var billId = int.Parse(response.OrderId);
+                var bill = await _db.Bill.FirstOrDefaultAsync(b => b.Id == billId);
+
+                if (bill != null)
+                {
+                    bill.Status = 2;
+                    bill.Total = int.Parse(response.TransactionId);
+                    await _db.SaveChangesAsync();
+                }
+            }
+
+            return response;
+        }
+
+
+
+
+        public async Task<Bill?> UpdateBillStatusAsync(int billId)
+        {
+            var bill = await _db.Bill.FirstOrDefaultAsync(b => b.Id == billId);
+
+            if (bill == null)
+            {
+                return null;
+            }
+            bill.Status = 2;
+
+            _db.Bill.Update(bill);
+            await _db.SaveChangesAsync();
+
+            return bill;
+        }
+
+        public async Task<Bill?> GetTotalByBillAsync(int billId)
+        {
+            var bill = await _db.Bill.FirstOrDefaultAsync(b => b.Id == billId);
+
+            if (bill == null)
+            {
+                return null;
+            }
+
+            return bill;
+        }
+
+        public class Address
+        {
+            public string Street { get; set; }
+            public string District { get; set; }
+            public string City { get; set; }
+            public string Province { get; set; }
+        }
+
+        public async Task<ActionResult<IEnumerable<RoomTypeWithPackageDTO>>> SearchRoomTypesByAddress(string address)
+        {
+
+            string[] addressParts = address.Split(new string[] { ", " }, StringSplitOptions.None);
+            Address addressObj = new Address
+            {
+                Street = addressParts[0],
+                District = addressParts[1],
+                City = addressParts[2],
+                Province = addressParts[3]
+            };
+            if (string.IsNullOrWhiteSpace(address))
+                return null;
+
+            var roomTypes = await _db.Room_Type
+                .Include(rt => rt.Motel)
+                .Include(rt => rt.Images)
+                .Include(rt => rt.Rooms)
+                    .ThenInclude(r => r.History)
+                .ToListAsync();
+            var filteredRoomTypes = roomTypes
+                .Where(rt => !string.IsNullOrEmpty(rt.Motel?.Address) &&
+                             (
+                                rt.Motel.Address.Contains(addressObj.Street, StringComparison.OrdinalIgnoreCase)) ||
+                                 rt.Motel.Address.Contains(addressObj.District, StringComparison.OrdinalIgnoreCase) ||
+                                 rt.Motel.Address.Contains(addressObj.City, StringComparison.OrdinalIgnoreCase) ||
+                                 rt.Motel.Address.Contains(addressObj.Province, StringComparison.OrdinalIgnoreCase)
+                             )
+                .Select(roomType => new RoomTypeWithPackageDTO
+                {
+                    Id = roomType.Id,
+                    Price = roomType.Price,
+                    Name = roomType.Name,
+                    Address = roomType.Motel?.Address,
+                    Images = roomType.Images?.Select(i => new ImageDTO
+                    {
+                        Id = i.Id,
+                        Link = i.Link,
+                        Type = i.Type
+                    }).ToList(),
+                    IsFeatured = _db.Package_User.Any(pu => pu.UserId == roomType.Motel.UserId),
+                    IsAvailable = roomType.Rooms.Any(room =>
+                        room.History == null ||
+                        room.History.All(h => h.EndDate != null && h.EndDate <= DateTime.Now))
+                })
+                .Where(r => r.IsAvailable).Take(8)
+                .ToList();
+            if (!filteredRoomTypes.Any())
+            {
+                filteredRoomTypes = roomTypes
+                    .Where(rt => _db.Package_User.Any(pu => pu.UserId == rt.Motel.UserId))
+                    .Select(roomType => new RoomTypeWithPackageDTO
+                    {
+                        Id = roomType.Id,
+                        Price = roomType.Price,
+                        Name = roomType.Name,
+                        Address = roomType.Motel?.Address,
+                        Images = roomType.Images?.Select(i => new ImageDTO
+                        {
+                            Id = i.Id,
+                            Link = i.Link,
+                            Type = i.Type
+                        }).ToList(),
+                        IsFeatured = true,
+                        IsAvailable = roomType.Rooms.Any(room =>
+                            room.History == null ||
+                            room.History.All(h => h.EndDate != null && h.EndDate <= DateTime.Now))
+                    })
+                    .Where(r => r.IsAvailable)
+                    .Take(8)
+                    .ToList();
+            }
+
+            return filteredRoomTypes;
+        }
+        public async Task<IEnumerable<DTOs.MotelDto.InfomationRegisterMotelDTO>?> GetInfomationRegisterMotelAsync(int id)
+        {
+            var motel = await _db.Motel
+                .Include(x => x.Services)
+                .Include(x => x.Room_Types)
+                .ThenInclude(x => x.Images)
+                .Include(x => x.Room_Types)
+                .ThenInclude(x => x.Rooms)
+                .Where(x => x.UserId == id && x.Status == 1)
+                .ToListAsync();
+            if (motel.Count() == 0) return null;
+            var map = _mapper.Map<List<DTOs.MotelDto.InfomationRegisterMotelDTO>?>(motel);
+            return map;
+        }
+
+        public async Task<DTOs.MotelDto.ResultDeleteMotelDTO?> DeleteRegisterMotelAsync(int id)
+        {
+            var motel = await _db.Motel.FirstOrDefaultAsync(x => x.Id == id);
+            if (motel == null) return null;
+
+            var services = await _db.Service.Where(x => x.MotelId == id).ToListAsync();
+            if (services.Any())
+            {
+                _db.Service.RemoveRange(services);
+            }
+
+            var roomTypes = await _db.Room_Type.Where(x => x.MotelId == id).ToListAsync();
+            if (roomTypes.Any())
+            {
+                foreach (var roomType in roomTypes)
+                {
+                    var imgs = await _db.Image.Where(x => x.Room_TypeId == roomType.Id).ToListAsync();
+                    if (imgs.Any())
+                    {
+                        _db.Image.RemoveRange(imgs);
+                    }
+                    var rooms = await _db.Room.Where(x => x.Room_TypeId == roomType.Id).ToListAsync();
+                    if (rooms.Any())
+                    {
+                        _db.Room.RemoveRange(rooms);
+                    }
+                }
+
+                _db.Room_Type.RemoveRange(roomTypes);
+            }
+
+            _db.Motel.Remove(motel);
+            await _db.SaveChangesAsync();
+            var map = _mapper.Map<DTOs.MotelDto.ResultDeleteMotelDTO>(motel);
+            return map;
         }
     }
 }

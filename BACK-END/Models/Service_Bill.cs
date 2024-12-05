@@ -11,5 +11,7 @@ namespace BACK_END.Models
         public int Quantity { get; set; }
         public int? BillId { get; set; }
         public Bill? Bill { get; set; }
+        public int? ServiceId { get; set; }
+        public Service? Service { get; set; }
     }
 }

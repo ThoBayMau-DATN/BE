@@ -33,7 +33,7 @@ namespace BACK_END.Data
                 // Tạo tài khoản admin mặc định
                 var powerUser = new IdentityUser
                 {
-                    UserName = "admin",
+                    UserName = "admin@gmail.com",
                     Email = "admin@gmail.com",
                     PhoneNumber = "0123456780"
                 };
@@ -69,7 +69,7 @@ namespace BACK_END.Data
                 // Tạo tài khoản saff mặc định
                 var powerStaff = new IdentityUser
                 {
-                    UserName = "staff",
+                    UserName = "staff@gmail.com",
                     Email = "staff@gmail.com",
                     PhoneNumber = "0123456788"
                 };

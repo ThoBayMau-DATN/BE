@@ -88,11 +88,11 @@ namespace BACK_END.Controllers
                     if (fullErrorMessage == null)
                     {
 
-                        fullErrorMessage = string.Join("; ", "Phone đã tồn tại.");
+                        fullErrorMessage = string.Join("; ", "Số điện thoại đã tồn tại.");
                     }
                     else
                     {
-                        fullErrorMessage = string.Join("; ", fullErrorMessage, "Phone đã tồn tại.");
+                        fullErrorMessage = string.Join("; ", fullErrorMessage, "Số điện thoại đã tồn tại.");
                     }
                 }
 

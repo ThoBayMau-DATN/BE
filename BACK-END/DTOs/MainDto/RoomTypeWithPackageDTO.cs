@@ -8,7 +8,8 @@
         public string Name { get; set; }
         public string Address { get; set; }  // Địa chỉ của Motel liên kết với RoomType
         public List<ImageDTO> Images { get; set; }
-        public bool IsFeatured { get; set; }  // Trạng thái nổi bật (có Package_User hay không)
+        public bool IsFeatured { get; set; }
+        public bool IsAvailable { get; set; }
     }
 
     // ImageDTO.cs

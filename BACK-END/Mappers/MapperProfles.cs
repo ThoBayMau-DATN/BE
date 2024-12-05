@@ -19,12 +19,6 @@ namespace BACK_END.Mappers
             .ForMember(dest => dest.PageSize, opt => opt.MapFrom(src => src.PageSize))
             .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src));
 
-            //CreateMap<Room, GetRoomById>()
-            //    .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
-            //    .ForMember(dest => dest.RoomNumber, opt => opt.MapFrom(src => src.RoomNumber))
-            //    .ForMember(dest => dest.Area, opt => opt.MapFrom(src => src.Area))
-            //    .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Price));
-
             CreateMap<Motel, MotelAvailabilityDTO>()
             .ForMember(dest => dest.MotelName, opt => opt.MapFrom(src => src.Name))
             .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
@@ -47,6 +41,21 @@ namespace BACK_END.Mappers
             .ForMember(dest => dest.PageNumber, opt => opt.MapFrom(src => src.CurrentPage))
             .ForMember(dest => dest.PageSize, opt => opt.MapFrom(src => src.PageSize))
             .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src));
+
+            //InfomationRegisterMotel
+            CreateMap<Motel, DTOs.MotelDto.InfomationRegisterMotelDTO>()
+                .ForMember(dest => dest.Service, opt => opt.MapFrom(src => src.Services))
+                .ForMember(dest => dest.RoomType, opt => opt.MapFrom(src => src.Room_Types))
+                .ReverseMap();
+            CreateMap<Service, DTOs.MotelDto.InfomationRegisterMotel_ServiceDTO>().ReverseMap();
+            CreateMap<Room_Type, DTOs.MotelDto.InfomationRegisterMotel_Room_TypeDTO>()
+                .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.Images))
+                .ForMember(dest => dest.TotalRoom, opt => opt.MapFrom(src => src.Rooms.Count()))
+                .ReverseMap();
+            CreateMap<Image, DTOs.MotelDto.InfomationRegisterMotel_ImageDTO>().ReverseMap();
+
+            //delete motel
+            CreateMap<Motel, DTOs.MotelDto.ResultDeleteMotelDTO>().ReverseMap();
         }
     }
 }
