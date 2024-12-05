@@ -521,6 +521,7 @@ namespace BACK_END.Services.Repositories
                 return null;
             identityUser.Email = userDetailDto.Email ?? identityUser.Email;
             identityUser.PhoneNumber = userDetailDto.Phone ?? identityUser.PhoneNumber;
+            identityUser.UserName = userDetailDto.Email ?? identityUser.Email;
             var identityResult = await _userManager.UpdateAsync(identityUser);
             if (!identityResult.Succeeded)
                 return null;
@@ -570,7 +571,7 @@ namespace BACK_END.Services.Repositories
                 Phone = user.Phone,
                 Avatar = user.Avatar,
                 Email = user.Email,
-
+                Role = (await _userManager.GetRolesAsync(identityUser)).FirstOrDefault()
             };
         }
 
@@ -595,11 +596,18 @@ namespace BACK_END.Services.Repositories
             if (room == null)
                 return null;
 
+            var bill = await _db.Bill
+        .Where(b => b.RoomId == room.Id && b.UserId == user.Id)
+        .OrderByDescending(b => b.CreatedDate) // Lấy hóa đơn mới nhất
+        .FirstOrDefaultAsync();
+
+            int? billId = bill?.Id;
+            int? total = bill?.Total;
+
             // Lấy thông tin sử dụng nước và điện
             var consumption = await _db.Consumption.FirstOrDefaultAsync(c => c.RoomId == room.Id);
             int waterUsage = consumption?.Water ?? 0;
             int electricUsage = consumption?.Electricity ?? 0;
-
             int waterPrice = 0, electricPrice = 0, otherServicePrice = 0;
             List<OtherServiceDTO> otherServices = new List<OtherServiceDTO>();
 
@@ -675,11 +683,12 @@ namespace BACK_END.Services.Repositories
             }
 
             // Kiểm tra tình trạng thanh toán
-            bool hasPaid = await _db.Bill.AnyAsync(b => b.UserId == user.Id);
+            var hasPaid = await _db.Bill.FirstOrDefaultAsync(b => b.UserId == user.Id);
 
             // Trả về DTO RentalRoomDetailDTO
             return new RentalRoomDetailDTO
             {
+                Id = motel.Id,
                 MotelName = motelName,
                 MotelAdress = motelAddress,
                 fullName = user.FullName,
@@ -687,13 +696,15 @@ namespace BACK_END.Services.Repositories
                 Price = room.Room_Type?.Price ?? 0,
                 Area = room.Room_Type?.Area ?? 0,
                 CreateDate = roomHistory.CreateDate,
-                Status = hasPaid,
+                Status = hasPaid.Status,
                 WaterPrice = waterPrice,
                 ElectricPrice = electricPrice,
                 OtherService = otherServices, // Các dịch vụ ngoài nước và điện
                 owner = ownerName,
                 phone = ownerPhone,
-                RoomImages = roomImages // Trả về danh sách hình ảnh của RoomType
+                RoomImages = roomImages,
+                BillId = billId,
+                TotalMoney = total
             };
         }
 

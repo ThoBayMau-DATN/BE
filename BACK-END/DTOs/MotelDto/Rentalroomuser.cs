@@ -3,6 +3,7 @@
     public class Rentalroomuser
     {
         public int RoomId { get; set; }
+        public string? Adress { get; set; }
         public string? MotelName { get; set; }
         public int RoomNumber { get; set; }
         public int? Price { get; set; }

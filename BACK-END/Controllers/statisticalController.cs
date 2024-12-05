@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BACK_END.DTOs.Repository;
+using BACK_END.DTOs.StaticDto;
 using BACK_END.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -115,6 +116,53 @@ namespace BACK_END.Controllers
         //        }));
         //    }
 
+        [HttpGet("revenue-admin")]
+        public async Task<IActionResult> GetRevenueAdmin([FromQuery] selecRevenueAdmin item)
+        {
+            var revenueData = await _statictical.MonthlyRevenue(item);
+            if (revenueData != null) {
+                return Ok((new ApiResponse<object>
+                {
+                    Code = 200,
+                    Status = "success",
+                    Message = "trả dữ liệu phần trăm thành công",
+                    Data = revenueData
+                }));
+
+            }
+            else
+            {
+                return BadRequest((new ApiResponse<object>
+                {
+                    Status = "error",
+                    Message = "Không thể lấy dữ liệu",
+                }));
+            }
+        }
+        [HttpGet("count-account")]
+        public async Task<IActionResult> CountAccount([FromQuery] FormCountAccount item)
+        {
+            var countAccount = await _statictical.CountAccount(item);
+            if (countAccount != null)
+            {
+                return Ok((new ApiResponse<object>
+                {
+                    Code = 200,
+                    Status = "success",
+                    Message = "trả dữ liệu phần trăm thành công",
+                    Data = countAccount
+                }));
+
+            }
+            else
+            {
+                return BadRequest((new ApiResponse<object>
+                {
+                    Status = "error",
+                    Message = "Không thể lấy dữ liệu",
+                }));
+            }
+        }
 
 
     }

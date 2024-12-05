@@ -163,9 +163,25 @@ namespace BACK_END.Controllers
                     n.Type,
                     n.Title,
                     n.Content,
-                    n.Status
+                    n.Status,
+                    n.CreateDate,
+                    n.Sender,
                 })
             });
+
+            
+        }
+        [HttpGet("GetNotificationsByType")]
+        public async Task<IActionResult> GetNotificationsByType([FromQuery] string token, [FromQuery] int type)
+        {
+            // Gọi repository để lấy thông báo
+            var notifications = await _noti.GetNotificationsByTokenAndTypeAsync(token, type);
+
+            // Kiểm tra kết quả
+            if (!notifications.Any())
+                return NotFound("No notifications found.");
+
+            return Ok(notifications);
         }
     }
 }
