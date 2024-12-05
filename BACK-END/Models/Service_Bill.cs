@@ -8,6 +8,7 @@ namespace BACK_END.Models
         [Column(TypeName = "nvarchar(100)")]
         public string? Name { get; set; }
         public int Price_Service { get; set; }
+        public int Quantity { get; set; }
         public int? BillId { get; set; }
         public Bill? Bill { get; set; }
         public int? ServiceId { get; set; }

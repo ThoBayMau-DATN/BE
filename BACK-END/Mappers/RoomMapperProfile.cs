@@ -74,6 +74,15 @@ namespace BACK_END.Mappers
             //get room by export bill
             CreateMap<Room, GetRoomByExportBillDto>()
                 .ForMember(dest => dest.Consumption, opt => opt.MapFrom(src => src.Consumption != null ? src.Consumption.OrderByDescending(c => c.Time).FirstOrDefault() : null));
+
+            //get bill by room id
+            CreateMap<Bill, GetBillByRoomIdDto>()
+                .ForMember(dest => dest.Room, opt => opt.MapFrom(src => src.Room))
+                .ForMember(dest => dest.User, opt => opt.MapFrom(src => src.User))
+                .ForMember(dest => dest.ServiceBills, opt => opt.MapFrom(src => src.Service_Bills));
+            CreateMap<Room, GetBillByRoomIdDto_Room>();
+            CreateMap<Service_Bill, GetBillByRoomIdDto_ServiceBill>();
+            
         }
 
         private static float CalculateAverageRating(Motel motel)
