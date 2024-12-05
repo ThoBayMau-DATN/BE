@@ -381,8 +381,8 @@ namespace BACK_END.Controllers
                 var result = await _room.AddElectricAndWaterToBill(dto);
                 if (!result || result == false)
                 {
-                return BadRequest(new MotelRepository<object> { Code = 400, Success = false, Message = "Thêm điện nước vào hóa đơn thất bại" });
-            }
+                    return BadRequest(new MotelRepository<object> { Code = 400, Success = false, Message = "Thêm điện nước vào hóa đơn thất bại" });
+                }
                 return Ok(new MotelRepository<object> { Code = 200, Success = true, Message = "Thêm điện nước vào hóa đơn thành công" });
             }
             catch (Exception ex)
@@ -402,6 +402,92 @@ namespace BACK_END.Controllers
                     return BadRequest(new MotelRepository<object> { Code = 400, Success = false, Message = "Không tìm thấy phòng trọ" });
                 }
                 return Ok(new MotelRepository<object> { Code = 200, Success = true, Message = "Lấy giá phòng trọ thành công", Data = result });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new MotelRepository<object> { Code = 400, Success = false, Message = ex.Message });
+            }
+        }
+
+        [HttpGet("find-user")]
+        public async Task<IActionResult> FindUser(string search)
+        {
+            try
+            {
+                var result = await _room.FindUser(search);
+                return Ok(new MotelRepository<object> { Code = 200, Success = true, Message = "Tìm kiếm người dùng thành công", Data = result });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new MotelRepository<object> { Code = 400, Success = false, Message = ex.Message });
+            }
+        }
+
+        [HttpPost("add-user-to-room")]
+        public async Task<IActionResult> AddUserToRoom([FromBody] AddUserToRoomDto dto)
+        {
+            try
+            {
+                var result = await _room.AddUserToRoom(dto);
+                if (!result || result == false)
+                {
+                    return BadRequest(new MotelRepository<object> { Code = 400, Success = false, Message = "Thêm người dùng vào phòng trọ thất bại" });
+                }
+                return Ok(new MotelRepository<object> { Code = 200, Success = true, Message = "Thêm người dùng vào phòng trọ thành công" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new MotelRepository<object> { Code = 400, Success = false, Message = ex.Message });
+            }
+        }
+
+        [HttpDelete("delete-user-from-room")]
+        public async Task<IActionResult> DeleteUserFromRoom([FromBody] DeleteUserFromRoomDto dto)
+        {
+            try
+            {
+                var result = await _room.DeleteUserFromRoom(dto);
+                if (!result || result == false)
+                {
+                    return BadRequest(new MotelRepository<object> { Code = 400, Success = false, Message = "Xóa người dùng khỏi phòng trọ thất bại" });
+                }
+                return Ok(new MotelRepository<object> { Code = 200, Success = true, Message = "Xóa người dùng khỏi phòng trọ thành công" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new MotelRepository<object> { Code = 400, Success = false, Message = ex.Message });
+            }
+        }
+
+        [HttpGet("get-bill-by-room-id/{roomId}")]
+        public async Task<IActionResult> GetBillByRoomId(int roomId)
+        {
+            try
+            {
+                var result = await _room.GetBillByRoomId(roomId);
+                if (result == null)
+                {
+                    return BadRequest(new MotelRepository<object> { Code = 400, Success = false, Message = "Không tìm thấy hóa đơn" });
+                }
+                return Ok(new MotelRepository<object> { Code = 200, Success = true, Message = "Lấy hóa đơn thành công", Data = result });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new MotelRepository<object> { Code = 400, Success = false, Message = ex.Message });
+            }
+        }
+
+        [HttpGet("get-bill-by-id/{id}")]
+        public async Task<IActionResult> GetBillById(int id)
+        {
+            try
+            {
+                var result = await _room.GetBillById(id);
+                if (result == null)
+                {
+                    return BadRequest(new MotelRepository<object> { Code = 400, Success = false, Message = "Không tìm thấy hóa đơn" });
+                }
+                return Ok(new MotelRepository<object> { Code = 200, Success = true, Message = "Lấy hóa đơn thành công", Data = result });
             }
             catch (Exception ex)
             {

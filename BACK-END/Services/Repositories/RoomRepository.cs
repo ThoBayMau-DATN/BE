@@ -607,7 +607,8 @@ namespace BACK_END.Services.Repositories
                     var serviceBill = new Service_Bill
                     {
                         Name = "Điện",
-                        Price_Service = priceElectric,
+                        Price_Service = service.FirstOrDefault(x => x.Name == "Điện")?.Price ?? 0,
+                        Quantity = dto.Electric - (oldConsumption?.Electricity ?? 0),
                         BillId = bill.Id
                     };
                     await _db.Service_Bill.AddAsync(serviceBill);
@@ -617,7 +618,8 @@ namespace BACK_END.Services.Repositories
                     var serviceBill = new Service_Bill
                     {
                         Name = "Nước",
-                        Price_Service = priceWater,
+                        Price_Service = service.FirstOrDefault(x => x.Name == "Nước")?.Price ?? 0,
+                        Quantity = dto.Water - (oldConsumption?.Water ?? 0),
                         BillId = bill.Id
                     };
                     await _db.Service_Bill.AddAsync(serviceBill);
@@ -628,6 +630,7 @@ namespace BACK_END.Services.Repositories
                     {
                         Name = "Khác",
                         Price_Service = dto.Other,
+                        Quantity = 1,
                         BillId = bill.Id
                     };
                     await _db.Service_Bill.AddAsync(serviceBill);
@@ -652,6 +655,79 @@ namespace BACK_END.Services.Repositories
             return roomType.MapToGetPriceByRoomTypeIdDto();
         }
 
+        public async Task<List<RoomUserDto>?> FindUser(string search)
+        {
+            if (string.IsNullOrEmpty(search)) return null;
+
+            var searchTrim = search.Trim();
+
+            var userHistory = await _db.Room_History
+                .Include(x => x.User)
+                .Where(x => x.Status == 1)
+                .ToListAsync();
+
+            var user = await _db.User
+                .Where(x => (x.Phone.Contains(searchTrim) || x.Email.Contains(searchTrim) || x.FullName.Contains(searchTrim)) && !userHistory.Select(x => x.UserId).Contains(x.Id))
+                .ToListAsync();
+
+            if (user == null)
+            {
+                return null;
+            }
+
+            // Map user sang RoomUserDto và trả về
+            return _mapper.Map<List<RoomUserDto>>(user);
+        }
+
+        public async Task<bool> AddUserToRoom(AddUserToRoomDto dto)
+        {
+            var room = await _db.Room.FindAsync(dto.RoomId);
+            if (room == null) return false;
+            var user = await _db.User.FindAsync(dto.UserId);
+            if (user == null) return false;
+            var roomHistory = new Room_History
+            {
+                RoomId = dto.RoomId,
+                UserId = dto.UserId,
+                Status = 1
+            };
+            await _db.Room_History.AddAsync(roomHistory);
+            return await _db.SaveChangesAsync() > 0;
+        }
+
+
+        public async Task<bool> DeleteUserFromRoom(DeleteUserFromRoomDto dto)
+        {
+            var roomHistory = await _db.Room_History.Where(x => x.RoomId == dto.RoomId && x.UserId == dto.UserId).FirstOrDefaultAsync();
+            if (roomHistory == null) return false;
+            roomHistory.Status = 2;
+            _db.Update(roomHistory);
+            return await _db.SaveChangesAsync() > 0;
+        }
+
+        public async Task<List<GetBillByRoomIdDto>?> GetBillByRoomId(int roomId)
+        {
+            if (roomId == 0) return null;
+            var bill = await _db.Bill.Where(x => x.RoomId == roomId && x.Status == 2)
+            .Include(x => x.Room)
+            .Include(x => x.User)
+            .Include(x => x.Service_Bills)
+            .ToListAsync();
+            if (bill == null) return null;
+            return _mapper.Map<List<GetBillByRoomIdDto>>(bill);
+        }
+
+        public async Task<GetBillByRoomIdDto?> GetBillById(int id)
+        {
+            if (id == 0) return null;
+            var bill = await _db.Bill
+                .Include(x => x.Room)
+            .Include(x => x.User)
+            .Include(x => x.Service_Bills)
+.           FirstOrDefaultAsync(x => x.Id == id);
+            if (bill == null) return null;
+            return _mapper.Map<GetBillByRoomIdDto>(bill);
+        }
 
 
 
