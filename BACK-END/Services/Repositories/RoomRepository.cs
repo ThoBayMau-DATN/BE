@@ -125,7 +125,10 @@ namespace BACK_END.Services.Repositories
                 .Include(x => x.Room_Types!)
                 .ThenInclude(x => x.Images)
                 .Include(x => x.Room_Types!)
-                .ThenInclude(x => x.Reviews).AsQueryable();
+                
+                .ThenInclude(x => x.Reviews)
+
+                .Where(x => x.UserId == userId).AsQueryable();
 
             //Lọc theo trạng thái
             if (queryDto.Status != null && queryDto.Status != 0)
