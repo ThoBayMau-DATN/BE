@@ -31,6 +31,11 @@ namespace BACK_END.Services.Interfaces
         Task<List<GetRoomByExportBillDto>?> GetRoomByExportBill(int roomTypeId);
         Task<bool> AddElectricAndWaterToBill(AddElectricAndWaterDto dto);
         Task<GetPriceByRoomTypeIdDto?> GetPriceByRoomTypeId(int roomTypeId);
+        Task<List<RoomUserDto>?> FindUser(string search);
+        Task<bool> AddUserToRoom(AddUserToRoomDto dto);
+        Task<bool> DeleteUserFromRoom(DeleteUserFromRoomDto dto);
+        Task<List<GetBillByRoomIdDto>?> GetBillByRoomId(int roomId);
+        Task<GetBillByRoomIdDto?> GetBillById(int id);
         // Task<List<GetRoomByMotelIdDto>?> GetRoomByMotelId(int motelId);
         // Task<bool> AddRoom(AddRoomDto dto);
         // Task<bool> AddMultiRoom(AddMultiRoomDto dto);
