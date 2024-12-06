@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BACK_END.Migrations
 {
     /// <inheritdoc />
-    public partial class ccccc : Migration
+    public partial class updatealltodb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -95,7 +95,7 @@ namespace BACK_END.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     FullName = table.Column<string>(type: "nvarchar(50)", nullable: true),
                     Phone = table.Column<string>(type: "varchar(10)", nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Email = table.Column<string>(type: "varchar(100)", nullable: true),
                     Avatar = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Status = table.Column<byte>(type: "tinyint", nullable: false)
@@ -293,7 +293,7 @@ namespace BACK_END.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Area = table.Column<int>(type: "int", nullable: false),
+                    Area = table.Column<byte>(type: "tinyint", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Price = table.Column<int>(type: "int", nullable: false),
                     NewPrice = table.Column<int>(type: "int", nullable: false),
@@ -568,7 +568,9 @@ namespace BACK_END.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(100)", nullable: true),
                     Price_Service = table.Column<int>(type: "int", nullable: false),
-                    BillId = table.Column<int>(type: "int", nullable: true)
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    BillId = table.Column<int>(type: "int", nullable: true),
+                    ServiceId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -577,6 +579,11 @@ namespace BACK_END.Migrations
                         name: "FK_Service_Bill_Bill_BillId",
                         column: x => x.BillId,
                         principalTable: "Bill",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Service_Bill_Service_ServiceId",
+                        column: x => x.ServiceId,
+                        principalTable: "Service",
                         principalColumn: "Id");
                 });
 
@@ -698,6 +705,11 @@ namespace BACK_END.Migrations
                 name: "IX_Service_Bill_BillId",
                 table: "Service_Bill",
                 column: "BillId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Service_Bill_ServiceId",
+                table: "Service_Bill",
+                column: "ServiceId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Service_Room_RoomId",
