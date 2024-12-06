@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BACK_END.Migrations
 {
     [DbContext(typeof(BACK_ENDContext))]
-    [Migration("20241201084502_add-name")]
-    partial class addname
+    [Migration("20241205133652_updatealltodb")]
+    partial class updatealltodb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -433,6 +433,9 @@ namespace BACK_END.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<int>("Price_Service")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
                         .HasColumnType("int");
 
                     b.Property<int?>("ServiceId")
@@ -910,7 +913,7 @@ namespace BACK_END.Migrations
             modelBuilder.Entity("BACK_END.Models.Service_Bill", b =>
                 {
                     b.HasOne("BACK_END.Models.Bill", "Bill")
-                        .WithMany()
+                        .WithMany("Service_Bills")
                         .HasForeignKey("BillId");
 
                     b.HasOne("BACK_END.Models.Service", "Service")
@@ -1025,6 +1028,11 @@ namespace BACK_END.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("BACK_END.Models.Bill", b =>
+                {
+                    b.Navigation("Service_Bills");
                 });
 
             modelBuilder.Entity("BACK_END.Models.Motel", b =>
