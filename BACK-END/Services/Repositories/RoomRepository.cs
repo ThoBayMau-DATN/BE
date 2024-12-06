@@ -6,6 +6,7 @@ using BACK_END.Models;
 
 using BACK_END.Services.Interfaces;
 using BACK_END.Services.MyServices;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
@@ -15,15 +16,17 @@ namespace BACK_END.Services.Repositories
 {
     public class RoomRepository : IRoom
     {
-
+        private readonly UserManager<IdentityUser> _userManager;
         private readonly BACK_ENDContext _db;
         private readonly FirebaseStorageService _firebaseStorageService;
         private readonly IMapper _mapper;
-        public RoomRepository(BACK_ENDContext db, FirebaseStorageService firebaseStorageService, IMapper mapper)
+        public RoomRepository(BACK_ENDContext db, FirebaseStorageService firebaseStorageService, IMapper mapper, UserManager<IdentityUser> userManager)
         {
             _db = db;
             _firebaseStorageService = firebaseStorageService;
             _mapper = mapper;
+            _userManager = userManager;
+
         }
 
         public async Task<PagedResultDto<RoomMotelDto>?> GetAllMotelByAdmin(MotelQueryDto queryDto)
@@ -367,7 +370,17 @@ namespace BACK_END.Services.Repositories
         //duyệt motel
         public async Task<bool> ApproveMotel(int motelId)
         {
+
             var motel = await _db.Motel.FindAsync(motelId);
+            var user = await _db.User.FirstOrDefaultAsync(x => x.Id == motel.UserId);
+            var UserDetail = await _userManager.FindByEmailAsync(user.Email);
+            var currentRoles = await _userManager.GetRolesAsync(UserDetail);
+            if (currentRoles[0] == "Customer")
+            {
+                await _userManager.RemoveFromRolesAsync(UserDetail, currentRoles);
+                await _userManager.AddToRoleAsync(UserDetail, "Owner");
+                await _db.SaveChangesAsync();
+            }
             if (motel == null || motel.Status != 1) return false;
 
             motel.Status = (int)MotelStatus.Active; // 2
