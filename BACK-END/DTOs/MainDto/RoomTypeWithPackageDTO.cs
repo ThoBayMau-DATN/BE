@@ -10,6 +10,8 @@
         public List<ImageDTO> Images { get; set; }
         public bool IsFeatured { get; set; }
         public bool IsAvailable { get; set; }
+        public string PackageName { get; set; }
+        public int PackagePrice { get; set; }
     }
 
     // ImageDTO.cs
