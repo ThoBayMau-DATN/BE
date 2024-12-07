@@ -12,5 +12,6 @@ namespace BACK_END.Models
         public virtual List<Room_History>? History { get; set; }
         public virtual Room_Type? Room_Type { get; set; }
         public virtual List<Consumption>? Consumption { get; set; }
+        public virtual List<Bill>? Bill { get; set; }
     }
 }

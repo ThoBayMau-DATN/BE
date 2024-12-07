@@ -128,7 +128,7 @@ namespace BACK_END.Services.Repositories
                 .Include(x => x.Room_Types!)
                 .ThenInclude(x => x.Images)
                 .Include(x => x.Room_Types!)
-                
+
                 .ThenInclude(x => x.Reviews)
 
                 .Where(x => x.UserId == userId).AsQueryable();
@@ -553,18 +553,33 @@ namespace BACK_END.Services.Repositories
             if (room == null) return null;
             var history = await _db.Room_History
                 .Include(x => x.User)
-                .Where(x => x.RoomId == roomId).ToListAsync();
+                .Where(x => x.RoomId == roomId)
+                .OrderByDescending(x => x.Id)
+                .ToListAsync();
             return _mapper.Map<List<GetHistoryDto>>(history);
         }
 
         public async Task<List<GetRoomByExportBillDto>?> GetRoomByExportBill(int roomTypeId)
         {
-            var room = await _db.Room
-            .Include(x => x.Consumption)
-            .Where(x => x.Room_TypeId == roomTypeId && x.Status == 2)
-            .ToListAsync();
-            if (room == null) return null;
-            return _mapper.Map<List<GetRoomByExportBillDto>>(room);
+            var currentDate = DateTime.Now;
+
+            // Lấy danh sách phòng trong một query duy nhất
+            var availableRooms = await _db.Room
+                .Include(x => x.Consumption)
+                .Include(x => x.Bill)
+                .Where(room =>
+                    room.Room_TypeId == roomTypeId &&
+                    room.Status == 2 &&
+                    (room.Bill == null || !room.Bill.Any(bill =>
+                        bill.CreatedDate.Month == currentDate.Month &&
+                        bill.CreatedDate.Year == currentDate.Year))
+                )
+                .ToListAsync();
+
+            if (!availableRooms.Any())
+                return null;
+
+            return _mapper.Map<List<GetRoomByExportBillDto>>(availableRooms);
         }
 
         public async Task<bool> AddElectricAndWaterToBill(AddElectricAndWaterDto dto)
@@ -702,6 +717,12 @@ namespace BACK_END.Services.Repositories
                 UserId = dto.UserId,
                 Status = 1
             };
+
+            if(room.Status == 1)
+            {
+                room.Status = 2;
+                _db.Update(room);
+            }
             await _db.Room_History.AddAsync(roomHistory);
             return await _db.SaveChangesAsync() > 0;
         }
@@ -709,9 +730,10 @@ namespace BACK_END.Services.Repositories
 
         public async Task<bool> DeleteUserFromRoom(DeleteUserFromRoomDto dto)
         {
-            var roomHistory = await _db.Room_History.Where(x => x.RoomId == dto.RoomId && x.UserId == dto.UserId).FirstOrDefaultAsync();
-            if (roomHistory == null) return false;
+            var roomHistory = await _db.Room_History.Where(x => x.RoomId == dto.RoomId && x.UserId == dto.UserId).OrderByDescending(x => x.Id).FirstOrDefaultAsync();
+            if (roomHistory == null || roomHistory.Status != 1) return false;
             roomHistory.Status = 2;
+            roomHistory.EndDate = DateTime.Now;
             _db.Update(roomHistory);
             return await _db.SaveChangesAsync() > 0;
         }
@@ -723,6 +745,7 @@ namespace BACK_END.Services.Repositories
             .Include(x => x.Room)
             .Include(x => x.User)
             .Include(x => x.Service_Bills)
+            .OrderByDescending(x => x.CreatedDate)
             .ToListAsync();
             if (bill == null) return null;
             return _mapper.Map<List<GetBillByRoomIdDto>>(bill);
@@ -735,7 +758,7 @@ namespace BACK_END.Services.Repositories
                 .Include(x => x.Room)
             .Include(x => x.User)
             .Include(x => x.Service_Bills)
-.           FirstOrDefaultAsync(x => x.Id == id);
+.FirstOrDefaultAsync(x => x.Id == id);
             if (bill == null) return null;
             return _mapper.Map<GetBillByRoomIdDto>(bill);
         }

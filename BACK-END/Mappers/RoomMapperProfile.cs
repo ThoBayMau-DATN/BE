@@ -61,6 +61,7 @@ namespace BACK_END.Mappers
                 .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.Room_Type != null ? src.Room_Type.Images : null))
                 .ForMember(dest => dest.Users, opt => opt.MapFrom(src => src.History != null ? src.History.Where(h => h.Status == 1).Select(h => h.User) : null))
                 .ForMember(dest => dest.Consumption, opt => opt.MapFrom(src => src.Consumption != null ? src.Consumption.OrderByDescending(c => c.Time).FirstOrDefault() : null));
+
             CreateMap<Room_Type, RoomDto_RoomType>();
             CreateMap<User, RoomDto_History_User>();
             CreateMap<Consumption, ConsumptionDto>();
