@@ -5,7 +5,7 @@ namespace BACK_END.Models
     public class Room_History
     {
         public int Id { get; set; }
-        public DateTime? CreateDate { get; set; } = DateTime.Now;
+        public DateTime CreateDate { get; set; } = DateTime.Now;
         public DateTime? EndDate { get; set; }
         [Column(TypeName = "tinyint")]
         public int? Status { get; set; }
