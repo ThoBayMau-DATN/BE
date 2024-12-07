@@ -5,6 +5,7 @@ using BACK_END.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Mail;
+using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
 
 namespace BACK_END.Controllers
 {
@@ -598,6 +599,25 @@ namespace BACK_END.Controllers
                 return NotFound("User not found or invalid token");
             return Ok(roomDetail);
         }
-
+        [HttpGet("send-bill-email")]
+        public async Task<IActionResult> SendBillEmail([FromQuery] int billId)
+        {
+            try
+            {
+                var res = await _auth.SendBillEmail(billId);
+                return Ok( new ApiResponse<object>
+                {
+                    Code = 200,
+                    Status = "success",
+                    Message = "Gửi hóa đơn thành công",
+                    Data = res
+                } );
+            }
+            
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Exception: {ex.Message}");
+            }
+        }
     }
 }
