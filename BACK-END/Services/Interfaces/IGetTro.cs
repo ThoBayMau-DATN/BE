@@ -12,11 +12,11 @@ namespace BACK_END.Services.Interfaces
     {
         Task<IEnumerable<RoomTypeWithPackageDTO>> GetRoomTypesWithFeature();
 
-        Task<List<RoomTypeWithPackageDTO>> GetNewRoomTypesAsync();
+        Task<IEnumerable<RoomTypeWithPackageDTO>> GetNewRoomTypesAsync();
 
         Task<ActionResult<IEnumerable<RoomTypeWithPackageDTO>>> SearchRoomTypesByAddress(string address);
 
-        Task<List<RoomTypeWithPackageDTO>> GetRoomTypesUnderOneMillionAsync();
+        Task<IEnumerable<RoomTypeWithPackageDTO>> GetRoomTypesUnderOneMillionAsync();
 
         Task<RoomTypeDTO> GetRoomTypeByRoomID(int id);
 

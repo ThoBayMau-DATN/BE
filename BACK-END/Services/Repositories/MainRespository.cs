@@ -40,38 +40,63 @@ namespace BACK_END.Services.Repositories
                     .ThenInclude(r => r.History)
                 .ToListAsync();
 
-            var result = roomTypes.Select(roomType => new RoomTypeWithPackageDTO
+            var result = roomTypes.Select(roomType =>
             {
-                Id = roomType.Id,
-                Price = roomType.Price,
-                Name = roomType.Name,
-                Address = roomType.Motel?.Address,
-                Images = roomType.Images?.Select(i => new ImageDTO
+                var topPackage = _db.Package_User
+                    .Where(pu => pu.UserId == roomType.Motel.UserId)
+                    .OrderByDescending(pu => pu.Package.Price)
+                    .Select(pu => pu.Package)
+                    .FirstOrDefault();
+
+                return new RoomTypeWithPackageDTO
                 {
-                    Id = i.Id,
-                    Link = i.Link,
-                    Type = i.Type
-                }).ToList(),
-                IsFeatured = _db.Package_User.Any(pu => pu.UserId == roomType.Motel.UserId),
-                IsAvailable = roomType.Rooms.Any(room =>
-                    room.History == null || room.History.All(h => h.EndDate != null && h.EndDate <= DateTime.Now)
-                )
+                    Id = roomType.Id,
+                    Price = roomType.Price,
+                    Name = roomType.Name,
+                    Address = roomType.Motel?.Address,
+                    Images = roomType.Images?.Select(i => new ImageDTO
+                    {
+                        Id = i.Id,
+                        Link = i.Link,
+                        Type = i.Type
+                    }).ToList(),
+                    IsFeatured = topPackage != null,
+                    IsAvailable = roomType.Rooms.Any(room =>
+                        room.History == null || room.History.All(h => h.EndDate != null && h.EndDate <= DateTime.Now)
+                    ),
+                    PackageName = topPackage?.Name ?? "",
+                    PackagePrice = topPackage?.Price ?? 0
+                };
             })
             .Where(r => r.IsFeatured && r.IsAvailable)
+            .OrderByDescending(r => r.PackagePrice)
             .Take(12)
             .ToList();
-
             return result;
         }
 
-        public async Task<List<RoomTypeWithPackageDTO>> GetNewRoomTypesAsync()
+
+
+        public async Task<IEnumerable<RoomTypeWithPackageDTO>> GetNewRoomTypesAsync()
         {
             var recentDate = DateTime.Now.AddMonths(-3);
             var roomTypes = await _db.Room_Type
                 .Include(rt => rt.Motel)
                 .Include(rt => rt.Images)
-                .Where(rt => rt.Motel.CreateDate >= recentDate).OrderByDescending(rt => rt.Motel.CreateDate)
-                .Select(rt => new RoomTypeWithPackageDTO
+                .Include(rt => rt.Rooms)
+                    .ThenInclude(r => r.History)
+                .Where(rt => rt.Motel.CreateDate >= recentDate)
+                .OrderByDescending(rt => rt.Motel.CreateDate)
+                .ToListAsync();
+            var roomTypeDtos = roomTypes.Select(rt =>
+            {
+                var topPackage = _db.Package_User
+                    .Where(pu => pu.UserId == rt.Motel.UserId)
+                    .OrderByDescending(pu => pu.Package.Price)
+                    .Select(pu => pu.Package)
+                    .FirstOrDefault();
+
+                return new RoomTypeWithPackageDTO
                 {
                     Id = rt.Id,
                     Name = rt.Name,
@@ -84,37 +109,58 @@ namespace BACK_END.Services.Repositories
                         Type = i.Type
                     }).ToList(),
                     IsAvailable = rt.Rooms.Any(room =>
-                    room.History == null || room.History.All(h => h.EndDate != null && h.EndDate <= DateTime.Now)
-                )
-                }).Where(r => r.IsFeatured && r.IsAvailable)
-                .Take(12).ToListAsync();
-
-            return roomTypes;
+                        room.History == null || room.History.All(h => h.EndDate != null && h.EndDate <= DateTime.Now)
+                    ),
+                    PackageName = topPackage?.Name ?? "",
+                    PackagePrice = topPackage?.Price ?? 0
+                };
+            })
+            .Where(r => r.IsAvailable)
+            .OrderByDescending(r => r.PackagePrice)
+            .Take(12)
+            .ToList();
+            return roomTypeDtos;
         }
-
-        public async Task<List<RoomTypeWithPackageDTO>> GetRoomTypesUnderOneMillionAsync()
+        public async Task<IEnumerable<RoomTypeWithPackageDTO>> GetRoomTypesUnderOneMillionAsync()
         {
             var roomTypes = await _db.Room_Type
-        .Include(rt => rt.Motel)
-        .Include(rt => rt.Images)
-        .Where(rt => rt.Price < 1000000)
-        .OrderByDescending(rt => rt.Motel.CreateDate)
-        .Select(rt => new RoomTypeWithPackageDTO
-        {
-            Id = rt.Id,
-            Name = rt.Name,
-            Price = rt.Price,
-            Address = rt.Motel.Address,
-            Images = rt.Images.Select(i => new ImageDTO
-            {
-                Id = i.Id,
-                Link = i.Link,
-                Type = i.Type
-            }).ToList(),
-        })
-        .ToListAsync();
+            .Include(rt => rt.Motel)
+            .Include(rt => rt.Images)
+            .Include(rt => rt.Rooms)
+            .ThenInclude(r => r.History)
+            .Where(rt => rt.Price < 1000000).ToListAsync();
 
-            return roomTypes;
+            var roomtypeDtos = roomTypes.Select(rt =>
+            {
+                var topPackage = _db.Package_User
+                .Where(pu => pu.UserId == rt.Motel.UserId)
+                .OrderByDescending(pu => pu.Package.Price)
+                .Select(pu => pu.Package)
+                .FirstOrDefault();
+                return new RoomTypeWithPackageDTO()
+                {
+                    Id = rt.Id,
+                    Name = rt.Name,
+                    Price = rt.Price,
+                    Address = rt.Motel.Address,
+                    Images = rt.Images.Select(i => new ImageDTO
+                    {
+                        Id = i.Id,
+                        Link = i.Link,
+                        Type = i.Type
+                    }).ToList(),
+                    IsAvailable = rt.Rooms.Any(room =>
+                room.History == null || 
+                room.History.All(h => h.EndDate != null && h.EndDate <= DateTime.Now)),
+                PackageName = topPackage?.Name ?? "",
+                PackagePrice = topPackage?.Price ?? 0
+                };
+
+            }).Where(r => r.IsAvailable)
+            .OrderByDescending(r => r.PackagePrice).Take(12)
+            .ToList();
+            return roomtypeDtos;
+
         }
         public Task<RoomTypeDTO> GetRoomTypeByRoomID(int id)
         {
