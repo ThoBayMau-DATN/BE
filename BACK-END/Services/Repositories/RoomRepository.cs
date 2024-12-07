@@ -604,12 +604,16 @@ namespace BACK_END.Services.Repositories
                 var priceWater = dto.Water > 0 ? (dto.Water - (oldConsumption?.Water ?? 0)) * (service.FirstOrDefault(x => x.Name == "Nước")?.Price ?? 0) : 0;
                 var total = roomType.Price + priceElectric + priceWater + dto.Other;
 
+                //tìm người dùng đang thuê phòng
+                var roomHistory = await _db.Room_History.Where(x => x.RoomId == dto.RoomId && x.Status == 1).FirstOrDefaultAsync();
+
                 var bill = new Bill
                 {
                     RoomId = dto.RoomId,
                     PriceRoom = roomType.Price,
                     Total = total,
-                    Status = 2
+                    Status = 2,
+                    UserId = roomHistory.UserId
                 };
                 await _db.Bill.AddAsync(bill);
                 await _db.SaveChangesAsync();
@@ -700,7 +704,7 @@ namespace BACK_END.Services.Repositories
             {
                 RoomId = dto.RoomId,
                 UserId = dto.UserId,
-                Status = 1
+                Status = 1 
             };
             await _db.Room_History.AddAsync(roomHistory);
             return await _db.SaveChangesAsync() > 0;
