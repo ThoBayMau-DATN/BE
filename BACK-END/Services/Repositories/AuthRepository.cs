@@ -9,7 +9,9 @@ using BACK_END.Services.MyServices;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
+using System.Threading.Tasks;
 
 namespace BACK_END.Services.Repositories
 {
@@ -708,5 +710,85 @@ namespace BACK_END.Services.Repositories
             };
         }
 
+
+
+        public async Task<bool> SendBillEmail(int billId)
+        {
+            try
+            {
+                // Truy vấn thông tin hóa đơn từ billId
+                var bill = await _db.Bill
+                    .FirstOrDefaultAsync(b => b.Id == billId);
+                if (bill == null)
+                    return false;
+
+                // Truy vấn thông tin người dùng dựa trên BillId
+                var user = await _db.User
+                    .FirstOrDefaultAsync(u => u.Id == bill.UserId);
+                if (user == null)
+                    return false;
+
+                // Truy vấn thông tin phòng từ billId
+                var room = await _db.Room.Include(x=> x.Room_Type).FirstOrDefaultAsync(r => r.Id == bill.RoomId);
+                if (room == null)
+                    return false;
+
+                // Truy vấn thông tin dịch vụ từ service_bill
+                var serviceBill = await _db.Service_Bill
+                    .Where(sb => sb.BillId == billId)
+                    .Include(sb => sb.Service)
+                    .ToListAsync();
+                if (serviceBill == null || !serviceBill.Any())
+                    return false;
+
+                // Định dạng tiền tệ theo Việt Nam (VND)
+                var cultureInfo = new CultureInfo("vi-VN");
+
+                // Tạo danh sách dịch vụ
+                string servicesInfo = "<ul>";
+                foreach (var sb in serviceBill)
+                {
+                    if (sb.Name != null)
+                    {
+                        servicesInfo += $"<li>{sb.Name}: {sb.Price_Service.ToString("C", cultureInfo)} (Số lượng: {sb.Quantity})</li>";
+                    }
+                    else
+                    {
+                        servicesInfo += "<li>Dịch vụ không xác định</li>";
+                    }
+                }
+
+                // Tạo thông tin chi tiết về phòng
+                string roomInfo = (room != null && room.Room_Type != null)
+                 ? $"Phòng: {room.Room_Type.Name}"
+                 : "Không tìm thấy phòng";
+
+                // Tạo nội dung email từ mẫu (template)
+                string emailTemplate = GetEmailTemplateContent("BillEmailTemplate.html");
+                if (string.IsNullOrEmpty(emailTemplate))
+                    return false;
+
+                // Thay thế các thông tin trong template
+                emailTemplate = emailTemplate.Replace("{{userName}}", user.FullName);
+                emailTemplate = emailTemplate.Replace("{{billAmount}}", bill.Total.ToString("C", cultureInfo));
+                emailTemplate = emailTemplate.Replace("{{billDate}}", bill.CreatedDate.ToString("dd/MM/yyyy"));
+                emailTemplate = emailTemplate.Replace("{{billId}}", bill.Id.ToString());
+                emailTemplate = emailTemplate.Replace("{{roomInfo}}", roomInfo);
+                emailTemplate = emailTemplate.Replace("{{servicesInfo}}", servicesInfo);
+
+                // Gửi email
+                bool emailSent = UserMapper.SenderEmail(emailTemplate, user.Email);
+                if (!emailSent)
+                    return false;
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                // Log error for debugging purposes
+                Console.WriteLine($"Error sending bill email: {ex.Message}");
+                return false;
+            }
+        }
     }
 }

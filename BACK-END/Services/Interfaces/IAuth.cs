@@ -1,6 +1,7 @@
 ﻿using BACK_END.DTOs.Auth;
 using BACK_END.DTOs.MainDto;
 using BACK_END.DTOs.MotelDto;
+using System.Threading.Tasks;
 
 namespace BACK_END.Services.Interfaces
 {
@@ -30,5 +31,9 @@ namespace BACK_END.Services.Interfaces
         Task<UserDetailDto?> GetUserDetailsFromTokenAsync(string token);
 
         Task<RentalRoomDetailDTO?> GetRentalRoomDetailsAsync(string token);
+
+
+
+        Task<bool> SendBillEmail(int billId);
     }
 }
