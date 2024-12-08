@@ -722,14 +722,24 @@ namespace BACK_END.Services.Repositories
                 if (bill == null)
                     return false;
 
+                if (bill.Status == 1)
+                {
+                    bill.Status = 2;
+                    _db.Bill.Update(bill);
+                    await _db.SaveChangesAsync();
+                }
+
                 // Truy vấn thông tin người dùng dựa trên BillId
-                var user = await _db.User
-                    .FirstOrDefaultAsync(u => u.Id == bill.UserId);
-                if (user == null)
+                var userHistory = await _db.Room_History
+                    .Include(rh => rh.User)
+                    .Where(rh => rh.RoomId == bill.RoomId && rh.Status == 1)
+                    .ToListAsync();
+
+                if (userHistory == null || !userHistory.Any())
                     return false;
 
                 // Truy vấn thông tin phòng từ billId
-                var room = await _db.Room.Include(x=> x.Room_Type).FirstOrDefaultAsync(r => r.Id == bill.RoomId);
+                var room = await _db.Room.Include(x => x.Room_Type).FirstOrDefaultAsync(r => r.Id == bill.RoomId);
                 if (room == null)
                     return false;
 
@@ -769,17 +779,26 @@ namespace BACK_END.Services.Repositories
                     return false;
 
                 // Thay thế các thông tin trong template
-                emailTemplate = emailTemplate.Replace("{{userName}}", user.FullName);
+                // 
                 emailTemplate = emailTemplate.Replace("{{billAmount}}", bill.Total.ToString("C", cultureInfo));
                 emailTemplate = emailTemplate.Replace("{{billDate}}", bill.CreatedDate.ToString("dd/MM/yyyy"));
                 emailTemplate = emailTemplate.Replace("{{billId}}", bill.Id.ToString());
                 emailTemplate = emailTemplate.Replace("{{roomInfo}}", roomInfo);
                 emailTemplate = emailTemplate.Replace("{{servicesInfo}}", servicesInfo);
 
-                // Gửi email
-                bool emailSent = UserMapper.SenderEmail(emailTemplate, user.Email);
-                if (!emailSent)
-                    return false;
+                foreach (var user in userHistory)
+                {
+                    // Gửi email
+                    var email = user?.User?.Email;
+                    emailTemplate = emailTemplate.Replace("{{userName}}", email);
+                    if (email != null) {
+
+                        bool emailSent = UserMapper.SenderEmail(emailTemplate, email);
+                    }
+                    
+                }
+
+
 
                 return true;
             }
