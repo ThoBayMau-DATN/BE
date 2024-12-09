@@ -36,6 +36,8 @@ namespace BACK_END.Services.Interfaces
         Task<bool> DeleteUserFromRoom(DeleteUserFromRoomDto dto);
         Task<List<GetBillByRoomIdDto>?> GetBillByRoomId(int roomId);
         Task<GetBillByRoomIdDto?> GetBillById(int id);
+        Task<bool> DaThanhToanBill(int id);
+
         // Task<List<GetRoomByMotelIdDto>?> GetRoomByMotelId(int motelId);
         // Task<bool> AddRoom(AddRoomDto dto);
         // Task<bool> AddMultiRoom(AddMultiRoomDto dto);

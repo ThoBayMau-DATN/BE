@@ -411,31 +411,31 @@ namespace BACK_END.Services.Repositories
 
         public async Task<bool> AddRoom(AddRoomDto dto)
         {
-            using var transaction = await _db.Database.BeginTransactionAsync();
             try
             {
-                if (dto.RoomTypeId == null || dto.RoomTypeId == 0 || dto.QuantityRoom == null || dto.QuantityRoom <= 0) return false;
-                for (int i = 0; i < dto.QuantityRoom; i++)
-                {
-                    var lastRoom = await _db.Room
+                // Lấy số phòng lớn nhất hiện tại
+                var lastRoomNumber = await _db.Room
                     .Where(x => x.Room_TypeId == dto.RoomTypeId)
-                    .OrderByDescending(x => x.RoomNumber)
-                    .FirstOrDefaultAsync();
-                    var room = new Room
+                    .MaxAsync(x => (int?)x.RoomNumber) ?? 0;
+
+                // Tạo danh sách phòng mới
+                var newRooms = Enumerable.Range(1, dto.QuantityRoom ?? 0)
+                    .Select(index => new Room
                     {
                         Room_TypeId = dto.RoomTypeId,
-                        RoomNumber = lastRoom?.RoomNumber != null ? lastRoom.RoomNumber + 1 : 1,
+                        RoomNumber = lastRoomNumber + index,
                         Status = 1
-                    };
-                    await _db.Room.AddAsync(room);
-                }
+                    })
+                    .ToList();
+
+                // Thêm tất cả phòng vào database
+                await _db.Room.AddRangeAsync(newRooms);
                 await _db.SaveChangesAsync();
-                await transaction.CommitAsync();
+
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                await transaction.RollbackAsync();
                 return false;
             }
         }
@@ -587,93 +587,167 @@ namespace BACK_END.Services.Repositories
             using var transaction = await _db.Database.BeginTransactionAsync();
             try
             {
-                var room = await _db.Room.FindAsync(dto.RoomId);
-                if (room == null) return false;
-                var roomType = await _db.Room_Type.FindAsync(room.Room_TypeId);
-                if (roomType == null) return false;
-                var motel = await _db.Motel.FindAsync(roomType.MotelId);
-                if (motel == null) return false;
-                var service = await _db.Service.Where(x => x.MotelId == motel.Id).ToListAsync();
+                // Lấy thông tin cần thiết
+                var (room, roomType, motel) = await GetRequiredEntities(dto.RoomId);
+                if (room == null || roomType == null || motel == null)
+                    return false;
 
-                var oldConsumption = await _db.Consumption.Where(x => x.RoomId == dto.RoomId).OrderByDescending(x => x.Time).FirstOrDefaultAsync();
+                var services = await _db.Service
+                    .Where(x => x.MotelId == motel.Id)
+                    .ToDictionaryAsync(x => x.Name, x => x.Price);
 
-                if (roomType.NewPrice != null && roomType.NewPrice > 0)
-                {
-                    roomType.Price = roomType.NewPrice;
-                    _db.Update(roomType);
-                }
+                var oldConsumption = await GetLastConsumption(dto.RoomId);
 
+                // Cập nhật giá phòng mới nếu có
+                await UpdateRoomTypePrice(roomType);
+
+                // Thêm consumption mới nếu có
                 if (dto.Electric > 0 || dto.Water > 0)
                 {
-                    var consumption = new Consumption
-                    {
-                        RoomId = dto.RoomId,
-                        Electricity = dto.Electric,
-                        Water = dto.Water,
-                        Time = DateTime.Now
-                    };
-                    await _db.Consumption.AddAsync(consumption);
+                    await AddNewConsumption(dto);
                 }
 
-                var priceElectric = dto.Electric > 0 ? (dto.Electric - (oldConsumption?.Electricity ?? 0)) * (service.FirstOrDefault(x => x.Name == "Điện")?.Price ?? 0) : 0;
-                var priceWater = dto.Water > 0 ? (dto.Water - (oldConsumption?.Water ?? 0)) * (service.FirstOrDefault(x => x.Name == "Nước")?.Price ?? 0) : 0;
-                var total = roomType.Price + priceElectric + priceWater + dto.Other;
+                // Tính toán giá
+                var prices = CalculatePrices(dto, oldConsumption, services, roomType.Price);
 
-                //tìm người dùng đang thuê phòng
-                var roomHistory = await _db.Room_History.Where(x => x.RoomId == dto.RoomId && x.Status == 1).FirstOrDefaultAsync();
+                // Tạo hóa đơn mới
+                var roomHistory = await _db.Room_History
+                    .FirstOrDefaultAsync(x => x.RoomId == dto.RoomId && x.Status == 1);
 
-                var bill = new Bill
-                {
-                    RoomId = dto.RoomId,
-                    PriceRoom = roomType.Price,
-                    Total = total,
-                    Status = 2,
-                    UserId = roomHistory.UserId
-                };
-                await _db.Bill.AddAsync(bill);
-                await _db.SaveChangesAsync();
-                if (dto.Electric > 0)
-                {
-                    var serviceBill = new Service_Bill
-                    {
-                        Name = "Điện",
-                        Price_Service = service.FirstOrDefault(x => x.Name == "Điện")?.Price ?? 0,
-                        Quantity = dto.Electric - (oldConsumption?.Electricity ?? 0),
-                        BillId = bill.Id
-                    };
-                    await _db.Service_Bill.AddAsync(serviceBill);
-                }
-                if (dto.Water > 0)
-                {
-                    var serviceBill = new Service_Bill
-                    {
-                        Name = "Nước",
-                        Price_Service = service.FirstOrDefault(x => x.Name == "Nước")?.Price ?? 0,
-                        Quantity = dto.Water - (oldConsumption?.Water ?? 0),
-                        BillId = bill.Id
-                    };
-                    await _db.Service_Bill.AddAsync(serviceBill);
-                }
-                if (dto.Other > 0)
-                {
-                    var serviceBill = new Service_Bill
-                    {
-                        Name = "Khác",
-                        Price_Service = dto.Other,
-                        Quantity = 1,
-                        BillId = bill.Id
-                    };
-                    await _db.Service_Bill.AddAsync(serviceBill);
-                }
+                var bill = await CreateBill(dto, roomHistory?.UserId, (roomType.Price, prices.total));
+
+                // Thêm chi tiết dịch vụ
+                await AddServiceBills(dto, bill.Id, oldConsumption, services);
+
                 await _db.SaveChangesAsync();
                 await transaction.CommitAsync();
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 await transaction.RollbackAsync();
                 return false;
             }
+        }
+
+        private async Task<(Room? room, Room_Type? roomType, Motel? motel)> GetRequiredEntities(int roomId)
+        {
+            var room = await _db.Room.FindAsync(roomId);
+            if (room == null) return (null, null, null);
+
+            var roomType = await _db.Room_Type.FindAsync(room.Room_TypeId);
+            if (roomType == null) return (room, null, null);
+
+            var motel = await _db.Motel.FindAsync(roomType.MotelId);
+            return (room, roomType, motel);
+        }
+
+        private async Task<Consumption?> GetLastConsumption(int roomId)
+        {
+            return await _db.Consumption
+                .Where(x => x.RoomId == roomId)
+                .OrderByDescending(x => x.Time)
+                .FirstOrDefaultAsync();
+        }
+
+        private async Task UpdateRoomTypePrice(Room_Type roomType)
+        {
+            if (roomType.NewPrice > 0)
+            {
+                roomType.Price = roomType.NewPrice;
+                _db.Update(roomType);
+            }
+        }
+
+        private async Task AddNewConsumption(AddElectricAndWaterDto dto)
+        {
+            var consumption = new Consumption
+            {
+                RoomId = dto.RoomId,
+                Electricity = dto.Electric,
+                Water = dto.Water,
+                Time = DateTime.Now
+            };
+            await _db.Consumption.AddAsync(consumption);
+        }
+
+        private (int priceElectric, int priceWater, int total) CalculatePrices(
+            AddElectricAndWaterDto dto,
+            Consumption? oldConsumption,
+            Dictionary<string, int> services,
+            int roomPrice)
+        {
+            var priceElectric = dto.Electric > 0
+                ? (dto.Electric - (oldConsumption?.Electricity ?? 0)) * services.GetValueOrDefault("Điện", 0)
+                : 0;
+
+            var priceWater = dto.Water > 0
+                ? (dto.Water - (oldConsumption?.Water ?? 0)) * services.GetValueOrDefault("Nước", 0)
+                : 0;
+
+            var total = roomPrice + priceElectric + priceWater + dto.Other;
+
+            return (priceElectric, priceWater, total);
+        }
+
+        private async Task<Bill> CreateBill(
+     AddElectricAndWaterDto dto,
+            int? userId,
+            (int priceRoom, int total) prices)
+        {
+            var bill = new Bill
+            {
+                RoomId = dto.RoomId,
+                PriceRoom = prices.priceRoom,
+                Total = prices.total,
+                Status = 1,
+                UserId = userId
+            };
+
+            var entry = await _db.Bill.AddAsync(bill);
+            await _db.SaveChangesAsync();
+
+            // Lấy bill đã được tạo với Id
+            return entry.Entity;
+        }
+
+        private async Task AddServiceBills(
+            AddElectricAndWaterDto dto,
+            int billId,
+            Consumption? oldConsumption,
+            Dictionary<string, int> services)
+        {
+            if (dto.Electric > 0)
+            {
+                await AddServiceBill("Điện", services.GetValueOrDefault("Điện", 0),
+                    dto.Electric - (oldConsumption?.Electricity ?? 0), billId);
+            }
+
+            if (dto.Water > 0)
+            {
+                await AddServiceBill("Nước", services.GetValueOrDefault("Nước", 0),
+                    dto.Water - (oldConsumption?.Water ?? 0), billId);
+            }
+
+            if (dto.Other > 0)
+            {
+                await AddServiceBill("Khác", dto.Other, 1, billId);
+            }
+
+
+
+        }
+
+        private async Task AddServiceBill(string name, int price, int quantity, int billId)
+        {
+            var serviceBill = new Service_Bill
+            {
+                Name = name,
+                Price_Service = price,
+                Quantity = quantity,
+                BillId = billId
+            };
+            await _db.Service_Bill.AddAsync(serviceBill);
         }
 
         public async Task<GetPriceByRoomTypeIdDto?> GetPriceByRoomTypeId(int roomTypeId)
@@ -719,10 +793,10 @@ namespace BACK_END.Services.Repositories
             {
                 RoomId = dto.RoomId,
                 UserId = dto.UserId,
-                Status = 1 
+                Status = 1
             };
 
-            if(room.Status == 1)
+            if (room.Status == 1)
             {
                 room.Status = 2;
                 _db.Update(room);
@@ -745,7 +819,7 @@ namespace BACK_END.Services.Repositories
         public async Task<List<GetBillByRoomIdDto>?> GetBillByRoomId(int roomId)
         {
             if (roomId == 0) return null;
-            var bill = await _db.Bill.Where(x => x.RoomId == roomId && x.Status == 2)
+            var bill = await _db.Bill.Where(x => x.RoomId == roomId && x.Status == 1 || x.Status == 2)
             .Include(x => x.Room)
             .Include(x => x.User)
             .Include(x => x.Service_Bills)
@@ -765,6 +839,15 @@ namespace BACK_END.Services.Repositories
 .FirstOrDefaultAsync(x => x.Id == id);
             if (bill == null) return null;
             return _mapper.Map<GetBillByRoomIdDto>(bill);
+        }
+
+        public async Task<bool> DaThanhToanBill(int id)
+        {
+            var bill = await _db.Bill.FindAsync(id);
+            if (bill == null || bill.Status != 1) return false;
+            bill.Status = 2;
+            _db.Update(bill);
+            return await _db.SaveChangesAsync() > 0;
         }
 
 
