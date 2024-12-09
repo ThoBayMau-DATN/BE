@@ -314,6 +314,7 @@ namespace BACK_END.Services.Repositories
             // Cập nhật người dùng trong identity
             identityUser.Email = user.Email;
             identityUser.UserName = user.Email; // Cập nhật UserName nếu cần
+            identityUser.PhoneNumber = user.Phone; // Cập nhật số điện thoại nếu cần
 
             //pdate role
             var currentRoles = await _userManager.GetRolesAsync(identityUser);
