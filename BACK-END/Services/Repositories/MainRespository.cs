@@ -206,19 +206,18 @@ namespace BACK_END.Services.Repositories
             return Task.FromResult(roomTypeDTO);
         }
         public async Task<PagedList<RoomTypeDTO>> SearchRoomTypeByLocationAsync(
-         string? Province,
-         string? District,
-         string? Ward,
-         string? search,
-         int pageNumber,
-         int pageSize = 10,
-         string? sortOption = null,
-         decimal? minPrice = null,
-         decimal? maxPrice = null,
-         double? minArea = null,
-         double? maxArea = null,
-         List<string>? surrounding = null
-
+        string? Province,
+        string? District,
+        string? Ward,
+        string? search,
+        int pageNumber,
+        int pageSize = 10,
+        string? sortOption = null,
+        decimal? minPrice = null,
+        decimal? maxPrice = null,
+        double? minArea = null,
+        double? maxArea = null,
+        List<string>? surrounding = null
         )
         {
             // Nếu tất cả thông tin tìm kiếm đều rỗng, trả về danh sách rỗng
@@ -232,27 +231,28 @@ namespace BACK_END.Services.Repositories
             var query = _db.Room_Type
                 .Include(rt => rt.Motel)
                 .Include(rt => rt.Images)
+                .Where(x => x.Motel.Status == 2)
                 .AsQueryable();
 
             // Lọc theo địa điểm
-            if (!string.IsNullOrEmpty(Province) && Province != "Tỉnh")
+            if (!string.IsNullOrEmpty(Province) && Province.ToLower() != "tỉnh")
             {
-                query = query.Where(rt => rt.Motel.Address.Contains(Province));
+                query = query.Where(rt => rt.Motel.Address.ToLower().Contains(Province.ToLower()));
             }
-            if (!string.IsNullOrEmpty(District) && District != "Thành phố")
+            if (!string.IsNullOrEmpty(District) && District.ToLower() != "thành phố")
             {
-                query = query.Where(rt => rt.Motel.Address.Contains(District));
+                query = query.Where(rt => rt.Motel.Address.ToLower().Contains(District.ToLower()));
             }
-            if (!string.IsNullOrEmpty(Ward) && Ward != "Phường")
+            if (!string.IsNullOrEmpty(Ward) && Ward.ToLower() != "phường")
             {
-                query = query.Where(rt => rt.Motel.Address.Contains(Ward));
+                query = query.Where(rt => rt.Motel.Address.ToLower().Contains(Ward.ToLower()));
             }
             if (!string.IsNullOrEmpty(search))
             {
-                query = query.Where(rt => rt.Motel.Address.Contains(search));
+                query = query.Where(rt => rt.Motel.Address.ToLower().Contains(search.ToLower()));
             }
 
-            // Lọc theo giá (nếu giá trị được cung cấp)
+            // Lọc theo giá
             if (minPrice.HasValue && minPrice > 0)
             {
                 query = query.Where(rt => rt.Price >= minPrice.Value);
@@ -262,7 +262,7 @@ namespace BACK_END.Services.Repositories
                 query = query.Where(rt => rt.Price <= maxPrice.Value);
             }
 
-            // Lọc theo diện tích (nếu giá trị được cung cấp)
+            // Lọc theo diện tích
             if (minArea.HasValue && minArea > 0)
             {
                 query = query.Where(rt => rt.Area >= minArea.Value);
@@ -271,36 +271,48 @@ namespace BACK_END.Services.Repositories
             {
                 query = query.Where(rt => rt.Area <= maxArea.Value);
             }
+
             if (surrounding != null && surrounding.Any())
             {
                 query = query.Where(rt => surrounding.All(s => rt.Motel.Description.Contains(s)));
             }
 
-
-            // Sắp xếp theo tùy chọn
-            query = sortOption?.ToLower() switch
+            // Lấy danh sách các gói dịch vụ VIP của chủ trọ
+            var roomTypesWithPackages = query.Select(rt => new
             {
-                "price_asc" => query.OrderBy(rt => rt.Price), // Giá tăng dần
-                "price_desc" => query.OrderByDescending(rt => rt.Price), // Giá giảm dần
-                "date_asc" => query.OrderBy(rt => rt.Motel.CreateDate), // Ngày tăng dần
-                _ => query.OrderByDescending(rt => rt.Motel.CreateDate) // Mặc định: Ngày giảm dần
-            };
+                RoomType = rt,
+                TopPackage = _db.Package_User
+                    .Where(pu => pu.UserId == rt.Motel.UserId)
+                    .OrderByDescending(pu => pu.Package.Price)
+                    .Select(pu => pu.Package)
+                    .FirstOrDefault()
+            });
+
+            // Mặc định sắp xếp theo gói dịch vụ (VIP) trước, sau đó mới sắp xếp theo giá trị khác
+            var sortedQuery = roomTypesWithPackages
+                .OrderByDescending(rtp => rtp.TopPackage != null ? rtp.TopPackage.Price : 0) // Gói dịch vụ cao nhất
+                .ThenByDescending(rtp => rtp.RoomType.Motel.CreateDate); // Ngày tạo gần nhất
 
             // Ánh xạ kết quả sang DTO
-            var projectedQuery = query.Select(rt => new RoomTypeDTO
+            var projectedQuery = sortedQuery.Select(rtp => new RoomTypeDTO
             {
-                Id = rt.Id,
-                Name = rt.Name,
-                Price = rt.Price,
-                Address = rt.Motel.Address,
-                Area = rt.Area, // Bao gồm diện tích nếu cần
-                Images = rt.Images.Select(i => new ImageDTO
+                Id = rtp.RoomType.Id,
+                Name = rtp.RoomType.Name,
+                Price = rtp.RoomType.Price,
+                Address = rtp.RoomType.Motel.Address,
+                Area = rtp.RoomType.Area,
+                Images = rtp.RoomType.Images.Select(i => new ImageDTO
                 {
                     Id = i.Id,
                     Link = i.Link,
                     Type = i.Type
                 }).ToList(),
             });
+            //nếu null
+            if (projectedQuery == null)
+            {
+                return new PagedList<RoomTypeDTO>(new List<RoomTypeDTO>(), 0, pageNumber, pageSize);
+            }
 
             // Trả về kết quả phân trang
             return await PagedList<RoomTypeDTO>.CreateAsync(projectedQuery, pageNumber, pageSize);
