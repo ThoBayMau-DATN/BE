@@ -1,7 +1,6 @@
 ﻿using BACK_END.DTOs.Auth;
 using BACK_END.DTOs.MainDto;
 using BACK_END.DTOs.MotelDto;
-using System.Threading.Tasks;
 
 namespace BACK_END.Services.Interfaces
 {
@@ -25,7 +24,7 @@ namespace BACK_END.Services.Interfaces
         Task<GetUserDto> GetUserByToken(string token);
         Task<string> EditRoleCustomerToOwner(string token);
 
-        Task<userDetailDto?> UpdateUserFromToken(string token, userDetailDto dto);
+        Task<(userDetailDto? UpdatedUser, string? NewToken)> UpdateUserFromToken(string token, userDetailDto userDetailDto);
 
         Task<bool> ChangePasswordFromTokenAsync(string token, ChangePasswordDto dto);
         Task<UserDetailDto?> GetUserDetailsFromTokenAsync(string token);

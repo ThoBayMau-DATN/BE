@@ -11,7 +11,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
-using System.Threading.Tasks;
 
 namespace BACK_END.Services.Repositories
 {
@@ -510,26 +509,34 @@ namespace BACK_END.Services.Repositories
             return "Thay đổi quyền thành công";
         }
 
-        public async Task<userDetailDto?> UpdateUserFromToken(string token, userDetailDto userDetailDto)
+        public async Task<(userDetailDto? UpdatedUser, string? NewToken)> UpdateUserFromToken(string token, userDetailDto userDetailDto)
         {
             var userNameIdentity = HandlerToken(token);
             if (string.IsNullOrEmpty(userNameIdentity))
-                return null;
+                return (null, null);
+
             var identityUser = await _userManager.FindByNameAsync(userNameIdentity);
             if (identityUser == null)
-                return null;
+                return (null, null);
+
             var myUser = await _db.User.FirstOrDefaultAsync(x => x.Email == identityUser.Email);
             if (myUser == null)
-                return null;
+                return (null, null);
+
+            // Cập nhật thông tin IdentityUser
             identityUser.Email = userDetailDto.Email ?? identityUser.Email;
             identityUser.PhoneNumber = userDetailDto.Phone ?? identityUser.PhoneNumber;
             identityUser.UserName = userDetailDto.Email ?? identityUser.Email;
+
             var identityResult = await _userManager.UpdateAsync(identityUser);
             if (!identityResult.Succeeded)
-                return null;
+                return (null, null);
+
+            // Cập nhật thông tin MyUser
             myUser.FullName = userDetailDto.FullName ?? myUser.FullName;
             myUser.Phone = userDetailDto.Phone ?? myUser.Phone;
             myUser.Email = userDetailDto.Email ?? myUser.Email;
+
             if (userDetailDto.Avatar != null)
             {
                 var avatarUrl = await _firebase.UploadFileAsync(userDetailDto.Avatar);
@@ -538,13 +545,17 @@ namespace BACK_END.Services.Repositories
                     myUser.Avatar = avatarUrl;
                 }
             }
+
             userDetailDto.AvatarLink = myUser.Avatar;
             _db.User.Update(myUser);
             await _db.SaveChangesAsync();
 
-            return userDetailDto;
+            // Tạo token mới với email đã cập nhật
+            var newToken = await _tokenService.GenerateTokenAsync(identityUser);
 
+            return (userDetailDto, newToken);
         }
+
 
         public async Task<bool> ChangePasswordFromTokenAsync(string token, ChangePasswordDto changePasswordDto)
         {
@@ -698,7 +709,7 @@ namespace BACK_END.Services.Repositories
                 Price = room.Room_Type?.Price ?? 0,
                 Area = room.Room_Type?.Area ?? 0,
                 CreateDate = roomHistory.CreateDate,
-                Status = hasPaid.Status,
+                Status = hasPaid?.Status ?? 0,
                 WaterPrice = waterPrice,
                 ElectricPrice = electricPrice,
                 OtherService = otherServices, // Các dịch vụ ngoài nước và điện
