@@ -5,7 +5,6 @@ using BACK_END.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Mail;
-using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
 
 namespace BACK_END.Controllers
 {
@@ -558,7 +557,7 @@ namespace BACK_END.Controllers
             }
 
             var isUpdated = await _auth.UpdateUserFromToken(token, dto);
-            if (isUpdated != null)
+            if (isUpdated.UpdatedUser == null || string.IsNullOrEmpty(isUpdated.NewToken))
             {
                 return Ok(isUpdated);
             }
