@@ -38,6 +38,7 @@ namespace BACK_END.Services.Repositories
                 .Include(rt => rt.Images)
                 .Include(rt => rt.Rooms)
                     .ThenInclude(r => r.History)
+                    .Where(rt => rt.Motel.Status == 2)
                 .ToListAsync();
 
             var result = roomTypes.Select(roomType =>
@@ -85,7 +86,7 @@ namespace BACK_END.Services.Repositories
                 .Include(rt => rt.Images)
                 .Include(rt => rt.Rooms)
                     .ThenInclude(r => r.History)
-                .Where(rt => rt.Motel.CreateDate >= recentDate)
+                .Where(rt => rt.Motel.CreateDate >= recentDate && rt.Motel.Status == 2)
                 .OrderByDescending(rt => rt.Motel.CreateDate)
                 .ToListAsync();
             var roomTypeDtos = roomTypes.Select(rt =>
@@ -128,7 +129,7 @@ namespace BACK_END.Services.Repositories
             .Include(rt => rt.Images)
             .Include(rt => rt.Rooms)
             .ThenInclude(r => r.History)
-            .Where(rt => rt.Price < 1000000).ToListAsync();
+            .Where(rt => rt.Price < 1000000 && rt.Motel.Status == 2).ToListAsync();
 
             var roomtypeDtos = roomTypes.Select(rt =>
             {
