@@ -165,17 +165,6 @@ namespace BACK_END.Controllers
 
                 var result = await _repo.SearchRoomTypeByLocationAsync(Province, District, Ward, search, pageNumber, pageSize, sortOption, minPrice, maxPrice, minArea, maxArea, surroundingList);
 
-                if (!result.Any())
-                {
-                    return NotFound(new ApiResponse<object>
-                    {
-                        Code = 404,
-                        Status = "error",
-                        Message = "Không tìm thấy kết quả nào",
-                        Data = null
-                    });
-                }
-
                 return Ok(new ApiResponse<object>
                 {
                     Code = 200,
