@@ -34,7 +34,7 @@ namespace BACK_END.Services.Interfaces
         Task<List<RoomUserDto>?> FindUser(string search);
         Task<bool> AddUserToRoom(AddUserToRoomDto dto);
         Task<bool> DeleteUserFromRoom(DeleteUserFromRoomDto dto);
-        Task<List<GetBillByRoomIdDto>?> GetBillByRoomId(int roomId);
+        Task<PagedResultDto<GetBillByRoomIdDto>?> GetBillByRoomId(int roomId, BillQueryDto dto);
         Task<GetBillByRoomIdDto?> GetBillById(int id);
         Task<bool> DaThanhToanBill(int id);
 

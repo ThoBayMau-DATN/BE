@@ -460,11 +460,11 @@ namespace BACK_END.Controllers
         }
 
         [HttpGet("get-bill-by-room-id/{roomId}")]
-        public async Task<IActionResult> GetBillByRoomId(int roomId)
+        public async Task<IActionResult> GetBillByRoomId(int roomId,[FromQuery] BillQueryDto dto)
         {
             try
             {
-                var result = await _room.GetBillByRoomId(roomId);
+                var result = await _room.GetBillByRoomId(roomId, dto);
                 if (result == null)
                 {
                     return BadRequest(new MotelRepository<object> { Code = 400, Success = false, Message = "Không tìm thấy hóa đơn" });
