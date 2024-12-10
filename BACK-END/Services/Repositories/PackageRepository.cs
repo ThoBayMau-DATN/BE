@@ -22,9 +22,13 @@ namespace BACK_END.Services.Repositories
         public async Task<PackageDto> CheckPackage(string token)
         {
             var isUser = await _auth.GetUserByToken(token);
+            if(isUser == null)
+            {
+                throw new Exception("User not found");
+            }
             if (isUser.Role.ToUpper() == "OWNER")
             {
-                var userPackage = await _db.Package_User.FirstOrDefaultAsync(x => x.UserId == isUser.Id && x.EndDate > DateTime.Now.Date);
+                var userPackage = await _db.Package_User.FirstOrDefaultAsync(x => x.UserId == isUser.Id && x.EndDate > DateTime.Now);
                 
                 if (userPackage != null)
                 {
