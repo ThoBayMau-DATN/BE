@@ -816,17 +816,54 @@ namespace BACK_END.Services.Repositories
             return await _db.SaveChangesAsync() > 0;
         }
 
-        public async Task<List<GetBillByRoomIdDto>?> GetBillByRoomId(int roomId)
+        public async Task<PagedResultDto<GetBillByRoomIdDto>?> GetBillByRoomId(int roomId, BillQueryDto dto)
         {
             if (roomId == 0) return null;
-            var bill = await _db.Bill.Where(x => x.RoomId == roomId && x.Status == 1 || x.Status == 2)
-            .Include(x => x.Room)
-            .Include(x => x.User)
-            .Include(x => x.Service_Bills)
-            .OrderByDescending(x => x.CreatedDate)
-            .ToListAsync();
-            if (bill == null) return null;
-            return _mapper.Map<List<GetBillByRoomIdDto>>(bill);
+
+            var query = _db.Bill
+                .Where(x => x.RoomId == roomId)
+                .Where(x => x.Status == 1 || x.Status == 2)
+                .Include(x => x.Room)
+                .Include(x => x.User)
+                .Include(x => x.Service_Bills)
+                .OrderByDescending(x => x.CreatedDate)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(dto.Search))
+            {
+                query = SearchBill(dto.Search, query);
+            }
+
+
+            var pagedResult = await PagedList<GetBillByRoomIdDto>.CreateAsync(
+                query.Select(x => _mapper.Map<GetBillByRoomIdDto>(x)),
+                dto.PageNumber,
+                dto.PageSize);
+
+            return new PagedResultDto<GetBillByRoomIdDto>
+            {
+                Items = pagedResult,
+                PageNumber = dto.PageNumber,
+                PageSize = dto.PageSize,
+                TotalPages = (int)Math.Ceiling(await query.CountAsync() / (double)dto.PageSize)
+            };
+        }
+
+        private IQueryable<Bill> SearchBill(string? search, IQueryable<Bill> bill)
+        {
+            if (string.IsNullOrEmpty(search))
+                return bill;
+
+            var searchTerms = search.ToLower().Trim().Split(' ');
+
+            return bill.Where(x => searchTerms.All(term =>
+                (x.Room != null && x.Room.RoomNumber.ToString().ToLower().Contains(term)) ||
+                (x.PriceRoom.ToString().ToLower().Contains(term)) ||
+                (x.Total.ToString().ToLower().Contains(term)) ||
+                (x.Service_Bills != null && x.Service_Bills.Any(y =>
+                    ((long)y.Price_Service * y.Quantity).ToString().ToLower().Contains(term)
+                ))
+            ));
         }
 
         public async Task<GetBillByRoomIdDto?> GetBillById(int id)
@@ -836,7 +873,7 @@ namespace BACK_END.Services.Repositories
                 .Include(x => x.Room)
             .Include(x => x.User)
             .Include(x => x.Service_Bills)
-.FirstOrDefaultAsync(x => x.Id == id);
+            .FirstOrDefaultAsync(x => x.Id == id);
             if (bill == null) return null;
             return _mapper.Map<GetBillByRoomIdDto>(bill);
         }

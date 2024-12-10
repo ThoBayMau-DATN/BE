@@ -33,6 +33,9 @@ namespace BACK_END.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("PaymentDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("PriceRoom")
                         .HasColumnType("int");
 
@@ -307,7 +310,7 @@ namespace BACK_END.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("CreateDate")
+                    b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("EndDate")
@@ -790,7 +793,7 @@ namespace BACK_END.Migrations
             modelBuilder.Entity("BACK_END.Models.Bill", b =>
                 {
                     b.HasOne("BACK_END.Models.Room", "Room")
-                        .WithMany()
+                        .WithMany("Bill")
                         .HasForeignKey("RoomId");
 
                     b.HasOne("BACK_END.Models.User", "User")
@@ -1041,6 +1044,8 @@ namespace BACK_END.Migrations
 
             modelBuilder.Entity("BACK_END.Models.Room", b =>
                 {
+                    b.Navigation("Bill");
+
                     b.Navigation("Consumption");
 
                     b.Navigation("History");

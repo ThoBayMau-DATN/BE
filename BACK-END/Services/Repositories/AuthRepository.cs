@@ -736,6 +736,7 @@ namespace BACK_END.Services.Repositories
                 if (bill.Status == 1)
                 {
                     bill.Status = 2;
+                    bill.PaymentDate = DateTime.Now;
                     _db.Bill.Update(bill);
                     await _db.SaveChangesAsync();
                 }
