@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BACK_END.Migrations
 {
     [DbContext(typeof(BACK_ENDContext))]
-    [Migration("20241205133652_updatealltodb")]
-    partial class updatealltodb
+    [Migration("20241210150154_addPaymentDate")]
+    partial class addPaymentDate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -34,6 +34,9 @@ namespace BACK_END.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("PaymentDate")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("PriceRoom")
@@ -310,7 +313,7 @@ namespace BACK_END.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("CreateDate")
+                    b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("EndDate")
@@ -793,7 +796,7 @@ namespace BACK_END.Migrations
             modelBuilder.Entity("BACK_END.Models.Bill", b =>
                 {
                     b.HasOne("BACK_END.Models.Room", "Room")
-                        .WithMany()
+                        .WithMany("Bill")
                         .HasForeignKey("RoomId");
 
                     b.HasOne("BACK_END.Models.User", "User")
@@ -1044,6 +1047,8 @@ namespace BACK_END.Migrations
 
             modelBuilder.Entity("BACK_END.Models.Room", b =>
                 {
+                    b.Navigation("Bill");
+
                     b.Navigation("Consumption");
 
                     b.Navigation("History");

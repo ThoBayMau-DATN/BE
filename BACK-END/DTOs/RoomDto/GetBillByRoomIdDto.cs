@@ -5,7 +5,8 @@ namespace BACK_END.DTOs.RoomDto
         public int Id { get; set; }
         public int PriceRoom { get; set; }
         public int Status { get; set; }
-        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime CreatedDate { get; set; }
+        public DateTime? PaymentDate { get; set; }
         public int Total { get; set; }
         public int? RoomId { get; set; }
         public GetBillByRoomIdDto_Room? Room { get; set; } 
