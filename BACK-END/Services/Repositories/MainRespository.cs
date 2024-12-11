@@ -292,7 +292,26 @@ namespace BACK_END.Services.Repositories
             var sortedQuery = roomTypesWithPackages
                 .OrderByDescending(rtp => rtp.TopPackage != null ? rtp.TopPackage.Price : 0) // Gói dịch vụ cao nhất
                 .ThenByDescending(rtp => rtp.RoomType.Motel.CreateDate); // Ngày tạo gần nhất
-
+                                                                         // lọc theo sort option
+            if (!string.IsNullOrEmpty(sortOption))
+            {
+                Console.WriteLine(sortOption);
+                switch (sortOption)
+                {
+                    case "price_asc":
+                        sortedQuery = sortedQuery.OrderBy(rtp => rtp.RoomType.Price);
+                        break;
+                    case "price_desc":
+                        sortedQuery = sortedQuery.OrderByDescending(rtp => rtp.RoomType.Price);
+                        break;
+                    case "new":
+                        sortedQuery = sortedQuery.OrderByDescending(rtp => rtp.RoomType.CreateDate);
+                        break;
+                    default:
+                        sortedQuery = sortedQuery;
+                        break;
+                }
+            }
             // Ánh xạ kết quả sang DTO
             var projectedQuery = sortedQuery.Select(rtp => new RoomTypeDTO
             {
