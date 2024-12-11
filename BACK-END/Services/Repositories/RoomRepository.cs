@@ -336,6 +336,8 @@ namespace BACK_END.Services.Repositories
             return _mapper.Map<List<RoomTypeDto>>(roomType);
         }
 
+
+
         //Lock trọ đổi trạng thái từ 2 sang 3
         public async Task<bool> LockMotel(int motelId)
         {
