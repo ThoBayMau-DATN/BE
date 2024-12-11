@@ -38,5 +38,7 @@ namespace BACK_END.Services.Interfaces
         Task<DTOs.MotelDto.ResultDeleteMotelDTO?> DeleteRegisterMotelAsync(int id);
 
         Task<MotelCountDto> GetMotelByUser(string token);
+
+        Task<RoomCountDto> GetRoomByMotel(int MotelId);
     }
 }
