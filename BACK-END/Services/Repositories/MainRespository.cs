@@ -672,13 +672,25 @@ namespace BACK_END.Services.Repositories
             var user = await _db.User.FirstOrDefaultAsync(u => u.Email == email);
             if (user == null)
                 throw new KeyNotFoundException("User not found");
-            var motels = await _db.Motel.Where(x => x.UserId == user.Id).ToListAsync();
+            var motels = await _db.Motel.Where(x => x.UserId == user.Id && x.Status != 5).ToListAsync();
             var motelCountDto = new MotelCountDto
             {
                 Count = motels.Count
             };
 
             return motelCountDto;
+        }
+
+        public async Task<RoomCountDto> GetRoomByMotel(int MotelId)
+        {
+            var availableRoom = await _db.Room.Where(r => r.Room_Type != null && r.Room_Type.MotelId == MotelId).CountAsync();
+
+            var getRoomCountDto = new RoomCountDto
+            {
+                Count = availableRoom
+            };
+            return getRoomCountDto;
+
         }
     }
 }
