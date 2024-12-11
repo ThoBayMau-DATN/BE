@@ -559,10 +559,10 @@ namespace BACK_END.Controllers
             var isUpdated = await _auth.UpdateUserFromToken(token, dto);
             if (isUpdated.UpdatedUser == null || string.IsNullOrEmpty(isUpdated.NewToken))
             {
-                return Ok(isUpdated);
+                return BadRequest("Cập nhật thông tin thất bại.");
             }
 
-            return BadRequest("Cập nhật thông tin thất bại.");
+            return Ok(isUpdated);
         }
 
         [HttpPost("ChangePasswordFromToken")]
