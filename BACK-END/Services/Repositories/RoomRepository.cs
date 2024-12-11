@@ -549,16 +549,55 @@ namespace BACK_END.Services.Repositories
             await _db.SaveChangesAsync();
         }
 
-        public async Task<List<GetHistoryDto>?> GetHistoryByRoomId(int roomId)
+        public async Task<PagedResultDto<GetHistoryDto>?> GetHistoryByRoomId(int roomId, RoomHistoryQueryDto dto)
         {
-            var room = await _db.Room.FindAsync(roomId);
-            if (room == null) return null;
-            var history = await _db.Room_History
-                .Include(x => x.User)
+            // Kiểm tra room tồn tại bằng Any thay vì FindAsync
+            if (!await _db.Room.AnyAsync(r => r.Id == roomId))
+                return null;
+
+            // Tạo và thực thi query một lần
+            var query = _db.Room_History
                 .Where(x => x.RoomId == roomId)
+                .Include(x => x.User)
                 .OrderByDescending(x => x.Id)
+                .AsQueryable();
+
+            // Áp dụng tìm kiếm nếu có
+            if (!string.IsNullOrEmpty(dto.Search))
+                query = SearchHistory(dto.Search, query);
+
+            // Tính toán số lượng và phân trang trong một lần query
+            var totalItems = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalItems / (double)dto.PageSize);
+
+            // Lấy dữ liệu đã phân trang và map
+            var items = await query
+                .Skip((dto.PageNumber - 1) * dto.PageSize)
+                .Take(dto.PageSize)
+                .Select(x => _mapper.Map<GetHistoryDto>(x))
                 .ToListAsync();
-            return _mapper.Map<List<GetHistoryDto>>(history);
+
+            return new PagedResultDto<GetHistoryDto>
+            {
+                Items = items,
+                PageNumber = dto.PageNumber,
+                PageSize = dto.PageSize,
+                TotalPages = totalPages
+            };
+        }
+
+        private IQueryable<Room_History> SearchHistory(string? search, IQueryable<Room_History> roomHistory)
+        {
+            if (string.IsNullOrEmpty(search))
+                return roomHistory;
+
+            var searchTerms = search.ToLower().Trim().Split(' ');
+
+            return roomHistory.Where(x => searchTerms.All(term =>
+                (x.User != null && x.User.FullName != null && x.User.FullName.ToString().ToLower().Contains(term)) ||
+                (x.User != null && x.User.Phone != null && x.User.Phone.ToString().ToLower().Contains(term)) ||
+                (x.User != null && x.User.Email != null && x.User.Email.ToString().ToLower().Contains(term))
+            ));
         }
 
         public async Task<List<GetRoomByExportBillDto>?> GetRoomByExportBill(int roomTypeId)
@@ -763,48 +802,87 @@ namespace BACK_END.Services.Repositories
 
         public async Task<List<RoomUserDto>?> FindUser(string search)
         {
-            if (string.IsNullOrEmpty(search)) return null;
+            if (string.IsNullOrEmpty(search))
+                return null;
 
             var searchTrim = search.Trim();
 
+            // Lấy danh sách user đang ở trong phòng
             var userHistory = await _db.Room_History
-                .Include(x => x.User)
                 .Where(x => x.Status == 1)
+                .Select(x => x.UserId)
                 .ToListAsync();
 
-            var user = await _db.User
-                .Where(x => (x.Phone.Contains(searchTrim) || x.Email.Contains(searchTrim) || x.FullName.Contains(searchTrim)) && !userHistory.Select(x => x.UserId).Contains(x.Id))
+            // Lấy danh sách user có role Customer
+            var usersInCustomerRole = await _userManager.GetUsersInRoleAsync("Customer");
+            var customerEmails = usersInCustomerRole.Select(x => x.Email).ToList();
+
+            // Tìm kiếm user theo điều kiện
+            var users = await _db.User
+                .Where(x =>
+                    // Điều kiện tìm kiếm
+                    (x.Phone.Contains(searchTrim) ||
+                     x.Email.Contains(searchTrim) ||
+                     x.FullName.Contains(searchTrim)) &&
+                    // Không có trong danh sách đang ở phòng
+                    !userHistory.Contains(x.Id) &&
+                    // Có email trong danh sách Customer
+                    customerEmails.Contains(x.Email)
+                )
                 .ToListAsync();
 
-            if (user == null)
-            {
+            if (!users.Any())
                 return null;
-            }
 
-            // Map user sang RoomUserDto và trả về
-            return _mapper.Map<List<RoomUserDto>>(user);
+            return _mapper.Map<List<RoomUserDto>>(users);
         }
 
         public async Task<bool> AddUserToRoom(AddUserToRoomDto dto)
         {
-            var room = await _db.Room.FindAsync(dto.RoomId);
-            if (room == null) return false;
-            var user = await _db.User.FindAsync(dto.UserId);
-            if (user == null) return false;
-            var roomHistory = new Room_History
+            using var transaction = await _db.Database.BeginTransactionAsync();
+            try
             {
-                RoomId = dto.RoomId,
-                UserId = dto.UserId,
-                Status = 1
-            };
+                // Kiểm tra room và user tồn tại
+                var room = await _db.Room.FindAsync(dto.RoomId);
+                if (room == null) return false;
 
-            if (room.Status == 1)
-            {
-                room.Status = 2;
-                _db.Update(room);
+                // Lấy user và kiểm tra role
+                var user = await _db.User.FindAsync(dto.UserId);
+                if (user == null) return false;
+
+                // Lấy IdentityUser để kiểm tra role
+                var identityUser = await _userManager.FindByEmailAsync(user.Email);
+                if (identityUser == null) return false;
+
+                // Kiểm tra user có role Customer không
+                var isCustomer = await _userManager.IsInRoleAsync(identityUser, "Customer");
+                if (!isCustomer) return false;
+
+                // Tạo lịch sử phòng mới
+                var roomHistory = new Room_History
+                {
+                    RoomId = dto.RoomId,
+                    UserId = dto.UserId,
+                    Status = 1
+                };
+
+                // Cập nhật trạng thái phòng nếu cần
+                if (room.Status == 1)
+                {
+                    room.Status = 2;
+                    _db.Update(room);
+                }
+
+                await _db.Room_History.AddAsync(roomHistory);
+                await _db.SaveChangesAsync();
+                await transaction.CommitAsync();
+                return true;
             }
-            await _db.Room_History.AddAsync(roomHistory);
-            return await _db.SaveChangesAsync() > 0;
+            catch
+            {
+                await transaction.RollbackAsync();
+                return false;
+            }
         }
 
 
@@ -867,6 +945,8 @@ namespace BACK_END.Services.Repositories
                 ))
             ));
         }
+
+
 
         public async Task<GetBillByRoomIdDto?> GetBillById(int id)
         {
