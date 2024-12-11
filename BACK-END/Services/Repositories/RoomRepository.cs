@@ -153,6 +153,8 @@ namespace BACK_END.Services.Repositories
                     : motel.OrderBy(GetSortPropertyByMotel(queryDto.SortColumn));
             }
 
+            var totalMotels = await _db.Motel.CountAsync(x => x.UserId == userId);
+
             // Áp dụng mapping và phân trang
             var pagedResult = await PagedList<RoomMotelDto>.CreateAsync(
                 motel.Select(x => _mapper.Map<RoomMotelDto>(x)),
@@ -167,6 +169,8 @@ namespace BACK_END.Services.Repositories
                 TotalPages = (int)Math.Ceiling(await motel.CountAsync() / (double)queryDto.PageSize)
             };
         }
+
+
 
         private Expression<Func<Motel, object>> GetSortPropertyByMotel(string sortColumn)
         {
@@ -208,8 +212,6 @@ namespace BACK_END.Services.Repositories
                         await _db.Service.AddAsync(service);
                     }
                 }
-
-                // Tải lên hình ảnh nếu có
                 if (addMotelDto.Images != null && addMotelDto.Images.Count > 0)
                 {
                     await AddImages(roomType.Id, addMotelDto.Images);
