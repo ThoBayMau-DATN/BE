@@ -334,5 +334,28 @@ namespace BACK_END.Controllers
                 Data = count
             });
         }
+
+        [HttpGet("get-Room-by-Motel")]
+        public async Task<IActionResult> getCountRoom(int motelId)
+        {
+            var count = await _repo.GetRoomByMotel(motelId);
+            if (count == null)
+            {
+                return BadRequest(new ApiResponse<object>
+                {
+                    Code = 404,
+                    Status = "error",
+                    Message = "Không có dữ liệu",
+                    Data = null
+                });
+            }
+            return Ok(new ApiResponse<object>
+            {
+                Code = 200,
+                Status = "success",
+                Message = "Lấy danh sách phòng thành công",
+                Data = count
+            });
+        }
     }
 }
