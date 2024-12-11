@@ -27,7 +27,7 @@ namespace BACK_END.Services.Interfaces
         Task<RoomDto?> GetRoomById(int roomTypeId);
         Task<GetRoomTypeByEditDto?> GetRoomTypeByEdit(int roomTypeId);
         Task<GetRoomTypeByEditDto?> EditRoomType(EditRoomTypeDto dto);
-        Task<List<GetHistoryDto>?> GetHistoryByRoomId(int roomId);
+        Task<PagedResultDto<GetHistoryDto>?> GetHistoryByRoomId(int roomId, RoomHistoryQueryDto dto);
         Task<List<GetRoomByExportBillDto>?> GetRoomByExportBill(int roomTypeId);
         Task<bool> AddElectricAndWaterToBill(AddElectricAndWaterDto dto);
         Task<GetPriceByRoomTypeIdDto?> GetPriceByRoomTypeId(int roomTypeId);
