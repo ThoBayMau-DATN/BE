@@ -1,7 +1,4 @@
-﻿using BACK_END.Models;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace BACK_END.DTOs.RoomDto
+﻿namespace BACK_END.DTOs.RoomDto
 {
     public class RoomMotelDto
     {
@@ -15,6 +12,7 @@ namespace BACK_END.DTOs.RoomDto
         public int TotalUser { get; set; }
         public int Status { get; set; }
         public DateTime CreateDate { get; set; } = DateTime.Now;
+        public int TotalMotels { get; set; }
         public virtual RoomOwnerDto? Owner { get; set; }
         public virtual List<RoomTypeDto>? RoomTypes { get; set; }
     }

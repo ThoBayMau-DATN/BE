@@ -662,5 +662,23 @@ namespace BACK_END.Services.Repositories
             var map = _mapper.Map<DTOs.MotelDto.ResultDeleteMotelDTO>(motel);
             return map;
         }
+
+        public async Task<MotelCountDto> GetMotelByUser(string token)
+        {
+            var email = HandlerToken(token);
+            if (string.IsNullOrEmpty(email))
+                throw new UnauthorizedAccessException("Invalid token");
+
+            var user = await _db.User.FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null)
+                throw new KeyNotFoundException("User not found");
+            var motels = await _db.Motel.Where(x => x.UserId == user.Id).ToListAsync();
+            var motelCountDto = new MotelCountDto
+            {
+                Count = motels.Count
+            };
+
+            return motelCountDto;
+        }
     }
 }
