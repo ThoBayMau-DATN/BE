@@ -338,11 +338,11 @@ namespace BACK_END.Controllers
         }
 
         [HttpGet("get-history-by-room-id/{roomId}")]
-        public async Task<IActionResult> GetHistoryByRoomId(int roomId)
+        public async Task<IActionResult> GetHistoryByRoomId(int roomId, [FromQuery] RoomHistoryQueryDto dto)
         {
             try
             {
-                var result = await _room.GetHistoryByRoomId(roomId);
+                var result = await _room.GetHistoryByRoomId(roomId, dto);
                 if (result == null)
                 {
                     return BadRequest(new MotelRepository<object> { Code = 400, Success = false, Message = "Không tìm thấy lịch sử phòng trọ" });
