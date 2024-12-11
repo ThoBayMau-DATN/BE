@@ -36,5 +36,7 @@ namespace BACK_END.Services.Interfaces
         //get register motel owner
         Task<IEnumerable<DTOs.MotelDto.InfomationRegisterMotelDTO>?> GetInfomationRegisterMotelAsync(int id);
         Task<DTOs.MotelDto.ResultDeleteMotelDTO?> DeleteRegisterMotelAsync(int id);
+
+        Task<MotelCountDto> GetMotelByUser(string token);
     }
 }
