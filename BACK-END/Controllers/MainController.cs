@@ -312,5 +312,27 @@ namespace BACK_END.Controllers
                 Data = motel
             });
         }
+        [HttpGet("get-count-motel")]
+        public async Task<IActionResult> getCountMotel(string token)
+        {
+            var count = await _repo.GetMotelByUser(token);
+            if (count == null)
+            {
+                return BadRequest(new ApiResponse<object>
+                {
+                    Code = 404,
+                    Status = "error",
+                    Message = "Không có dữ liệu",
+                    Data = null
+                });
+            }
+            return Ok(new ApiResponse<object>
+            {
+                Code = 200,
+                Status = "success",
+                Message = "Lấy danh sách trọ thành công",
+                Data = count
+            });
+        }
     }
 }
