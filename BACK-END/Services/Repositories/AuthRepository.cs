@@ -635,11 +635,11 @@ namespace BACK_END.Services.Repositories
                 var service = serviceRoom.Service;
                 if (service == null) continue;
 
-                if (service.Name?.ToLower() == "water")
+                if (service.Name == "Nước")
                 {
                     waterPrice = service.Price * waterUsage;
                 }
-                else if (service.Name?.ToLower() == "electric")
+                else if (service.Name == "Điện")
                 {
                     electricPrice = service.Price * electricUsage;
                 }
