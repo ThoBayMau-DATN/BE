@@ -106,7 +106,6 @@ namespace BACK_END.Services.Repositories
             {
                 //kiểm tra người dùng đã đăng ký gói chưa
                 var checkUserPackage = await _db.Package_User.FirstOrDefaultAsync(x => x.UserId == isUser.Id && x.EndDate > DateTime.Now);
-                Console.WriteLine(checkUserPackage.Id);
                 if (checkUserPackage != null)
                 {
                     checkUserPackage.EndDate = DateTime.Now;
