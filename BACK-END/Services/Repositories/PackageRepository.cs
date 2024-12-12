@@ -105,10 +105,12 @@ namespace BACK_END.Services.Repositories
             else
             {
                 //kiểm tra người dùng đã đăng ký gói chưa
-                var checkUserPackage = await _db.Package_User.FirstOrDefaultAsync(x => x.UserId == isUser.Id && x.EndDate > DateTime.Now.Date);
+                var checkUserPackage = await _db.Package_User.FirstOrDefaultAsync(x => x.UserId == isUser.Id && x.EndDate > DateTime.Now);
+                Console.WriteLine(checkUserPackage.Id);
                 if (checkUserPackage != null)
                 {
                     checkUserPackage.EndDate = DateTime.Now;
+                  
                 }
                 var package = await _db.Package.FirstOrDefaultAsync(x => x.Id == registerPackageDto.IdPackage);
                 if (package == null)
@@ -127,7 +129,7 @@ namespace BACK_END.Services.Repositories
                     PackageId = registerPackageDto.IdPackage,
                     EndDate = DateTime.UtcNow.AddDays(30)
                 };
-
+                
                 await _db.Package_User.AddAsync(userPackage);
                 await _db.SaveChangesAsync();
                 return true;
