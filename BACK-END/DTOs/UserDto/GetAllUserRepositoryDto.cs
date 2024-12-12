@@ -26,6 +26,7 @@ namespace BACK_END.DTOs.UserDto
 
         [Required(ErrorMessage = "Email là bắt buộc.")]
         [EmailAddress(ErrorMessage = "Định dạng email không hợp lệ.")]
+        [StringLength(50, ErrorMessage = "Email không được dài quá 50 ký tự.")]
         public string Email { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Mật khẩu là bắt buộc.")]
@@ -51,6 +52,7 @@ namespace BACK_END.DTOs.UserDto
 
         [Required(ErrorMessage = "Email là bắt buộc.")]
         [EmailAddress(ErrorMessage = "Định dạng email không hợp lệ.")]
+        [StringLength(50, ErrorMessage = "Email không được dài quá 50 ký tự.")]
         public string Email { get; set; } = string.Empty;
         public string? Avatar { get; set; } = string.Empty;
 
