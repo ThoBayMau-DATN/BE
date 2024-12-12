@@ -618,23 +618,20 @@ namespace BACK_END.Services.Repositories
             int? total = bill?.Total;
 
             // Lấy thông tin sử dụng nước và điện
+            // Lấy thông tin sử dụng nước và điện
             var consumption = await _db.Consumption.FirstOrDefaultAsync(c => c.RoomId == room.Id);
             int waterUsage = consumption?.Water ?? 0;
             int electricUsage = consumption?.Electricity ?? 0;
             int waterPrice = 0, electricPrice = 0, otherServicePrice = 0;
             List<OtherServiceDTO> otherServices = new List<OtherServiceDTO>();
 
-            // Lấy các dịch vụ ngoài nước và điện
-            var serviceRooms = await _db.Service_Room
-                .Include(sr => sr.Service)
-                .Where(sr => sr.RoomId == room.Id)
+            // Lấy giá dịch vụ nước và điện qua Room_History -> Room -> Room_Type -> Motel -> Service
+            var motelServices = await _db.Service
+                .Where(s => s.MotelId == room.Room_Type.MotelId && (s.Name == "Nước" || s.Name == "Điện"))
                 .ToListAsync();
 
-            foreach (var serviceRoom in serviceRooms)
+            foreach (var service in motelServices)
             {
-                var service = serviceRoom.Service;
-                if (service == null) continue;
-
                 if (service.Name == "Nước")
                 {
                     waterPrice = service.Price * waterUsage;
@@ -643,16 +640,22 @@ namespace BACK_END.Services.Repositories
                 {
                     electricPrice = service.Price * electricUsage;
                 }
-                else
-                {
-                    // Thêm các dịch vụ khác vào danh sách OtherServiceDTO
-                    otherServices.Add(new OtherServiceDTO
-                    {
-                        Name = service.Name,
-                        price = service.Price
-                    });
-                }
             }
+
+            // Lấy các dịch vụ khác ngoài nước và điện
+            var otherServicesQuery = await _db.Service
+                .Where(s => s.MotelId == room.Room_Type.MotelId && s.Name != "Nước" && s.Name != "Điện")
+                .ToListAsync();
+
+            foreach (var service in otherServicesQuery)
+            {
+                otherServices.Add(new OtherServiceDTO
+                {
+                    Name = service.Name,
+                    price = service.Price
+                });
+            }
+
 
             // Lấy hình ảnh của RoomType
             var roomImages = await _db.Image
