@@ -477,12 +477,12 @@ namespace BACK_END.Services.Repositories
                 Electric = consumption?.Electricity ?? 0,
                 Water = consumption?.Water ?? 0,
                 RoomPrice = room.Room_Type?.Price ?? 0,
-                WaterName = services.FirstOrDefault(s => s.Service?.Name == "Water")?.Service?.Name,
-                ElectricName = services.FirstOrDefault(s => s.Service?.Name == "Electric")?.Service?.Name,
-                WaterPrice = services.FirstOrDefault(s => s.Service?.Name == "Water")?.Service?.Price ?? 0,
-                ElectricPrice = services.FirstOrDefault(s => s.Service?.Name == "Electric")?.Service?.Price ?? 0,
+                WaterName = services.FirstOrDefault(s => s.Service?.Name == "Nuớc")?.Service?.Name,
+                ElectricName = services.FirstOrDefault(s => s.Service?.Name == "Điện")?.Service?.Name,
+                WaterPrice = services.FirstOrDefault(s => s.Service?.Name == "Nuớc")?.Service?.Price ?? 0,
+                ElectricPrice = services.FirstOrDefault(s => s.Service?.Name == "Điện")?.Service?.Price ?? 0,
                 OtherService = services
-                    .Where(s => s.Service?.Name != "Water" && s.Service?.Name != "Electric")
+                    .Where(s => s.Service?.Name != "Nuớc" && s.Service?.Name != "Điện")
                     .Select(s => new OtherServiceBillDTO
                     {
                         Name = s.Service?.Name,
