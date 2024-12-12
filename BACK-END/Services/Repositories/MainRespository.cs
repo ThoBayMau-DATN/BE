@@ -445,7 +445,7 @@ namespace BACK_END.Services.Repositories
                         .ThenInclude(rt => rt.Motel)
                 .Include(b => b.Room)
                     .ThenInclude(r => r.Consumption)
-                    .Include(b => b.User)
+                .Include(b => b.User)
                 .FirstOrDefaultAsync(b => b.Id == billId);
 
             if (bill == null)
@@ -456,14 +456,19 @@ namespace BACK_END.Services.Repositories
             if (room == null)
                 return null;
 
-            var services = await _db.Service_Room
-                .Include(sr => sr.Service)
-                .Where(sr => sr.RoomId == room.Id)
+            var motelServices = await _db.Service
+                .Where(s => s.MotelId == room.Room_Type.MotelId && (s.Name == "Nước" || s.Name == "Điện"))
                 .ToListAsync();
+
+            var waterService = motelServices.FirstOrDefault(s => s.Name == "Nước");
+            var electricService = motelServices.FirstOrDefault(s => s.Name == "Điện");
 
             var consumption = room.Consumption?
                 .OrderByDescending(c => c.Time)
                 .FirstOrDefault();
+
+            var waterUsage = consumption?.Water ?? 0;
+            var electricUsage = consumption?.Electricity ?? 0;
 
             var dto = new BilldetailDto
             {
@@ -474,20 +479,21 @@ namespace BACK_END.Services.Repositories
                 CreateDate = bill.CreatedDate,
                 Status = bill.Status,
                 FullName = bill.User?.FullName,
-                Electric = consumption?.Electricity ?? 0,
-                Water = consumption?.Water ?? 0,
+                Electric = electricUsage,
+                Water = waterUsage,
                 RoomPrice = room.Room_Type?.Price ?? 0,
-                WaterName = services.FirstOrDefault(s => s.Service?.Name == "Nuớc")?.Service?.Name,
-                ElectricName = services.FirstOrDefault(s => s.Service?.Name == "Điện")?.Service?.Name,
-                WaterPrice = services.FirstOrDefault(s => s.Service?.Name == "Nuớc")?.Service?.Price ?? 0,
-                ElectricPrice = services.FirstOrDefault(s => s.Service?.Name == "Điện")?.Service?.Price ?? 0,
-                OtherService = services
-                    .Where(s => s.Service?.Name != "Nuớc" && s.Service?.Name != "Điện")
-                    .Select(s => new OtherServiceBillDTO
+                WaterName = waterService?.Name,
+                ElectricName = electricService?.Name,
+                WaterPrice = waterService?.Price ?? 0,
+                ElectricPrice = electricService?.Price ?? 0,
+                OtherService = await _db.Service_Room
+                    .Include(sr => sr.Service)
+                    .Where(sr => sr.RoomId == room.Id && sr.Service.Name != "Nước" && sr.Service.Name != "Điện")
+                    .Select(sr => new OtherServiceBillDTO
                     {
-                        Name = s.Service?.Name,
-                        price = s.Service?.Price
-                    }).ToList()
+                        Name = sr.Service.Name,
+                        price = sr.Service.Price
+                    }).ToListAsync()
             };
 
             return dto;
