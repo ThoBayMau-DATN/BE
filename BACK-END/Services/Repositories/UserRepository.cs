@@ -1,6 +1,5 @@
 ﻿using BACK_END.Data;
 using BACK_END.DTOs.MainDto;
-using BACK_END.DTOs.Ticket;
 using BACK_END.DTOs.UserDto;
 using BACK_END.Models;
 using BACK_END.Services.Interfaces;
@@ -74,9 +73,11 @@ namespace BACK_END.Services.Repositories
                 userDict.Add(user.Email, user);
                 Console.WriteLine("Email người dùng: " + user.Email);
             }
-           
+
+
+
             var usersWithRoles = query.Select(user => new GetAllUserRepositoryDto
-            {   
+            {
                 Id = userDict[user.Email].Id,
                 Email = user.Email,
                 FullName = userDict[user.Email].FullName,
@@ -84,7 +85,8 @@ namespace BACK_END.Services.Repositories
                 Avatar = userDict[user.Email].Avatar,
                 TimeCreated = userDict[user.Email].CreateDate,
                 Status = userDict[user.Email].Status,
-                Role = userRoles.GetValueOrDefault(user.Email, "")
+                Role = userRoles.GetValueOrDefault(user.Email, ""),
+                Vip = _db.Package_User.Where(x => x.User.Id == user.Id).Select(x => x.Package.Name).FirstOrDefault() ?? "VIP 0"
             });
             //trả về người dùng active 
            

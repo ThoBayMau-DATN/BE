@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BACK_END.DTOs.UserDto
 {
@@ -13,6 +12,7 @@ namespace BACK_END.DTOs.UserDto
         public DateTime TimeCreated { get; set; } = DateTime.Now;
         public bool Status { get; set; } = true;
         public string Role { get; set; } = string.Empty;
+        public string Vip { get; set; }
     }
     public class CreateUserRepositoryDto
     {
