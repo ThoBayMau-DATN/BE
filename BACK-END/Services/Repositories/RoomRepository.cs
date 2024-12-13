@@ -890,6 +890,10 @@ namespace BACK_END.Services.Repositories
 
         public async Task<bool> DeleteUserFromRoom(DeleteUserFromRoomDto dto)
         {
+            //kiểm tra bill chưa thanh toán có tồn tại hay không?
+            var bill = await _db.Bill.Where(x => x.RoomId == dto.RoomId && x.Status == 1).FirstOrDefaultAsync();
+            //nếu có bill chưa thanh toán thì không thể xóa user
+            if (bill != null) return false;
             var roomHistory = await _db.Room_History.Where(x => x.RoomId == dto.RoomId && x.UserId == dto.UserId).OrderByDescending(x => x.Id).FirstOrDefaultAsync();
             if (roomHistory == null || roomHistory.Status != 1) return false;
             roomHistory.Status = 2;

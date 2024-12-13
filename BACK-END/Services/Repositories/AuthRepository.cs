@@ -736,13 +736,7 @@ namespace BACK_END.Services.Repositories
                 if (bill == null)
                     return false;
 
-                if (bill.Status == 1)
-                {
-                    bill.Status = 2;
-                    bill.PaymentDate = DateTime.Now;
-                    _db.Bill.Update(bill);
-                    await _db.SaveChangesAsync();
-                }
+               
 
                 // Truy vấn thông tin người dùng dựa trên BillId
                 var userHistory = await _db.Room_History
@@ -805,12 +799,26 @@ namespace BACK_END.Services.Repositories
                 {
                     // Gửi email
                     var email = user?.User?.Email;
-                    emailTemplate = emailTemplate.Replace("{{userName}}", email);
+                    
+                 
                     if (email != null) {
+                        // Tạo một bản sao của template gốc
+                        string emailToSend = emailTemplate;
 
-                        bool emailSent = UserMapper.SenderEmail(emailTemplate, email);
+                        // Thay thế giá trị trong template
+                        emailToSend = emailToSend.Replace("{{userName}}", email);
+
+                        // Gửi email với nội dung đã thay thế
+                        bool emailSent = UserMapper.SenderEmail(emailToSend, email);
                     }
                     
+                }
+                if (bill.Status == 1)
+                {
+                    bill.Status = 2;
+                    bill.PaymentDate = DateTime.Now;
+                    _db.Bill.Update(bill);
+                    await _db.SaveChangesAsync();
                 }
 
 
