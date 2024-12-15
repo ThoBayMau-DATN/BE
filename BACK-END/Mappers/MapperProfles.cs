@@ -56,6 +56,9 @@ namespace BACK_END.Mappers
 
             //delete motel
             CreateMap<Motel, DTOs.MotelDto.ResultDeleteMotelDTO>().ReverseMap();
+
+            //chat
+            CreateMap<Message, DTOs.ChatDTO.MessageDTO>().ReverseMap();
         }
     }
 }

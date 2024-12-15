@@ -2,7 +2,7 @@
 
 namespace BACK_END.Models
 {
-    public class User //: IdentityUser
+    public class User
     {
         public int Id { get; set; }
         [Column(TypeName = "nvarchar(50)")]
@@ -15,5 +15,8 @@ namespace BACK_END.Models
         public DateTime CreateDate { get; set; } = DateTime.Now;
         [Column(TypeName = "tinyint")]
         public bool Status { get; set; } = true;
+
+        public virtual ICollection<Message>? SentMessages { get; set; }
+        public virtual ICollection<Message>? ReceivedMessages { get; set; }
     }
 }
