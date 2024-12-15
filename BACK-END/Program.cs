@@ -1,11 +1,12 @@
 using BACK_END.Data;
+using BACK_END.Services.MyServices;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using FirebaseAdmin;
-using Google.Apis.Auth.OAuth2;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<BACK_ENDContext>(options =>
@@ -55,7 +56,7 @@ builder.Services.AddAuthentication(options =>
 });
 
 // Add services to the container.
-
+builder.Services.AddSignalR();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -66,28 +67,18 @@ builder.Services.AddMemoryCache(); // su dung cache
 
 var MyCors = "_APP-CORS"; // => Config name cors
 // setting cors
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: MyCors,
                       policy =>
                       {
-                          policy.WithOrigins("*");
-                          policy.WithMethods("*");
-                          policy.WithHeaders("*");
+                          policy.WithOrigins("http://localhost:3000")
+                                .AllowAnyHeader()
+                                .AllowAnyMethod()
+                                .AllowCredentials();
                       });
 });
-
-//builder.Services.AddCors(options =>
-//{
-//    options.AddPolicy(name: MyCors,
-//                      policy =>
-//                      {
-//                          policy.WithOrigins("http://localhost:5173")
-//                                .AllowAnyHeader()
-//                                .AllowAnyMethod()
-//                                .AllowCredentials();
-//                      });
-//});
 
 var app = builder.Build();
 
@@ -125,5 +116,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<ChatHub>("/chathub");
 
 app.Run();

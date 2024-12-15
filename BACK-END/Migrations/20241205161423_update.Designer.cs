@@ -4,6 +4,7 @@ using BACK_END.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BACK_END.Migrations
 {
     [DbContext(typeof(BACK_ENDContext))]
-    partial class BACK_ENDContextModelSnapshot : ModelSnapshot
+    [Migration("20241205161423_update")]
+    partial class update
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -31,9 +34,6 @@ namespace BACK_END.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("PaymentDate")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("PriceRoom")
@@ -340,7 +340,7 @@ namespace BACK_END.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreateDate")
+                    b.Property<DateTime?>("CreateDate")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("EndDate")
@@ -463,9 +463,6 @@ namespace BACK_END.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<int>("Price_Service")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Quantity")
                         .HasColumnType("int");
 
                     b.Property<int?>("ServiceId")
@@ -823,7 +820,7 @@ namespace BACK_END.Migrations
             modelBuilder.Entity("BACK_END.Models.Bill", b =>
                 {
                     b.HasOne("BACK_END.Models.Room", "Room")
-                        .WithMany("Bill")
+                        .WithMany()
                         .HasForeignKey("RoomId");
 
                     b.HasOne("BACK_END.Models.User", "User")
@@ -960,7 +957,7 @@ namespace BACK_END.Migrations
             modelBuilder.Entity("BACK_END.Models.Service_Bill", b =>
                 {
                     b.HasOne("BACK_END.Models.Bill", "Bill")
-                        .WithMany("Service_Bills")
+                        .WithMany()
                         .HasForeignKey("BillId");
 
                     b.HasOne("BACK_END.Models.Service", "Service")
@@ -1077,11 +1074,6 @@ namespace BACK_END.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("BACK_END.Models.Bill", b =>
-                {
-                    b.Navigation("Service_Bills");
-                });
-
             modelBuilder.Entity("BACK_END.Models.Motel", b =>
                 {
                     b.Navigation("Room_Types");
@@ -1091,8 +1083,6 @@ namespace BACK_END.Migrations
 
             modelBuilder.Entity("BACK_END.Models.Room", b =>
                 {
-                    b.Navigation("Bill");
-
                     b.Navigation("Consumption");
 
                     b.Navigation("History");
