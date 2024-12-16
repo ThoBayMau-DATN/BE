@@ -56,6 +56,13 @@ namespace BACK_END.Mappers
 
             //delete motel
             CreateMap<Motel, DTOs.MotelDto.ResultDeleteMotelDTO>().ReverseMap();
+
+            //chat
+            CreateMap<Message, DTOs.ChatDTO.MessageDTO>().ReverseMap();
+            CreateMap<Message, DTOs.ChatDTO.ReceiverDTO>()
+            .ForMember(dest => dest.Receiver, opt => opt.MapFrom((src, dest, _, context) => src.SenderId == (int)context.Items["UserId"] ? src.Receiver : src.Sender));
+            CreateMap<User, DTOs.ChatDTO.ReceiverInfo>().ReverseMap();
+            CreateMap<User, DTOs.ChatDTO.SearchDTO>().ReverseMap();
         }
     }
 }

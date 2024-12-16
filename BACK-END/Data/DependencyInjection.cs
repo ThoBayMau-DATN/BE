@@ -23,6 +23,7 @@ namespace BACK_END.Data
             services.AddScoped<IGetTro, MainRespository>();
             services.AddSingleton<IVnPayService, VnPayService>();
             services.AddScoped<IPackage, PackageRepository>();
+            services.AddScoped<IMessage, MessageRepository>();
         }
     }
 }

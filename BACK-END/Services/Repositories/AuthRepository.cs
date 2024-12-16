@@ -580,6 +580,7 @@ namespace BACK_END.Services.Repositories
                 return null;
             return new UserDetailDto
             {
+                Id = user.Id,
                 FullName = user.FullName,
                 Phone = user.Phone,
                 Avatar = user.Avatar,

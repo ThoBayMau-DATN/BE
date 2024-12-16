@@ -1,4 +1,4 @@
-﻿ using BACK_END.Models;
+﻿using BACK_END.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +11,26 @@ namespace BACK_END.Data
         {
 
         }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Message>(entity =>
+            {
+                entity.HasKey(m => m.Id);
+
+                entity.HasOne(m => m.Sender)
+                      .WithMany(u => u.SentMessages)
+                      .HasForeignKey(m => m.SenderId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(m => m.Receiver)
+                      .WithMany(u => u.ReceivedMessages)
+                      .HasForeignKey(m => m.ReceiverId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+        }
+
         public DbSet<Bill> Bill { get; set; }
         public DbSet<Consumption> Consumption { get; set; }
         public DbSet<Image> Image { get; set; }
@@ -29,5 +49,6 @@ namespace BACK_END.Data
         public DbSet<Ticket_Log> Ticket_Log { get; set; }
         public DbSet<User> User { get; set; }
         public DbSet<User_Notification> User_Notification { get; set; }
+        public DbSet<Message> Message { get; set; }
     }
 }

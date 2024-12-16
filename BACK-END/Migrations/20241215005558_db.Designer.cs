@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BACK_END.Migrations
 {
     [DbContext(typeof(BACK_ENDContext))]
-    [Migration("20241210150154_addPaymentDate")]
-    partial class addPaymentDate
+    [Migration("20241215005558_db")]
+    partial class db
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -120,6 +120,36 @@ namespace BACK_END.Migrations
                     b.HasIndex("TicketId");
 
                     b.ToTable("Image");
+                });
+
+            modelBuilder.Entity("BACK_END.Models.Message", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("Nvarchar(max)");
+
+                    b.Property<int?>("ReceiverId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SenderId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Time")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReceiverId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("Message");
                 });
 
             modelBuilder.Entity("BACK_END.Models.Motel", b =>
@@ -832,6 +862,23 @@ namespace BACK_END.Migrations
                     b.Navigation("Ticket");
                 });
 
+            modelBuilder.Entity("BACK_END.Models.Message", b =>
+                {
+                    b.HasOne("BACK_END.Models.User", "Receiver")
+                        .WithMany("ReceivedMessages")
+                        .HasForeignKey("ReceiverId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("BACK_END.Models.User", "Sender")
+                        .WithMany("SentMessages")
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Receiver");
+
+                    b.Navigation("Sender");
+                });
+
             modelBuilder.Entity("BACK_END.Models.Motel", b =>
                 {
                     b.HasOne("BACK_END.Models.User", "User")
@@ -1066,6 +1113,13 @@ namespace BACK_END.Migrations
             modelBuilder.Entity("BACK_END.Models.Ticket", b =>
                 {
                     b.Navigation("Images");
+                });
+
+            modelBuilder.Entity("BACK_END.Models.User", b =>
+                {
+                    b.Navigation("ReceivedMessages");
+
+                    b.Navigation("SentMessages");
                 });
 #pragma warning restore 612, 618
         }
