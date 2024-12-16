@@ -14,7 +14,7 @@ namespace BACK_END.Models
         public string? Avatar { get; set; }
         public DateTime CreateDate { get; set; } = DateTime.Now;
         [Column(TypeName = "tinyint")]
-        public bool Status { get; set; } = true;
+        public int Status { get; set; } = true;
 
         public virtual ICollection<Message>? SentMessages { get; set; }
         public virtual ICollection<Message>? ReceivedMessages { get; set; }

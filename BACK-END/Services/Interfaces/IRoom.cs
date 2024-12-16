@@ -37,6 +37,9 @@ namespace BACK_END.Services.Interfaces
         Task<PagedResultDto<GetBillByRoomIdDto>?> GetBillByRoomId(int roomId, BillQueryDto dto);
         Task<GetBillByRoomIdDto?> GetBillById(int id);
         Task<bool> DaThanhToanBill(int id);
+        Task<bool> LockRoom(int roomId);
+        Task<bool> CheckIsLockRoom(int roomId);
+        Task<bool> UnlockRoom(int roomId);
 
         // Task<List<GetRoomByMotelIdDto>?> GetRoomByMotelId(int motelId);
         // Task<bool> AddRoom(AddRoomDto dto);

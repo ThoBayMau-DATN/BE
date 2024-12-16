@@ -513,6 +513,48 @@ namespace BACK_END.Controllers
             }
         }
 
+        [HttpPut("lock-room/{roomId}")]
+        public async Task<IActionResult> LockRoom(int roomId) {
+            try {
+                var result = await _room.LockRoom(roomId);
+                if (result == null || result == false) {
+                return BadRequest(new MotelRepository<object> { Code = 400, Success = false, Message = "Khóa phòng trọ thất bại" });
+            }
+                return Ok(new MotelRepository<object> { Code = 200, Success = true, Data = result, Message = "Khóa phòng trọ thành công" });
+            }
+            catch (Exception ex) {
+                return BadRequest(new MotelRepository<object> { Code = 400, Success = false, Message = ex.Message });
+            }
+        }
+
+        [HttpGet("check-is-lock-room/{roomId}")]
+        public async Task<IActionResult> CheckIsLockRoom(int roomId) {
+            try {
+                var result = await _room.CheckIsLockRoom(roomId);
+                if (result == null) {
+                    return BadRequest(new MotelRepository<object> { Code = 400, Success = false, Message = "Không tìm thấy phòng trọ" });
+                }
+                return Ok(new MotelRepository<object> { Code = 200, Success = true, Message = "Kiểm tra phòng trọ thành công", Data = result });
+            }
+            catch (Exception ex) {
+                return BadRequest(new MotelRepository<object> { Code = 400, Success = false, Message = ex.Message });
+            }
+        }
+
+        [HttpPut("unlock-room/{roomId}")]
+        public async Task<IActionResult> UnlockRoom(int roomId) {
+            try {
+                var result = await _room.UnlockRoom(roomId);
+                if (result == null || result == false) {
+                    return BadRequest(new MotelRepository<object> { Code = 400, Success = false, Message = "Mở khóa phòng trọ thất bại" });
+                }
+                return Ok(new MotelRepository<object> { Code = 200, Success = true, Data = result, Message = "Mở khóa phòng trọ thành công" });
+            }
+            catch (Exception ex) {
+                return BadRequest(new MotelRepository<object> { Code = 400, Success = false, Message = ex.Message });
+            }
+        }
+
         // [HttpGet("get-room-by-motel-id/{motelId}")]
         // public async Task<IActionResult> GetRoomByMotelId(int motelId)
         // {

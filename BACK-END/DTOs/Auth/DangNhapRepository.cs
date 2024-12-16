@@ -8,7 +8,7 @@ namespace BACK_END.DTOs.Auth
         public string Email { get; set; } = string.Empty;
         public string? Phone { get; set; } = string.Empty;
         public string? Avatar { get; set; } = string.Empty;
-        public bool Status { get; set; }
+        public Byte Status { get; set; }
     }
 
 }

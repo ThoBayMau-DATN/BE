@@ -315,24 +315,24 @@ namespace BACK_END.Services.Repositories
             }
 
             //check lại hết số người trong phòng nếu có người thì status = 2 nếu không có người thì status = 1, update database
-            foreach (var item in roomType)
-            {
-                var room = await _db.Room.Where(x => x.Room_TypeId == item.Id).ToListAsync();
-                if (room == null || !room.Any()) continue;
-                foreach (var r in room)
-                {
-                    if (r.History != null && r.History.Count > 0 && r.History.Any(x => x.Status == 1) && r.Status != 2)
-                    {
-                        r.Status = 2;
-                    }
-                    else if (r.History != null && r.History.Count > 0 && r.History.Any(x => x.Status != 1) && r.Status != 1)
-                    {
-                        r.Status = 1;
-                    }
-                }
-                _db.UpdateRange(room);
-            }
-            await _db.SaveChangesAsync();
+            /*  foreach (var item in roomType)
+              {
+                  var room = await _db.Room.Where(x => x.Room_TypeId == item.Id).ToListAsync();
+                  if (room == null || !room.Any()) continue;
+                  foreach (var r in room)
+                  {
+                      if (r.History != null && r.History.Count > 0 && r.History.Any(x => x.Status == 1) && r.Status != 2)
+                      {
+                          r.Status = 2;
+                      }
+                      else if (r.History != null && r.History.Count > 0 && r.History.Any(x => x.Status != 1) && r.Status != 1)
+                      {
+                          r.Status = 1;
+                      }
+                  }
+                  _db.UpdateRange(room);
+              }
+              await _db.SaveChangesAsync();*/
             return _mapper.Map<List<RoomTypeDto>>(roomType);
         }
 
@@ -890,16 +890,58 @@ namespace BACK_END.Services.Repositories
 
         public async Task<bool> DeleteUserFromRoom(DeleteUserFromRoomDto dto)
         {
-            //kiểm tra bill chưa thanh toán có tồn tại hay không?
-            var bill = await _db.Bill.Where(x => x.RoomId == dto.RoomId && x.Status == 1).FirstOrDefaultAsync();
-            //nếu có bill chưa thanh toán thì không thể xóa user
-            if (bill != null) return false;
-            var roomHistory = await _db.Room_History.Where(x => x.RoomId == dto.RoomId && x.UserId == dto.UserId).OrderByDescending(x => x.Id).FirstOrDefaultAsync();
-            if (roomHistory == null || roomHistory.Status != 1) return false;
-            roomHistory.Status = 2;
-            roomHistory.EndDate = DateTime.Now;
-            _db.Update(roomHistory);
-            return await _db.SaveChangesAsync() > 0;
+            using var transaction = await _db.Database.BeginTransactionAsync();
+            try
+            {
+                // Kiểm tra bill mới nhất có đang chưa thanh toán không
+                var bill = await _db.Bill
+                    .Where(x => x.RoomId == dto.RoomId)
+                    .OrderByDescending(x => x.CreatedDate)
+                    .FirstOrDefaultAsync();
+
+                // Nếu có bill chưa thanh toán thì không thể xóa user
+                if (bill != null && bill.Status == 1) 
+                    return false;
+
+                // Lấy lịch sử phòng của user cần xóa
+                var roomHistory = await _db.Room_History
+                    .Where(x => x.RoomId == dto.RoomId && x.UserId == dto.UserId)
+                    .OrderByDescending(x => x.Id)
+                    .FirstOrDefaultAsync();
+
+                if (roomHistory == null || roomHistory.Status != 1) 
+                    return false;
+
+                // Cập nhật lịch sử phòng
+                roomHistory.Status = 2;
+                roomHistory.EndDate = DateTime.Now;
+                _db.Update(roomHistory);
+
+                // Kiểm tra xem còn user nào trong phòng không
+                var activeUsersInRoom = await _db.Room_History
+                    .Where(x => x.RoomId == dto.RoomId && x.Status == 1 && x.UserId != dto.UserId)
+                    .AnyAsync();
+
+                // Nếu không còn user nào, chuyển trạng thái phòng về 1
+                if (!activeUsersInRoom)
+                {
+                    var room = await _db.Room.FindAsync(dto.RoomId);
+                    if (room != null)
+                    {
+                        room.Status = 1; // Chuyển về trạng thái phòng trống
+                        _db.Update(room);
+                    }
+                }
+
+                await _db.SaveChangesAsync();
+                await transaction.CommitAsync();
+                return true;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                return false;
+            }
         }
 
         public async Task<PagedResultDto<GetBillByRoomIdDto>?> GetBillByRoomId(int roomId, BillQueryDto dto)
@@ -972,6 +1014,55 @@ namespace BACK_END.Services.Repositories
             if (bill == null || bill.Status != 1) return false;
             bill.Status = 2;
             _db.Update(bill);
+            return await _db.SaveChangesAsync() > 0;
+        }
+
+        public async Task<bool> CheckIsLockRoom(int roomId)
+        {
+
+            var room = await _db.Room.FindAsync(roomId);
+            if (room == null) return false;
+
+            if (room.Status == 3) return false;
+
+            // Tạo và thực thi query một lần
+            var history_room = await _db.Room_History
+                .Where(x => x.RoomId == roomId)
+                .Include(x => x.User)
+                .Where(x => x.Status == 1)
+                .OrderByDescending(x => x.Id)
+                .ToListAsync();
+
+            if (history_room.Count() > 0)
+                return false;
+            return true;
+        }
+
+        public async Task<bool> LockRoom(int roomId)
+        {
+            var room = await _db.Room.FindAsync(roomId);
+            if (room == null) return false;
+
+            var isLock = await CheckIsLockRoom(roomId);
+            if (!isLock) return false;
+
+            room.Status = 3;
+            _db.Update(room);
+            return await _db.SaveChangesAsync() > 0;
+        }
+
+        public async Task<bool> UnlockRoom(int roomId)
+        {
+            var room = await _db.Room.FindAsync(roomId);
+
+            // Kiểm tra phòng tồn tại và đang ở trạng thái khóa (status = 3)
+            if (room == null || room.Status != 3)
+                return false;
+
+            // Chuyển trạng thái về 1 (phòng trống)
+            room.Status = 1;
+            _db.Update(room);
+
             return await _db.SaveChangesAsync() > 0;
         }
 
