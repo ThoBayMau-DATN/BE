@@ -30,7 +30,7 @@ namespace BACK_END.Services.Repositories
             {
                return null;
             }
-            var query = _db.User.Where(x=>x.Status==true);
+            var query = _db.User.Where(x=>x.Status==1);
             //check token 
             var isUser = await _auth.GetUserByToken(token);
             if(isUser == null)
@@ -228,7 +228,7 @@ namespace BACK_END.Services.Repositories
                 Email = userDto.Email,
                 Avatar = userDto.Avatar,
                 CreateDate = DateTime.Now, // Thiết lập thời gian tạo
-                Status = true // Trạng thái mặc định
+                Status = 1 // Trạng thái mặc định
             };
             if (!await _roleManager.RoleExistsAsync(userDto.Role))
             {
@@ -361,7 +361,13 @@ namespace BACK_END.Services.Repositories
             }
 
            //đổi trạng thái người dùng
-            existingUser.Status = false;
+            existingUser.Status = 0;
+            //đổi trạng thái motel của người dùng
+            var motels = _db.Motel.Where(x => x.UserId == id).ToList();
+            foreach (var motel in motels)
+            {
+                motel.Status = 5;
+            }
             //identityUser.Email = identityUser.Email + "_deleted";
             //identityUser.UserName = identityUser.UserName + "_deleted";
             // Lưu các thay đổi vào cơ sở dữ liệu
@@ -390,7 +396,7 @@ namespace BACK_END.Services.Repositories
                 throw new Exception("User is not owner");
             }
             //đổi trạng thái người dùng
-            existingUser.Status = true;
+            existingUser.Status = 1;
             // Lưu các thay đổi vào cơ sở dữ liệu
             _db.SaveChanges();
             return Task.FromResult(existingUser);
