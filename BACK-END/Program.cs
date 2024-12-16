@@ -10,7 +10,7 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<BACK_ENDContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("BACK_ENDContext") ?? throw new InvalidOperationException("Connection string 'BACK_ENDContext' not found.")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("_BACK_ENDContext") ?? throw new InvalidOperationException("Connection string 'BACK_ENDContext' not found.")));
 
 builder.Services.AddServices();
 
