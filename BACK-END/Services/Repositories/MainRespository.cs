@@ -151,10 +151,10 @@ namespace BACK_END.Services.Repositories
                         Type = i.Type
                     }).ToList(),
                     IsAvailable = rt.Rooms.Any(room =>
-                room.History == null || 
+                room.History == null ||
                 room.History.All(h => h.EndDate != null && h.EndDate <= DateTime.Now)),
-                PackageName = topPackage?.Name ?? "",
-                PackagePrice = topPackage?.Price ?? 0
+                    PackageName = topPackage?.Name ?? "",
+                    PackagePrice = topPackage?.Price ?? 0
                 };
 
             }).Where(r => r.IsAvailable)
@@ -196,6 +196,8 @@ namespace BACK_END.Services.Repositories
                 Status = roomType.Motel.Status,
                 CreateDate = roomType.CreateDate,
                 UpdateDate = roomType.UpdateDate,
+                UserId = roomType.Motel.User.Id,
+                Avatar = roomType.Motel.User.Avatar,
                 FullName = roomType.Motel.User.FullName,
                 PhoneNumber = roomType.Motel.User.Phone,
                 Email = roomType.Motel.User.Email,

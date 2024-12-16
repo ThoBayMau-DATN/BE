@@ -35,6 +35,27 @@ namespace BACK_END.Services.Repositories
             return null;
         }
 
+        public async Task<IEnumerable<DTOs.ChatDTO.ReceiverDTO>?> getListUserAsync(int userId)
+        {
+            var messages = await _db.Message
+                .Where(m => m.SenderId == userId || m.ReceiverId == userId)
+                .Include(m => m.Sender)
+                .Include(m => m.Receiver)
+                .ToListAsync();
+
+            var latestMessages = messages
+                .GroupBy(m => m.SenderId == userId ? m.ReceiverId : m.SenderId)
+                .Select(g => g.OrderByDescending(m => m.Time).FirstOrDefault())
+                .ToList();
+
+            var result = _mapper.Map<List<DTOs.ChatDTO.ReceiverDTO>>(latestMessages, opt =>
+            {
+                opt.Items["UserId"] = userId;
+            });
+
+            return result;
+        }
+
         public async Task<IEnumerable<DTOs.ChatDTO.MessageDTO>?> getMessageHistoryAsync(int SenderId, int ReceiverId)
         {
             var data = await _db.Message
@@ -42,6 +63,13 @@ namespace BACK_END.Services.Repositories
                 .OrderBy(x => x.Time)
                 .ToListAsync();
             var map = _mapper.Map<List<DTOs.ChatDTO.MessageDTO>>(data);
+            return map;
+        }
+
+        public async Task<IEnumerable<DTOs.ChatDTO.SearchDTO>?> getSearchAsync(string key, int userId)
+        {
+            var data = await _db.User.Where(x => x.Phone.Contains(key) && x.Id != userId).ToListAsync();
+            var map = _mapper.Map<List<DTOs.ChatDTO.SearchDTO>>(data);
             return map;
         }
     }
