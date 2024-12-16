@@ -57,7 +57,7 @@ namespace BACK_END.Data
                         Email = powerUser.Email,
                         Phone = "0123456780",
                         CreateDate = DateTime.Now,
-                        Status = true
+                        Status = 1
                     };
 
                     dbContext.User.Add(newUser);
@@ -88,7 +88,7 @@ namespace BACK_END.Data
                         Email = powerStaff.Email,
                         Phone = "0123456788",
                         CreateDate = DateTime.Now,
-                        Status = true
+                        Status = 1
                     };
                     dbContext.User.Add(newStaff);
                     dbContext.SaveChanges();
