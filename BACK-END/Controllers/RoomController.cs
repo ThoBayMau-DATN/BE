@@ -541,6 +541,20 @@ namespace BACK_END.Controllers
             }
         }
 
+        [HttpPut("unlock-room/{roomId}")]
+        public async Task<IActionResult> UnlockRoom(int roomId) {
+            try {
+                var result = await _room.UnlockRoom(roomId);
+                if (result == null || result == false) {
+                    return BadRequest(new MotelRepository<object> { Code = 400, Success = false, Message = "Mở khóa phòng trọ thất bại" });
+                }
+                return Ok(new MotelRepository<object> { Code = 200, Success = true, Data = result, Message = "Mở khóa phòng trọ thành công" });
+            }
+            catch (Exception ex) {
+                return BadRequest(new MotelRepository<object> { Code = 400, Success = false, Message = ex.Message });
+            }
+        }
+
         // [HttpGet("get-room-by-motel-id/{motelId}")]
         // public async Task<IActionResult> GetRoomByMotelId(int motelId)
         // {
