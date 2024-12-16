@@ -10,7 +10,7 @@ namespace BACK_END.DTOs.UserDto
         public string Email { get; set; } = string.Empty;
         public string? Avatar { get; set; } = string.Empty;
         public DateTime TimeCreated { get; set; } = DateTime.Now;
-        public bool Status { get; set; } = true;
+        public byte Status { get; set; } = 1;
         public string Role { get; set; } = string.Empty;
         public string Vip { get; set; }
     }
