@@ -118,7 +118,7 @@ namespace BACK_END.Controllers
             }
         }
         [HttpPost]
-        public async Task<IActionResult> CreateUser([FromBody] CreateUserRepositoryDto user)
+        public async Task<IActionResult> CreateUser([FromForm] CreateUserRepositoryDto user)
         {
             try
             {
@@ -160,7 +160,7 @@ namespace BACK_END.Controllers
             }
         }
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser([FromRoute] int id, [FromBody] UpdateUserRepositoryDto? user)
+        public async Task<IActionResult> UpdateUser([FromRoute] int id, [FromForm] UpdateUserRepositoryDto? user)
         {
             try
             {
