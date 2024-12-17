@@ -10,7 +10,7 @@ namespace BACK_END.DTOs.UserDto
         public string Email { get; set; } = string.Empty;
         public string? Avatar { get; set; } = string.Empty;
         public DateTime TimeCreated { get; set; } = DateTime.Now;
-        public byte Status { get; set; } = 1;
+        public int Status { get; set; } = 1;
         public string Role { get; set; } = string.Empty;
         public string Vip { get; set; }
     }
@@ -33,7 +33,7 @@ namespace BACK_END.DTOs.UserDto
         [StringLength(100, MinimumLength = 6, ErrorMessage = "Mật khẩu phải có ít nhất 6 ký tự.")]
         public string Password { get; set; } = string.Empty;
 
-        public string? Avatar { get; set; } = string.Empty;
+        public IFormFile? Avatar { get; set; }
 
         [Required(ErrorMessage = "Vai trò là bắt buộc.")]
         public string Role { get; set; } = string.Empty;
@@ -54,10 +54,11 @@ namespace BACK_END.DTOs.UserDto
         [EmailAddress(ErrorMessage = "Định dạng email không hợp lệ.")]
         [StringLength(50, ErrorMessage = "Email không được dài quá 50 ký tự.")]
         public string Email { get; set; } = string.Empty;
-        public string? Avatar { get; set; } = string.Empty;
+        public IFormFile? Avatar { get; set; }
 
         [Required(ErrorMessage = "Vai trò là bắt buộc.")]
         public string Role { get; set; } = string.Empty;
+
 
     }
 

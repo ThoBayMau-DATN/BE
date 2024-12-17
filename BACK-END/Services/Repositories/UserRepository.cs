@@ -6,6 +6,7 @@ using BACK_END.Services.Interfaces;
 using BACK_END.Services.MyServices;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace BACK_END.Services.Repositories
 {
@@ -15,12 +16,14 @@ namespace BACK_END.Services.Repositories
         private readonly BACK_ENDContext _db;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IAuth _auth;
-        public UserRepository(BACK_ENDContext db, RoleManager<IdentityRole> roleManager, UserManager<IdentityUser> userManager, IAuth auth)
+        private readonly FirebaseStorageService _firebase;
+        public UserRepository(BACK_ENDContext db, RoleManager<IdentityRole> roleManager, UserManager<IdentityUser> userManager, IAuth auth, FirebaseStorageService firebase)
         {
             _db = db;
             _roleManager = roleManager;
             _userManager = userManager;
             _auth = auth;
+            _firebase = firebase;
         }
 
        
@@ -31,7 +34,6 @@ namespace BACK_END.Services.Repositories
                return null;
             }
             var query = _db.User.Where(x=>x.Status==1);
-            //check token 
             var isUser = await _auth.GetUserByToken(token);
             if(isUser == null)
             {
@@ -43,7 +45,6 @@ namespace BACK_END.Services.Repositories
             }
             else
             {
-                //return error không có quyền truy cập
                 throw new KeyNotFoundException("Không có quyền truy cập");
             }
             if (!string.IsNullOrEmpty(searchString))
@@ -54,7 +55,7 @@ namespace BACK_END.Services.Repositories
            
             Dictionary<string, string> userRoles = new Dictionary<string, string>();
            
-            IList<IdentityUser> iusers = await _userManager.Users.ToListAsync(); // tất cả người dùng trong identity
+            IList<IdentityUser> iusers = await _userManager.Users.ToListAsync();
 
 
             for (int i = 0; i < iusers.Count; i++)
@@ -74,8 +75,6 @@ namespace BACK_END.Services.Repositories
                 Console.WriteLine("Email người dùng: " + user.Email);
             }
 
-
-
             var usersWithRoles = query.Select(user => new GetAllUserRepositoryDto
             {
                 Id = userDict[user.Email].Id,
@@ -88,15 +87,9 @@ namespace BACK_END.Services.Repositories
                 Role = userRoles.GetValueOrDefault(user.Email, ""),
                 Vip = _db.Package_User.Where(x => x.User.Id == user.Id).Select(x => x.Package.Name).FirstOrDefault() ?? "VIP 0"
             });
-            //trả về người dùng active 
-           
-
-            //sắp xếp
             if (!string.IsNullOrEmpty(sortColumn))
             {
-                //query = sortOrder == "desc"
-                //    ? query.OrderByDescending(GetSortProperty(sortColumn))
-                //    : query.OrderBy(GetSortProperty(sortColumn));
+             
                 if (sortOrder == "desc")
                 {
                     if (sortColumn == "FullName")
@@ -152,12 +145,10 @@ namespace BACK_END.Services.Repositories
                     }
                 }
             }
-            //phân trang
             var pagedResult = await PagedList<GetAllUserRepositoryDto>.CreateAsync(
                usersWithRoles,
                pageNumber,
                pageSize);
-              //trả về phân trang và danh sách
               return pagedResult;   
         }
 
@@ -218,7 +209,16 @@ namespace BACK_END.Services.Repositories
             {
                 throw new InvalidOperationException("Số điện thoại đã tồn tại.");
             }
-           
+            var avatarUrlUser = "";
+            if (userDto.Avatar != null)
+            {
+                var avatarUrl = await _firebase.UploadFileAsync(userDto.Avatar);
+                if (!string.IsNullOrEmpty(avatarUrl))
+                { 
+                  avatarUrlUser   = avatarUrl;
+                }
+            }
+
 
             // Tạo một thực thể User mới
             var newUser = new User
@@ -226,7 +226,7 @@ namespace BACK_END.Services.Repositories
                 FullName = userDto.FullName,
                 Phone = userDto.Phone,
                 Email = userDto.Email,
-                Avatar = userDto.Avatar,
+                Avatar = avatarUrlUser,
                 CreateDate = DateTime.Now, // Thiết lập thời gian tạo
                 Status = 1 // Trạng thái mặc định
             };
@@ -309,7 +309,15 @@ namespace BACK_END.Services.Repositories
             existingUser.FullName = user.FullName;
             existingUser.Phone = user.Phone;
             existingUser.Email = user.Email;
-            existingUser.Avatar = user.Avatar;
+           
+            if (user.Avatar != null)
+            {
+                var avatarUrl = await _firebase.UploadFileAsync(user.Avatar);
+                if (!string.IsNullOrEmpty(avatarUrl))
+                {
+                    existingUser.Avatar = avatarUrl;
+                }
+            }
             //tìm id người dùng trong identity
 
 
