@@ -46,6 +46,7 @@ namespace BACK_END.Services.Repositories
             var latestMessages = messages
                 .GroupBy(m => m.SenderId == userId ? m.ReceiverId : m.SenderId)
                 .Select(g => g.OrderByDescending(m => m.Time).FirstOrDefault())
+                .OrderByDescending(m => m.Time)
                 .ToList();
 
             var result = _mapper.Map<List<DTOs.ChatDTO.ReceiverDTO>>(latestMessages, opt =>
