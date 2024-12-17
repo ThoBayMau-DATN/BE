@@ -5,7 +5,7 @@ using BACK_END.Models;
 using BACK_END.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace BACK_END.Services.Repositories
 {
@@ -23,12 +23,28 @@ namespace BACK_END.Services.Repositories
             _userManager = userManager;
         }
 
-        
+
 
         //public async Task<List<Invoice>> GetAllAsync()
         //{
         //    return await _db.Invoice.ToListAsync(); // Lấy tất cả các hóa đơn
         //}
+
+        private string? HandlerToken(string token)
+        {
+            try
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var jwtToken = tokenHandler.ReadJwtToken(token);
+
+                return jwtToken.Claims.FirstOrDefault(x => x.Type == "sub")?.Value;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Token error: {ex.Message}");
+                return null;
+            }
+        }
 
         public async Task<List<MonthlyRevenueDto>> GetLastSixMonthsRevenueAsync()
         {
