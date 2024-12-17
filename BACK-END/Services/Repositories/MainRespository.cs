@@ -276,7 +276,7 @@ namespace BACK_END.Services.Repositories
 
             if (surrounding != null && surrounding.Any())
             {
-                query = query.Where(rt => surrounding.All(s => rt.Motel.Description.Contains(s)));
+                query = query.Where(rt => surrounding.All(s => rt.Description.ToLower().Contains(s.ToLower())));
             }
 
             // Lấy danh sách các gói dịch vụ VIP của chủ trọ
