@@ -148,16 +148,28 @@ namespace BACK_END.Services.Repositories
                     UserId = user.Id,
                     MotelId = data.MotelId
                 };
-                if (await _roleManager.RoleExistsAsync("Admin"))
+                if (ticket.MotelId == null || ticket.Type == 1)
                 {
-                    var usersInRole = await _userManager.GetUsersInRoleAsync("Admin");
-                    var firstAdminUser = usersInRole.FirstOrDefault();
-                    var admin = await _db.User.FirstOrDefaultAsync(x => x.Email == firstAdminUser.Email);
-                    if (string.IsNullOrEmpty(data.Receiver) && admin != null)
+                    if (await _roleManager.RoleExistsAsync("Admin"))
                     {
-                        ticket.Receiver = admin.Id.ToString();
+                        var usersInRole = await _userManager.GetUsersInRoleAsync("Admin");
+                        var firstAdminUser = usersInRole.FirstOrDefault();
+                        var admin = await _db.User.FirstOrDefaultAsync(x => x.Email == firstAdminUser.Email);
+                        if (string.IsNullOrEmpty(data.Receiver) && admin != null)
+                        {
+                            ticket.Receiver = admin.Id.ToString();
+                        }
                     }
                 }
+
+                else if (ticket.MotelId != null && ticket.Type != 1)
+                {
+                    if (string.IsNullOrEmpty(data.Receiver))
+                    {
+                        ticket.Receiver = ticket.MotelId.ToString();
+                    }
+                }
+
                 var result = await _db.Ticket.AddAsync(ticket);
                 await _db.SaveChangesAsync();
                 if (data.imgs != null && data.imgs.Count() > 0 && data.imgs.Count() <= 4)
